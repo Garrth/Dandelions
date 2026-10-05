@@ -1,67 +1,75 @@
 (function () {
-  var title = document.getElementById("welcome-title");
-  var body = document.getElementById("welcome-body");
   var cfg = window.DANDELIONS_CONFIG || {};
+  function $(id) { return document.getElementById(id); }
 
-  function render(heading, paragraphs) {
-    title.textContent = heading;
+  function render(heading, paragraphs, linkText, linkHref) {
+    $("w-title").textContent = heading;
+    var body = $("w-body");
     body.innerHTML = "";
     paragraphs.forEach(function (text) {
       var p = document.createElement("p");
+      p.className = "if";
       p.textContent = text;
       body.appendChild(p);
     });
-  }
-
-  function addLink(text, href) {
-    var a = document.createElement("a");
-    a.className = "button";
-    a.textContent = text;
-    a.href = href;
-    body.appendChild(a);
+    if (linkText) {
+      var a = document.createElement("a");
+      a.className = "btn";
+      a.textContent = linkText;
+      a.href = linkHref;
+      body.appendChild(a);
+    }
   }
 
   // Supabase puts an error in the link if it expired or was already used.
-  var hash = new URLSearchParams(window.location.hash.slice(1));
+  var hash = new URLSearchParams(location.hash.slice(1));
   if (hash.get("error")) {
     render("That link didn't work", [
       "It may have expired or already been used. Links only work once and for a short time.",
-      "Go back and enter your email again to get a fresh one.",
-    ]);
-    addLink("Back to the pledge form", "/preview.html#pledge");
+      "Go back and enter your email again to get a fresh one."
+    ], "Back to the pledge", "/#pledge");
     return;
   }
 
-  if (!window.supabase || !cfg.supabaseUrl || cfg.supabaseUrl.indexOf("PASTE_") === 0) {
-    render("Signups aren't open yet", ["Please check back soon."]);
+  if (!window.supabase) {
+    render("Something didn't load", ["Please refresh the page."]);
     return;
   }
 
-  var client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+  var db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
 
-  client.auth.getSession().then(async function (res) {
+  db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
     if (!session) {
-      render("You're not signed in", ["Use the pledge form to get a confirmation link by email."]);
-      addLink("Back to the pledge form", "/preview.html#pledge");
+      render("You're not signed in", ["Use the pledge form to get a confirmation link by email."], "Back to the pledge", "/#pledge");
       return;
     }
 
-    var member = await client.from("members").select("zip").eq("id", session.user.id).maybeSingle();
-    var zip = member.data && member.data.zip;
-
-    render("Your pledge is confirmed", [
-      zip ? "Thanks for joining. Your pledge now counts toward ZIP code " + zip + "." : "Thanks for joining. Your pledge now counts.",
-      "There's nothing else you need to do right now. Soon you'll be able to see how your area is growing right here on the site.",
-    ]);
-
-    var signOut = document.createElement("button");
-    signOut.className = "button secondary";
-    signOut.textContent = "Sign out";
-    signOut.addEventListener("click", async function () {
-      await client.auth.signOut();
-      window.location.href = "/";
+    Promise.all([
+      db.from("members").select("zip,county_fips,referral_code").eq("id", session.user.id).maybeSingle(),
+      fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; })
+    ]).then(function (out) {
+      var m = out[0].data || {}, counties = out[1], c = m.county_fips && counties[m.county_fips];
+      render("You're a seed.", [
+        c ? "Your pledge is confirmed and counts toward " + c[0] + ", " + c[1] + "." : "Your pledge is confirmed and counts now."
+      ]);
+      $("w-meta").textContent = c ? "Planted in " + c[0] + ", " + c[1] : (m.zip ? "Planted in ZIP " + m.zip : "");
+      var link = location.host + "/?ref=" + (m.referral_code || "");
+      $("w-link").textContent = link;
+      $("w-card").hidden = !m.referral_code;
+      $("w-copy").addEventListener("click", function () {
+        var btn = this;
+        function done() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy link"; }, 1600); }
+        function selectIt() {
+          var r = document.createRange(); r.selectNodeContents($("w-link"));
+          var s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Press copy";
+        }
+        try { navigator.clipboard.writeText("https://" + link).then(done, selectIt); } catch (e) { selectIt(); }
+      });
     });
-    body.appendChild(signOut);
+  });
+
+  $("w-signout").addEventListener("click", function () {
+    db.auth.signOut().then(function () { location.href = "/"; });
   });
 })();

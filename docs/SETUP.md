@@ -12,12 +12,13 @@ Do these one at a time. Each one only needs a web browser.
 3. Click **New query**.
 4. Open `supabase/migrations/20261005000000_members.sql` from this repo, copy all of it, and paste it in.
 5. Click **Run**. You should see "Success. No rows returned."
+6. Do the same with each newer file in `supabase/migrations/`, oldest first (the date is at the start of the file name). Run each one only once.
 
 ## 2. Tell Supabase where the site lives
 
 1. In the left sidebar, click **Authentication**, then **URL Configuration**.
-2. Set **Site URL** to `https://dandelions.lol`
-3. Under **Redirect URLs**, click **Add URL** and add `https://dandelions.lol/welcome.html`
+2. Set **Site URL** to `https://www.dandelions.lol`
+3. Under **Redirect URLs**, click **Add URL** and add `https://www.dandelions.lol/welcome.html`
 4. Once DigitalOcean gives the app its own address (step 5), add that too, ending in `/welcome.html`.
 
 ## 3. Set the email wording
@@ -53,14 +54,17 @@ These two are safe to publish. Never share the **secret** or **service_role** ke
 
 1. Go to https://cloud.digitalocean.com/apps and click **Create App**.
 2. Choose **GitHub**, pick the **Garrth/Dandelions** repo, branch **main**. Leave **Autodeploy** on.
-3. When it shows the component, make sure it's a **Static Site** and set **Output Directory** to `public`.
+3. Set **Source directories** to `/public`. It should detect a **Static Site**.
 4. Pick the free static site plan and click **Create**.
 
 ## 6. Point dandelions.lol at the site
 
-1. In the DigitalOcean app, go to **Settings**, then **Domains**, then **Add Domain**, and enter `dandelions.lol`.
-2. DigitalOcean shows the DNS records to add. In GoDaddy DNS, replace the placeholder A record with what DigitalOcean asks for.
-3. Keep the existing DMARC record and the Resend records as they are.
+GoDaddy can't point the bare name `dandelions.lol` at DigitalOcean, so the site lives at `www.dandelions.lol` and GoDaddy forwards the bare name there.
+
+1. In the DigitalOcean app, open the **Networking** tab, click **Add Domain**, enter `www.dandelions.lol`, and pick **You manage your domain**.
+2. In GoDaddy DNS, set the `www` CNAME record to the app's `.ondigitalocean.app` address.
+3. In GoDaddy, add domain forwarding from `dandelions.lol` to `https://www.dandelions.lol` (Permanent 301, forward only).
+4. Keep the existing DMARC and Resend records as they are.
 
 ## 7. An inbox for privacy requests
 

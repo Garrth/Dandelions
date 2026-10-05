@@ -3,29 +3,50 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Welcome to Dandelions</title>
+  <title>Welcome | Dandelions</title>
   <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"> Dandelions</a>
+<div class="wrap welcome-page">
+  <header class="top">
+    <a class="brand" href="/">
+      <img src="/favicon.svg" alt="" width="30" height="30">
+      Dandelions
+    </a>
   </header>
 
-  <main>
-    <section class="block" id="welcome">
-      <h1 id="welcome-title">Checking your link...</h1>
-      <div id="welcome-body"></div>
-    </section>
+  <main class="page">
+    <div class="pledge">
+      <h1 id="w-title">Checking your link...</h1>
+      <div id="w-body"></div>
+
+      <div class="welcome" id="w-card" hidden>
+        <div class="share-card">
+          <div class="tag">I'm a Dandelion.<br><em>There's plenty to do.</em></div>
+          <div class="meta" id="w-meta"></div>
+          <svg viewBox="0 0 64 84" aria-hidden="true"><path d="M32 80 C31 64 33 52 32 38" stroke="#7fcf72" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="#ffd21a"><circle cx="32" cy="12" r="7"/><circle cx="32" cy="38" r="7"/><circle cx="19" cy="25" r="7"/><circle cx="45" cy="25" r="7"/><circle cx="23" cy="16" r="7"/><circle cx="41" cy="16" r="7"/><circle cx="23" cy="34" r="7"/><circle cx="41" cy="34" r="7"/></g><circle cx="32" cy="25" r="8" fill="#e0a800"/></svg>
+        </div>
+        <p class="if">Help your county grow. Share your link with friends:</p>
+        <div class="copy-row">
+          <code id="w-link"></code>
+          <button type="button" id="w-copy">Copy link</button>
+        </div>
+        <p class="form-note">Your link only shows who brought who in. It has no cash value.</p>
+        <p><a class="btn" href="/">Back to the site</a> <button type="button" class="link-btn" id="w-signout">Sign out</button></p>
+      </div>
+    </div>
   </main>
 
-  <footer class="site-footer">
-    <p><a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Open source code</a></p>
+  <footer>
+    <p><a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
   </footer>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="/js/config.js"></script>
-  <script src="/js/welcome.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/welcome.js"></script>
 </body>
 </html>

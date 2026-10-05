@@ -1,3 +1,2 @@
 User-agent: *
-Disallow: /preview.html
 Disallow: /welcome.html
