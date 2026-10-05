@@ -4,90 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dandelions</title>
-  <meta name="description" content="Money worked into existence, debt-free, for the work people and the planet need. Add your pledge.">
+  <meta name="description" content="Money worked into existence, debt-free, for the work people and the planet need. Coming soon.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
-  <header class="site-header">
-    <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"> Dandelions</a>
-    <a class="header-link" href="#pledge">Pledge</a>
-  </header>
-
+<body class="coming-soon">
   <main>
-    <section class="hero">
-      <h1>What if money paid for the work we actually need?</h1>
-      <p class="lead">Today, money is lent into existence. Only work that can pay back a loan with interest gets funded. Dandelions is building a different kind of money: created debt-free, only when real work gets done, for things like housing, healthcare, care work, and restoring the planet.</p>
-      <a class="button" href="#pledge">Add your pledge</a>
-    </section>
-
-    <section class="block">
-      <h2>Where things stand today</h2>
-      <p>We're at the very beginning. There are no tokens yet, no way to earn them, and nothing to buy. Nobody is asking you for money.</p>
-      <p>Right now we're counting people. When you pledge, you're saying: <strong>"If Dandelions money exists in my area, I'll accept it."</strong> That's it. Each pledge shows up as a count for your area, so we can see where enough people care to get started.</p>
-    </section>
-
-    <section class="block">
-      <h2>How an area grows</h2>
-      <ol class="cycle">
-        <li><span class="stage">Seed</span> You pledge. Your area gets its first count.</li>
-        <li><span class="stage">Sprout</span> Neighbors and local businesses pledge too.</li>
-        <li><span class="stage">Bloom</span> The area reaches its local goal and is ready for the next step.</li>
-        <li><span class="stage">Seed head</span> Members spread the word to the next area.</li>
-      </ol>
-      <p class="note">What happens at "bloom" will be decided in the open, with members. We'll tell you plainly as it takes shape.</p>
-    </section>
-
-    <section class="block">
-      <h2>What we believe</h2>
-      <ul class="plain">
-        <li>A job that pays a living wage should be there for anyone who wants one. For some people, that job is simply getting better.</li>
-        <li>We should put back more than we take from the planet.</li>
-        <li>No one gets to print money. It only comes from verified work.</li>
-        <li>Everything happens in the open: the rules, the data, and the code.</li>
-        <li>We won't make promises we can't keep.</li>
-      </ul>
-      <p class="note">Dandelions sits alongside the regular economy. It doesn't replace it.</p>
-    </section>
-
-    <section class="block pledge" id="pledge">
-      <h2>Add your pledge</h2>
-      <p>We'll email you a link to confirm. Your pledge counts once you click it.</p>
-      <form id="pledge-form" novalidate>
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" autocomplete="email" required>
-
-        <label for="zip">ZIP code</label>
-        <input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" maxlength="5" required>
-
-        <label class="check">
-          <input id="age" name="age" type="checkbox" required>
-          <span>I am 18 or older.</span>
-        </label>
-
-        <label class="check">
-          <input id="agree" name="agree" type="checkbox" required>
-          <span>If Dandelions money ever exists in my area, I pledge to accept it. I understand there are no tokens today and nothing has cash value. I've read the <a href="/privacy.html">privacy policy</a>.</span>
-        </label>
-
-        <!-- Hidden from people. Bots that fill it in get ignored. -->
-        <div class="hp" aria-hidden="true">
-          <label for="website">Leave this empty</label>
-          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
-        </div>
-
-        <button class="button" type="submit">Send my confirmation email</button>
-        <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
-      </form>
-    </section>
+    <img src="/favicon.svg" alt="" width="96" height="96">
+    <h1>Dandelions</h1>
+    <p class="lead">Money worked into existence, debt-free, for the work people and the planet need.</p>
+    <p class="soon">Coming soon.</p>
   </main>
-
   <footer class="site-footer">
     <p><a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Open source code</a></p>
   </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="/js/config.js"></script>
-  <script src="/js/pledge.js"></script>
 </body>
 </html>

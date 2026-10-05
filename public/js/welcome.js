@@ -28,7 +28,7 @@
       "It may have expired or already been used. Links only work once and for a short time.",
       "Go back and enter your email again to get a fresh one.",
     ]);
-    addLink("Back to the pledge form", "/#pledge");
+    addLink("Back to the pledge form", "/preview.html#pledge");
     return;
   }
 
@@ -43,7 +43,7 @@
     var session = res.data && res.data.session;
     if (!session) {
       render("You're not signed in", ["Use the pledge form to get a confirmation link by email."]);
-      addLink("Back to the pledge form", "/#pledge");
+      addLink("Back to the pledge form", "/preview.html#pledge");
       return;
     }
 

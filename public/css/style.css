@@ -131,3 +131,16 @@ form .check input { margin-top: 6px; width: 18px; height: 18px; flex: none; }
   h1 { font-size: 1.7rem; }
   .block { padding: 18px; }
 }
+
+.coming-soon main {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.coming-soon h1 { font-size: 2.8rem; margin: 0.3em 0 0.2em; }
+.coming-soon .lead { max-width: 30em; }
+.coming-soon .soon { font-weight: 700; color: var(--accent-dark); font-size: 1.2rem; }
+.coming-soon .site-footer { text-align: center; }

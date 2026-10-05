@@ -5,7 +5,7 @@ Dandelions is building money that's worked into existence, debt-free, for the wo
 
 ## What's here
 
-- `public/` the website (plain HTML, CSS, JavaScript, no build step)
+- `public/` the website (plain HTML, CSS, JavaScript, no build step). The home page is a coming soon page for now; the pledge page is at `/preview.html` for testing.
 - `supabase/migrations/` the database setup
 - `docs/SETUP.md` how to set up Supabase and DigitalOcean
 
