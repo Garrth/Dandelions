@@ -18,6 +18,10 @@
   var ref = new URLSearchParams(location.search).get("ref");
   if (ref && /^[a-z0-9]{4,16}$/i.test(ref)) store("dandelions_ref", ref.toLowerCase());
 
+  // Remember where someone first came from, like dandelions.lol/?src=tiktok
+  var src = (new URLSearchParams(location.search).get("src") || "").toLowerCase();
+  if (/^[a-z0-9_-]{1,40}$/.test(src) && !store("dandelions_src")) store("dandelions_src", src);
+
   // Floating seeds in the hero
   var seeds = $("seeds");
   var seedSvg = '<svg viewBox="0 0 22 30"><path d="M11 29 L11 12" stroke="currentColor" stroke-width="1.2"/><ellipse cx="11" cy="27" rx="2" ry="3" fill="currentColor"/><g stroke="currentColor" stroke-width="1"><path d="M11 12 l-7 -7"/><path d="M11 12 l7 -7"/><path d="M11 12 l0 -10"/><path d="M11 12 l-10 -1"/><path d="M11 12 l10 -1"/></g></svg>';
@@ -257,6 +261,7 @@
             county_fips: zips[zip] || null,
             age_confirmed: true,
             referred_by: store("dandelions_ref"),
+            source: store("dandelions_src"),
             picks: picks
           }
         }
