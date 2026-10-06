@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dandelions</title>
-  <meta name="description" content="There's plenty to do. If you think anyone who wants a living wage job should have one, become a Dandelion.">
-  <meta property="og:title" content="Dandelions: There's plenty to do.">
-  <meta property="og:description" content="If you think anyone who wants a living wage job should have one, become a Dandelion.">
+  <meta name="description" content="AI is going to change a lot of jobs. Dandelions has a plan, and it runs on people taking part. The goal: useful work for anyone who wants it.">
+  <meta property="og:title" content="Dandelions: useful work for anyone who wants it">
+  <meta property="og:description" content="AI is going to change a lot of jobs. Dandelions has a plan, and it runs on people taking part.">
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
@@ -19,7 +19,7 @@
       <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 34 C31 44 33 52 32 62" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="#ffd21a" stroke="#15210f" stroke-width="1.5"><circle cx="32" cy="9" r="7"/><circle cx="32" cy="35" r="7"/><circle cx="19" cy="22" r="7"/><circle cx="45" cy="22" r="7"/><circle cx="23" cy="13" r="7"/><circle cx="41" cy="13" r="7"/><circle cx="23" cy="31" r="7"/><circle cx="41" cy="31" r="7"/></g><circle cx="32" cy="22" r="8" fill="#15210f"/></svg>
       Dandelions
     </a>
-    <a class="pill" href="#pledge">Join</a>
+    <nav class="top-nav"><a href="/under-the-hood.html">Under the hood</a><a class="pill" href="#pledge">Join</a></nav>
   </header>
 
   <div class="hero">
@@ -27,7 +27,8 @@
     <div class="hero-grid">
     <div>
     <h1>There's <span class="hl">plenty</span> to do.</h1>
-    <p class="sub">AI and robots will change a lot of jobs. They won't finish the world's to-do list. <strong>There will always be more to do than people to do it.</strong> Dandelions is building a better way to get that work done, starting with the people who want in.</p>
+    <p class="goal">The goal: <span class="hl">useful work for anyone who wants it.</span></p>
+    <p class="sub">AI is going to change a lot of jobs. So who has a plan for what comes next? The market isn't paid to solve it. Government doesn't have the tools. <strong>Dandelions has a plan, and it runs on one thing: people taking part.</strong></p>
     <div class="cta-row">
       <a class="btn" href="#pledge">Become a Dandelion</a>
       <span class="count" id="hero-count-wrap" hidden><b id="hero-count"></b> Dandelions so far</span>
@@ -63,9 +64,10 @@
   <section>
     <div class="missing">
       <h2>The work is there. The system isn't.</h2>
-      <p>Every item on that list needs people, and lots of them. What's been missing is a way to organize the work and pay the people who do it.</p>
-      <p class="big">Changing times need changing systems. Dandelions is that upgrade, and it runs on one thing first: people who are in.</p>
-      <a href="#how">See how it grows</a>
+      <p>The people are here. The materials are here. The work is right there on the list. What's missing is a system that puts them together.</p>
+      <p>Today, work mostly gets done when it pays back fast. Most of this list pays back slowly, or in ways nobody can send a bill for, like cleaner water or healthier soil. So it waits, no matter how many people are ready to do it.</p>
+      <p class="big">Dandelions is testing a different way to decide what gets done. The more people take part, the closer we get.</p>
+      <p class="links"><a href="#how">See how it grows</a><a href="/under-the-hood.html">Look under the hood</a></p>
     </div>
   </section>
 
@@ -81,7 +83,7 @@
       <div class="stage">
         <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="74" rx="22" ry="5" fill="#8a6a3c"/><path d="M32 72 C32 60 32 52 32 44" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M32 54 C22 52 16 44 16 36 C25 37 31 44 32 54Z" fill="#2d7a34"/><path d="M32 48 C42 46 48 38 48 30 C39 31 33 38 32 48Z" fill="#3f9a45"/></svg>
         <h3>Sprout</h3>
-        <p>1% of the county has pledged.</p>
+        <p>1% of the county has pledged. That starts phase 2: small local projects you can choose to join.</p>
       </div>
       <div class="stage">
         <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="76" rx="22" ry="5" fill="#8a6a3c"/><path d="M32 74 C31 60 33 48 32 34" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M32 62 C22 60 17 53 17 46 C25 47 31 53 32 62Z" fill="#2d7a34"/><g fill="#ffd21a" stroke="#15210f" stroke-width="1.2"><circle cx="32" cy="10" r="7"/><circle cx="32" cy="36" r="7"/><circle cx="19" cy="23" r="7"/><circle cx="45" cy="23" r="7"/><circle cx="23" cy="14" r="7"/><circle cx="41" cy="14" r="7"/><circle cx="23" cy="32" r="7"/><circle cx="41" cy="32" r="7"/></g><circle cx="32" cy="23" r="8" fill="#e0a800"/></svg>
@@ -126,7 +128,13 @@
   <section id="pledge">
     <div class="pledge">
       <h2>Be a Dandelion.</h2>
-      <p class="if">If you think anyone who wants a living wage job should have one, and you like the idea of making life better while putting back more than we take, add your name.</p>
+      <p class="if">By joining, you're saying:</p>
+      <ul class="agree">
+        <li>This work matters.</li>
+        <li>The way we do things now won't get it done.</li>
+        <li>I'm ready to try something new.</li>
+      </ul>
+      <p class="if">That's it. No money, nothing to buy, and you can leave any time.</p>
 
       <form id="pledge-form" novalidate>
         <label class="field" for="p-email">Email<input id="p-email" type="email" autocomplete="email" placeholder="you@example.com"></label>
@@ -134,12 +142,12 @@
         <label class="check" for="p-age"><input id="p-age" type="checkbox"><span>I'm 18 or older.</span></label>
         <label class="check" for="p-agree"><input id="p-agree" type="checkbox"><span>I'm in. I know this is a pledge, not a purchase, and there's nothing with cash value today. I've read the <a href="/privacy.html">privacy policy</a>.</span></label>
         <div class="hp" aria-hidden="true"><label for="p-website">Leave this empty</label><input id="p-website" type="text" tabindex="-1" autocomplete="off"></div>
-        <button class="go" type="submit">Plant my seed</button>
+        <button class="go" type="submit">Count me in</button>
         <p class="msg" id="p-msg" role="status" aria-live="polite"></p>
       </form>
 
       <div class="welcome" id="sent" hidden>
-        <p class="if"><b>Almost there.</b> Check your email for a link to confirm your pledge. Your seed gets planted when you click it.</p>
+        <p class="if"><b>Almost there.</b> Check your email for a link to confirm your pledge. Your pledge counts once you click it.</p>
         <p class="form-note">Don't see it? Check your spam folder, or <button type="button" class="link-btn" id="p-again">try again</button>.</p>
       </div>
     </div>
@@ -147,7 +155,7 @@
 
   <footer>
     <p class="honest">No tokens. Nothing to buy. Just a pledge.</p>
-    <p>Dandelions is open source, and everything happens in the open. <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
+    <p>Dandelions doesn't depend on one leader. The rules are public and the code is open. <a href="/under-the-hood.html">Under the hood</a> · <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
   </footer>
 </div>
 

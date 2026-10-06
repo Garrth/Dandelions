@@ -69,3 +69,18 @@ GoDaddy can't point the bare name `dandelions.lol` at DigitalOcean, so the site 
 ## 7. An inbox for privacy requests
 
 The privacy policy tells people to email `privacy@dandelions.lol`. Set up forwarding for that address to your personal email (GoDaddy has email forwarding under the domain's settings).
+
+## 8. See where signups come from
+
+Give each place you post its own link, like `https://www.dandelions.lol/?src=tiktok` or `https://www.dandelions.lol/?src=instagram`. Use lowercase letters, numbers, and dashes only. The site remembers the first tag a visitor arrived with and saves it with their pledge.
+
+To see the counts, open the **SQL Editor** in Supabase and run:
+
+```sql
+select coalesce(m.source, '(none)') as source, count(*) as confirmed
+from public.members m
+join auth.users u on u.id = m.id
+where u.email_confirmed_at is not null
+group by 1
+order by 2 desc;
+```
