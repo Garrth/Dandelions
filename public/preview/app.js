@@ -8,13 +8,12 @@
   const typeName = (k) => (S.types.find((t) => t.key === k) || {}).name || k;
 
   // Changes made while clicking around are kept in this browser so the preview feels real.
-  const KEY = "dandelions-preview-v1";
+  const KEY = "dandelions-preview-v2";
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { saved = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* preview still works */ } };
   if (saved.projects) S.projects = saved.projects;
   if (saved.log) S.log = saved.log;
-  if (saved.slow) S.me.slow = saved.slow;
 
   function toast(msg) {
     const t = document.createElement("div");
@@ -38,7 +37,7 @@
     talk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg>'
   };
   const tab = (key, href, label, soon) =>
-    '<a href="' + href + '"' + (page === key || (page === "project" && key === "projects") ? ' aria-current="page"' : "") + (soon ? ' class="soon" aria-disabled="true"' : "") + ">" + icon[key] + label + "</a>";
+    '<a href="' + href + '"' + (page === key || (page === "project" && key === "projects") || (page === "business" && key === "profile") ? ' aria-current="page"' : "") + (soon ? ' class="soon" aria-disabled="true"' : "") + ">" + icon[key] + label + "</a>";
   document.body.insertAdjacentHTML("beforeend",
     '<nav class="tabs" aria-label="Preview screens">' +
     tab("home", "/preview/", "Home") + tab("projects", "/preview/projects.html", "Projects") + tab("profile", "/preview/profile.html", "Profile") +
@@ -47,14 +46,13 @@
 
   const main = $("#main");
 
-  // ---------- Profile ----------
+  // ---------- Person profile ----------
   if (page === "profile") {
     const m = S.me;
     const steps = ["Visitor", "Verified", "Business", "Checker", "Operator", "Keeper"];
-    const days = ["M", "T", "W", "T", "F", "S", "S"];
-    const isSlow = (d, s) => m.slow.some((x) => x[0] === d && x[1] === s);
-    const weekCells = (s, label) => "<b>" + label + "</b>" + days.map((_, d) =>
-      '<button type="button" data-d="' + d + '" data-s="' + s + '" aria-pressed="' + isSlow(d, s) + '" aria-label="' + label + " " + d + '"></button>').join("");
+    const mine = S.businesses.filter((b) => m.owns.includes(b.id));
+    const hiring = S.businesses.filter((b) => !m.owns.includes(b.id) && b.hiring.length);
+    if (saved.lookingOpen !== undefined) m.lookingFor.open = saved.lookingOpen;
 
     main.innerHTML =
       '<div class="card hero-card"><div class="avatar"><img src="/images/andy.webp" alt=""></div><div>' +
@@ -71,32 +69,27 @@
       "</div>" +
 
       '<div class="card stats">' +
-        '<div class="stat"><b>' + m.stats.jobs + "</b><span>Jobs done</span></div>" +
-        '<div class="stat"><b>' + m.stats.rating + "</b><span>Rating</span></div>" +
+        '<div class="stat"><b>' + m.stats.projects + "</b><span>Projects worked</span></div>" +
         '<div class="stat"><b>' + m.stats.checks + "</b><span>Checks done</span></div>" +
+        '<div class="stat"><b>' + m.stats.months + "</b><span>Months a member</span></div>" +
       "</div>" +
 
-      '<h2 class="section-title">Your business</h2>' +
-      '<div class="card"><h3>' + esc(m.business.name) + "</h3>" +
-        '<p class="small muted" style="margin-top:4px">' + esc(m.business.license) + "</p>" +
-        '<div class="row" style="margin-top:10px"><span class="chip ok">License checked</span><span class="chip">Accepts points</span><span class="chip">In the directory</span></div>' +
-        '<p class="note" style="margin-top:12px">Dandelions pays businesses, never people directly. Points can\'t be used to pay wages. Pay your workers in dollars.</p>' +
+      '<h2 class="section-title">Your businesses</h2>' +
+      mine.map((b) => '<a class="card pcard" href="/preview/business.html?id=' + b.id + '"><div class="spread"><h3 style="margin:0">' + esc(b.name) + '</h3><span class="chip ok">License checked</span></div>' +
+        '<p class="small muted" style="margin-top:4px">' + b.services.slice(0, 3).map(esc).join(" · ") + '</p><p class="small" style="margin-top:8px">Open business profile →</p></a>').join("") +
+
+      '<h2 class="section-title">Looking for work</h2>' +
+      '<div class="card"><div class="spread"><b>Open to work</b><button class="btn small' + (m.lookingFor.open ? "" : " ghost") + '" type="button" id="open-toggle" aria-pressed="' + m.lookingFor.open + '">' + (m.lookingFor.open ? "Yes" : "No") + "</button></div>" +
+        '<p class="small muted" style="margin-top:6px">Businesses that are hiring can find you. Pay is agreed between you and the business.</p>' +
+        '<div class="row" style="margin-top:10px">' + m.lookingFor.kinds.map((k) => '<span class="chip">' + esc(k) + "</span>").join("") + '<span class="chip">' + esc(m.lookingFor.area) + "</span></div>" +
+        '<p class="small" style="margin-top:12px"><b>What I can do</b></p><div class="row" style="margin-top:6px">' + m.canDo.map((k) => '<span class="chip">' + esc(k) + "</span>").join("") + "</div>" +
+        '<p class="small" style="margin-top:12px"><b>Certifications</b></p><div class="row" style="margin-top:6px">' + m.certs.map((c) => '<span class="chip">' + esc(c) + "</span>").join("") + "</div>" +
       "</div>" +
 
-      '<h2 class="section-title">Skills</h2>' +
-      '<div class="card">' + m.skills.map((s) =>
-        '<div class="skill"><div><b>' + esc(s.name) + '</b><div class="lvl">' + [1, 2, 3, 4, 5].map((i) => '<i class="' + (i <= s.level ? "on" : "") + '"></i>').join("") + '</div></div>' +
-        '<div style="text-align:right"><b>' + esc(s.rate) + '</b><div class="small ' + (s.proof === "Self-reported" ? "muted" : "") + '">' + esc(s.proof) + "</div></div></div>").join("") +
-        '<button class="btn ghost small" type="button" id="add-skill" style="margin-top:10px">Add a skill</button>' +
-      "</div>" +
-
-      '<h2 class="section-title">Certifications</h2>' +
-      '<div class="card row">' + m.certs.map((c) => '<span class="chip">' + esc(c) + "</span>").join("") + "</div>" +
-
-      '<h2 class="section-title">Slow spots</h2>' +
-      '<div class="card"><p class="small muted" style="margin-bottom:10px">Tap the times your business usually has room. Projects and upkeep jobs fill these first, so points never pull you away from paying customers.</p>' +
-        '<div class="week" id="week"><span></span>' + days.map((d) => "<b>" + d + "</b>").join("") + weekCells(0, "AM") + weekCells(1, "PM") + "</div>" +
-      "</div>" +
+      '<h2 class="section-title">Hiring near you</h2>' +
+      '<div class="card">' + hiring.map((b) => b.hiring.map((h) =>
+        '<div class="skill"><div><b>' + esc(h.title) + '</b><div class="small muted">' + esc(b.name) + " · " + esc(h.note) + '</div></div><div style="text-align:right"><span class="chip">' + esc(h.kind) + '</span></div></div>').join("")).join("") +
+        '<p class="small muted" style="margin-top:8px">Matched from what you can do and where you are. Every job is with the business and paid in dollars.</p></div>' +
 
       '<h2 class="section-title">Badges</h2>' +
       '<div class="card badges">' + m.badges.map((b) =>
@@ -104,16 +97,68 @@
 
       '<p class="small muted" style="margin-top:18px">ID checked by ' + esc(m.verified.by) + " on " + esc(m.verified.on) + ". Dandelions keeps only the yes and the date, never your ID papers.</p>";
 
-    $("#week").addEventListener("click", (e) => {
-      const b = e.target.closest("button");
-      if (!b) return;
-      const d = +b.dataset.d, s = +b.dataset.s;
-      const on = b.getAttribute("aria-pressed") === "true";
-      m.slow = on ? m.slow.filter((x) => !(x[0] === d && x[1] === s)) : m.slow.concat([[d, s]]);
-      b.setAttribute("aria-pressed", String(!on));
-      saved.slow = m.slow; save();
+    $("#open-toggle").addEventListener("click", () => { saved.lookingOpen = !m.lookingFor.open; save(); location.reload(); });
+  }
+
+  // ---------- Business profile ----------
+  if (page === "business") {
+    const id = new URLSearchParams(location.search).get("id") || "b1";
+    const b = S.businesses.find((x) => x.id === id) || S.businesses[0];
+    const isMine = S.me.owns.includes(b.id);
+    if (saved.busy && saved.busy[b.id] !== undefined) b.busy = saved.busy[b.id];
+    const theirs = S.projects.filter((p) => p.ownerId === b.id);
+    const busyWord = (n) => (n < 40 ? "Lots of room" : n < 70 ? "Some room" : n < 90 ? "Busy" : "Full");
+
+    main.innerHTML =
+      '<div class="page-head"><div class="eyebrow">Business profile</div><h1 style="font-size:32px">' + esc(b.name) + "</h1>" +
+        "<p>" + esc(b.county) + " · Owner: " + esc(b.owner) + "</p></div>" +
+      '<div class="card"><div class="row"><span class="chip ok">License checked</span><span class="chip">Accepts points</span><span class="chip">In the directory</span></div>' +
+        '<p class="small muted" style="margin-top:8px">' + esc(b.license) + "</p></div>" +
+
+      '<h2 class="section-title">Services</h2>' +
+      '<div class="card row">' + b.services.map((s) => '<span class="chip">' + esc(s) + "</span>").join("") + "</div>" +
+
+      '<h2 class="section-title">Track record</h2>' +
+      '<div class="card"><div class="stats">' +
+        '<div class="stat"><b>' + b.track.done + '</b><span>Projects done</span></div>' +
+        '<div class="stat"><b>' + Math.round(b.track.onTime / b.track.done * 100) + '%</b><span>On time</span></div>' +
+        '<div class="stat"><b>' + b.track.disputes + '</b><span>Disputes</span></div>' +
+        '<div class="stat"><b>' + fmt(b.track.average) + '</b><span>Avg size, pts</span></div>' +
+        '<div class="stat"><b>' + fmt(b.track.largest) + '</b><span>Largest, pts</span></div>' +
+        '<div class="stat"><b>' + b.size.employees + '</b><span>Employees</span></div>' +
+      "</div></div>" +
+
+      '<h2 class="section-title">Project size</h2>' +
+      '<div class="card"><div class="spread"><span>Largest project this business can take now</span><span class="pts" style="font-size:22px">' + fmt(b.limit.now) + " pts</span></div>" +
+        '<p class="small muted" style="margin-top:6px">' + esc(b.limit.rule) + "</p>" +
+        '<div class="stats" style="margin-top:12px;grid-template-columns:1fr 1fr">' +
+          '<div class="stat"><b>$' + fmt(b.size.grossUsd) + '</b><span>Last year\'s gross, dollars</span></div>' +
+          '<div class="stat"><b>' + fmt(b.size.grossPts) + '</b><span>Last year\'s gross, points</span></div>' +
+        "</div>" + (isMine ? '<p class="small muted" style="margin-top:8px">Only you and the checkers see the dollar figure. The public sees the size limit.</p>' : "") + "</div>" +
+
+      '<h2 class="section-title">How busy right now</h2>' +
+      '<div class="card"><div class="spread"><b id="busy-word">' + busyWord(b.busy) + '</b><span class="muted small"><span id="busy-n">' + b.busy + "</span>% booked</span></div>" +
+        '<div class="bar" style="margin-top:8px"><span id="busy-bar" style="width:' + b.busy + '%"></span></div>' +
+        (isMine ? '<label class="small" style="display:block;margin-top:12px">Update this month<input id="busy" type="range" min="0" max="100" step="5" value="' + b.busy + '" style="width:100%"></label>' : "") +
+        '<p class="small muted" style="margin-top:8px">Every business reports this once a month. Added up by area and trade, it tells Dandelions where there\'s room for new projects, so we only fund work the market isn\'t already paying for.</p></div>' +
+
+      '<h2 class="section-title">Hiring</h2>' +
+      '<div class="card">' + (b.hiring.length ? b.hiring.map((h) =>
+        '<div class="skill"><div><b>' + esc(h.title) + '</b><div class="small muted">' + esc(h.note) + '</div></div><div style="text-align:right"><span class="chip">' + esc(h.kind) + "</span></div></div>").join("") : '<p class="muted">Not hiring right now.</p>') +
+        (isMine ? '<button class="btn ghost small" type="button" id="add-job" style="margin-top:10px">Post a job</button>' : "") +
+        '<p class="small muted" style="margin-top:8px">Members who are open to work get matched to these. Pay is in dollars, agreed with the business.</p></div>' +
+
+      '<h2 class="section-title">Projects</h2>' +
+      '<div class="stack">' + (theirs.length ? theirs.map((p) => '<a class="card pcard" href="/preview/project.html?id=' + p.id + '"><span class="type">' + esc(typeName(p.type)) + "</span><h3>" + esc(p.title) + '</h3><p class="small muted">' + fmt(p.points) + " points</p></a>").join("") : '<p class="muted">No open projects.</p>') + "</div>";
+
+    const r = $("#busy");
+    if (r) r.addEventListener("input", () => {
+      b.busy = +r.value;
+      $("#busy-n").textContent = b.busy; $("#busy-word").textContent = busyWord(b.busy); $("#busy-bar").style.width = b.busy + "%";
+      saved.busy = Object.assign(saved.busy || {}, { [b.id]: b.busy }); save();
     });
-    $("#add-skill").addEventListener("click", () => toast("Adding skills comes with the real build"));
+    const j = $("#add-job");
+    if (j) j.addEventListener("click", () => toast("Posting jobs comes with the real build"));
   }
 
   // ---------- Project board ----------
@@ -222,7 +267,7 @@
       main.innerHTML =
         '<p class="small" style="margin:4px 0 10px"><a href="/preview/projects.html">← All projects</a></p>' +
         '<div class="page-head" style="padding-top:0"><div class="eyebrow">' + esc(typeName(p.type)) + "</div><h1 style=\"font-size:32px\">" + esc(p.title) + "</h1>" +
-          "<p>" + esc(p.owner) + (p.client ? " for " + esc(p.client) : "") + " · " + esc(p.county) + "</p></div>" +
+          "<p>" + (p.ownerId ? '<a href="/preview/business.html?id=' + p.ownerId + '">' + esc(p.owner) + "</a>" : esc(p.owner)) + (p.client ? " for " + esc(p.client) : "") + " · " + esc(p.county) + "</p></div>" +
         '<div class="viewas" id="viewas" role="group" aria-label="See this page as">' +
           ["owner", "checker", "visitor"].map((v) => '<button type="button" data-v="' + v + '" aria-pressed="' + (view === v) + '">As ' + (v === "owner" ? "owner" : v === "checker" ? "checker" : "visitor") + "</button>").join("") + "</div>" +
         '<div class="card"><p>' + esc(p.desc) + "</p>" +
@@ -230,6 +275,11 @@
           (view === "visitor" ? '<button class="btn" type="button" id="help" style="margin-top:14px;width:100%">Help on this project</button>' : "") +
         "</div>" +
         (p.subs ? '<h2 class="section-title">Sub-projects</h2><div class="card">' + p.subs.map((s) => '<div class="spread" style="padding-block:6px"><span>' + esc(s) + '</span><span class="chip">Creator</span></div>').join("") + "</div>" : "") +
+        (S.local[p.county] ? '<h2 class="section-title">Why this is funded now</h2><div class="card">' +
+          '<div class="stats"><div class="stat"><b>' + S.local[p.county].busy + '%</b><span>How booked local ' + esc(S.local[p.county].trade.toLowerCase()) + ' businesses are</span></div>' +
+          '<div class="stat"><b>' + S.local[p.county].lookingForWork + '</b><span>Members nearby looking for this kind of work</span></div>' +
+          '<div class="stat"><b>' + esc(S.local[p.county].materials) + '</b><span>Materials</span></div></div>' +
+          '<p class="small muted" style="margin-top:10px">From ' + S.local[p.county].reporting + ' businesses reporting in ' + esc(p.county) + '. Dandelions only funds work the market isn\'t paying for, and only as much as local workers and materials can cover. If local businesses fill up, new funding here pauses.</p></div>' : "") +
         '<h2 class="section-title">Milestones</h2><div class="card">' + p.milestones.map(milestone).join("") + "</div>" +
         '<h2 class="section-title">Public log</h2><div class="card log"><ul>' + S.log.slice(0, 6).map((l) => '<li><span class="when">' + esc(l.when) + "</span><br>" + esc(l.what) + "</li>").join("") + "</ul></div>" +
         '<p class="small muted" style="margin-top:10px">Every step goes on the public log, with no personal info. A fingerprint of the log is posted daily so history can\'t be changed quietly.</p>';

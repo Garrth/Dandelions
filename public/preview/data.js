@@ -5,13 +5,7 @@ window.SAMPLE = {
     county: "Fresno County, CA",
     step: 3,
     verified: { by: "Equitide (Plaid)", on: "Oct 12, 2026" },
-    business: {
-      name: "Rivera Handyman Services",
-      license: "City of Fresno business license, checked Oct 14, 2026",
-      acceptsPoints: true,
-      listed: true
-    },
-    stats: { jobs: 7, rating: 4.8, checks: 0 },
+    stats: { projects: 7, checks: 0, months: 2 },
     nextStep: {
       name: "Checker",
       needs: [
@@ -20,37 +14,66 @@ window.SAMPLE = {
         { text: "No open disputes", done: 1, of: 1 }
       ]
     },
-    skills: [
-      { name: "Drywall repair", level: 4, rate: "$55/hr", proof: "Verified on 4 jobs" },
-      { name: "Plumbing fixtures", level: 3, rate: "$60/hr", proof: "Verified on 2 jobs" },
-      { name: "Interior painting", level: 3, rate: "$45/hr", proof: "Verified on 3 jobs" },
-      { name: "Doors and locks", level: 2, rate: "$50/hr", proof: "Self-reported" }
-    ],
+    // What the person can do, for matching with businesses that are hiring. Pay is left to the business and the person.
+    lookingFor: { open: true, kinds: ["Temp work", "Part-time"], area: "Within 20 miles of Fresno" },
+    canDo: ["Drywall repair", "Plumbing fixtures", "Interior painting", "Doors and locks"],
     certs: ["OSHA 10-hour construction", "EPA lead-safe renovator (RRP)"],
-    // Slow spots: day index 0 = Mon, slot 0 = morning, 1 = afternoon
-    slow: [[0, 0], [0, 1], [2, 0], [3, 1], [4, 1]],
+    owns: ["b1"],
     badges: [
       { icon: "🌱", name: "Seed planter", got: true },
       { icon: "🔨", name: "First project", got: true },
-      { icon: "⭐", name: "5 jobs done", got: true },
+      { icon: "⭐", name: "5 projects done", got: true },
       { icon: "🔍", name: "Checker", got: false },
       { icon: "🛠️", name: "Operator", got: false },
       { icon: "🗝️", name: "Keeper", got: false }
     ]
   },
 
+  businesses: [
+    {
+      id: "b1", name: "Rivera Handyman Services", owner: "Sam Rivera", county: "Fresno County, CA",
+      license: "City of Fresno business license, checked Oct 14, 2026",
+      services: ["Small home repairs", "Drywall and paint", "Plumbing fixtures", "Doors, locks and hardware"],
+      size: { grossUsd: 185000, grossPts: 2400, employees: 2 },
+      track: { done: 7, onTime: 6, disputes: 0, largest: 600, average: 380 },
+      limit: { now: 3000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
+      busy: 55,
+      hiring: [
+        { title: "Handyman helper", kind: "Temp, 6 weeks", note: "Basic tools, own ride" },
+        { title: "Office help, 10 hrs a week", kind: "Part-time", note: "Scheduling and invoices" }
+      ]
+    },
+    {
+      id: "b2", name: "Summit Roofing", owner: "Dana Cho", county: "Fresno County, CA",
+      license: "CSLB C-39 roofing license, checked Sep 30, 2026",
+      services: ["Roof repair", "Gutter cleaning and repair", "Roof inspections"],
+      size: { grossUsd: 1400000, grossPts: 5100, employees: 11 },
+      track: { done: 12, onTime: 12, disputes: 1, largest: 2400, average: 900 },
+      limit: { now: 12000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
+      busy: 40,
+      hiring: [{ title: "Roofing laborer", kind: "Permanent", note: "Will train" }]
+    }
+  ],
+
+  // Local numbers behind funding decisions. In the real build these come from member reports and public data.
+  local: {
+    "Fresno County, CA": { trade: "Home repair and roofing", busy: 52, reporting: 23, lookingForWork: 31, materials: "Available" },
+    "Kern County, CA": { trade: "Restaurants and food supply", busy: 68, reporting: 14, lookingForWork: 19, materials: "Available" },
+    "Tulare County, CA": { trade: "Painting", busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" }
+  },
+
   types: [
     { key: "word", name: "Spread the word", blurb: "Posts, videos, podcast spots and articles. Paid mostly on results: views and pledges through your link." },
-    { key: "upkeep", name: "Home upkeep", blurb: "Repairs and upkeep for landlords and business owners, done in your slow spots." },
+    { key: "upkeep", name: "Home upkeep", blurb: "Repairs and upkeep for landlords and business owners, funded when local repair businesses have room." },
     { key: "suppliers", name: "Bring in the suppliers", blurb: "When a business joins, reach out to its suppliers and get them signed up." },
     { key: "trainee", name: "Trainees", blurb: "Take on a trainee. The points go to your business; you pay the trainee in dollars." }
   ],
 
   projects: [
     {
-      id: "p2", type: "upkeep", title: "Slow-day repairs on 4 rental homes", owner: "Rivera Handyman Services", mine: true,
+      id: "p2", type: "upkeep", title: "Repairs on 4 rental homes", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
       client: "Oak Street Rentals", county: "Fresno County, CA", points: 600, helpers: 1, status: "working",
-      desc: "Small repairs across four rental homes, booked into Monday and Wednesday slow spots. Oak Street Rentals takes points as part of the rent from business tenants and spends them here.",
+      desc: "Small repairs across four rental homes. Oak Street Rentals takes points as part of the rent from business tenants and spends them here.",
       milestones: [
         { title: "Walkthrough and repair list", points: 100, status: "approved", proof: ["Repair list, 4 homes", "Photo: 1214 Oak St", "Photo: 1220 Oak St"], votes: ["yes", "yes", "yes"] },
         { title: "Repairs done", points: 400, status: "todo", proof: [], votes: [] },
@@ -88,9 +111,9 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p5", type: "upkeep", title: "Gutter and roof checks before the rain", owner: "Summit Roofing",
+      id: "p5", type: "upkeep", title: "Gutter and roof checks before the rain", owner: "Summit Roofing", ownerId: "b2",
       county: "Fresno County, CA", points: 450, helpers: 2, status: "open",
-      desc: "Clear gutters and check roofs on 12 homes owned by member businesses, in Summit's slow weeks before the rains.",
+      desc: "Clear gutters and check roofs on 12 homes owned by member businesses before the rains.",
       milestones: [
         { title: "Homes scheduled", points: 50, status: "approved", proof: ["Schedule, 12 homes"], votes: ["yes", "yes", "yes"] },
         { title: "Gutters cleared and roofs checked", points: 400, status: "review", proof: ["Before: 418 Elm gutter", "After: 418 Elm gutter", "Roof check sheet", "After: 502 Elm gutter", "Dump receipt"], votes: ["yes"] }

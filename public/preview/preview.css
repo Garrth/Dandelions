@@ -117,10 +117,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .skill .lvl { display: flex; gap: 3px; margin-top: 4px; }
 .skill .lvl i { width: 18px; height: 6px; border-radius: 3px; background: var(--soft); border: 1px solid var(--line); }
 .skill .lvl i.on { background: var(--leaf); border-color: var(--leaf); }
-.week { display: grid; grid-template-columns: 34px repeat(7, 1fr); gap: 4px; font-size: 12px; text-align: center; }
-.week b { font-weight: 700; color: var(--muted); }
-.week button { border: 1px solid var(--line); background: var(--soft); border-radius: 6px; height: 28px; cursor: pointer; padding: 0; }
-.week button[aria-pressed="true"] { background: var(--sun); border-color: var(--ink); }
 .badges { display: flex; gap: 10px; flex-wrap: wrap; }
 .badge { width: 72px; text-align: center; font-size: 11px; font-weight: 700; }
 .badge .disc { width: 56px; height: 56px; margin: 0 auto 4px; border-radius: 50%; display: grid; place-items: center; font-size: 26px; background: var(--sun); border: 2px solid var(--ink); }
@@ -176,3 +172,4 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .screen-link.soon { opacity: .5; pointer-events: none; }
 
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; z-index: 20; max-width: calc(100% - 32px); }
+.chip, .pts { white-space: nowrap; }
