@@ -57,27 +57,38 @@ window.SAMPLE = {
 
   // Local numbers behind funding decisions. In the real build these come from member reports and public data.
   local: {
-    "Fresno County, CA": { trade: "Home repair and roofing", busy: 52, reporting: 23, lookingForWork: 31, materials: "Available" },
-    "Kern County, CA": { trade: "Restaurants and food supply", busy: 68, reporting: 14, lookingForWork: 19, materials: "Available" },
-    "Tulare County, CA": { trade: "Painting", busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" }
+    "Fresno County, CA": { busy: 52, reporting: 23, lookingForWork: 31, materials: "Available" },
+    "Kern County, CA": { busy: 68, reporting: 14, lookingForWork: 19, materials: "Available" },
+    "Tulare County, CA": { busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" }
   },
 
+  // What points are created for: work usually paid by taxes or charity, running Dandelions, and paid training.
+  // Regular jobs between businesses (like repairs for a landlord) aren't funded; they're paid in points or dollars through the directory.
   types: [
-    { key: "word", name: "Spread the word", blurb: "Posts, videos, podcast spots and articles. Paid mostly on results: views and pledges through your link." },
-    { key: "upkeep", name: "Home upkeep", blurb: "Repairs and upkeep for landlords and business owners, funded when local repair businesses have room." },
-    { key: "suppliers", name: "Bring in the suppliers", blurb: "When a business joins, reach out to its suppliers and get them signed up." },
-    { key: "trainee", name: "Trainees", blurb: "Take on a trainee. The points go to your business; you pay the trainee in dollars." }
+    { key: "train", name: "Pay to train", blurb: "Take on someone who wants to learn a trade. Your business gets points to cover training; you pay the trainee in dollars." },
+    { key: "common", name: "Common good", blurb: "Work usually paid for by taxes or charity that isn't getting done: storm drains, trails, creek cleanups, public spaces." },
+    { key: "word", name: "Spread the word", blurb: "Posts, videos, podcast spots and outreach to new businesses. Paid mostly on results." },
+    { key: "run", name: "Run Dandelions", blurb: "The work of running the system: ID checks, proof checks, hosting, support, moderation." }
   ],
 
   projects: [
     {
-      id: "p2", type: "upkeep", title: "Repairs on 4 rental homes", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
-      client: "Oak Street Rentals", county: "Fresno County, CA", points: 600, helpers: 1, status: "working",
-      desc: "Small repairs across four rental homes. Oak Street Rentals takes points as part of the rent from business tenants and spends them here.",
+      id: "p2", type: "train", title: "Handyman helper, 6 weeks", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
+      county: "Fresno County, CA", points: 600, helpers: 0, status: "working",
+      desc: "Rivera takes on one helper who wants to learn repair work, and pays them in dollars. The points go to Rivera to cover the time spent training and the materials.",
       milestones: [
-        { title: "Walkthrough and repair list", points: 100, status: "approved", proof: ["Repair list, 4 homes", "Photo: 1214 Oak St", "Photo: 1220 Oak St"], votes: ["yes", "yes", "yes"] },
-        { title: "Repairs done", points: 400, status: "todo", proof: [], votes: [] },
-        { title: "Owner sign-off", points: 100, status: "todo", proof: [], votes: [] }
+        { title: "Helper starts, training plan posted", points: 100, status: "approved", proof: ["Training plan", "Start date confirmed"], votes: ["yes", "yes", "yes"] },
+        { title: "Week 3 skills check", points: 200, status: "todo", proof: [], votes: [] },
+        { title: "Week 6 skills check", points: 300, status: "todo", proof: [], votes: [] }
+      ]
+    },
+    {
+      id: "p5", type: "common", title: "Clear storm drains before the rain", owner: "Summit Roofing", ownerId: "b2",
+      county: "Fresno County, CA", points: 450, helpers: 2, status: "working",
+      desc: "The city pays for this with taxes but hasn't gotten to the east side this year. Clear and photograph 40 storm drains before the rains.",
+      milestones: [
+        { title: "Drains mapped", points: 50, status: "approved", proof: ["Map, 40 drains"], votes: ["yes", "yes", "yes"] },
+        { title: "Drains cleared", points: 400, status: "review", proof: ["Before: drain 12", "After: drain 12", "Before: drain 13", "After: drain 13", "Dump receipt"], votes: ["yes"] }
       ]
     },
     {
@@ -92,7 +103,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p3", type: "suppliers", title: "Sign up Lupita's Kitchen suppliers", owner: "Lupita's Kitchen",
+      id: "p3", type: "word", title: "Sign up Lupita's Kitchen suppliers", owner: "Lupita's Kitchen",
       county: "Kern County, CA", points: 300, helpers: 0, status: "open",
       desc: "Lupita's Kitchen joined last week. This project reaches out to its 8 regular suppliers: produce, meat, tortillas, paper goods and the linen service.",
       milestones: [
@@ -101,7 +112,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p4", type: "trainee", title: "Paint crew trainee, 8 weeks", owner: "Bright Coat Painting",
+      id: "p4", type: "train", title: "Paint crew trainee, 8 weeks", owner: "Bright Coat Painting",
       county: "Tulare County, CA", points: 800, helpers: 0, status: "open",
       desc: "Bright Coat takes on one trainee for 8 weeks and pays them at least minimum wage in dollars. The points go to Bright Coat as a training subsidy, for materials and costs.",
       milestones: [
@@ -111,20 +122,73 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p5", type: "upkeep", title: "Gutter and roof checks before the rain", owner: "Summit Roofing", ownerId: "b2",
-      county: "Fresno County, CA", points: 450, helpers: 2, status: "open",
-      desc: "Clear gutters and check roofs on 12 homes owned by member businesses before the rains.",
+      id: "p6", type: "run", title: "ID checks for new members", owner: "Equitide",
+      county: "Nationwide", points: 900, helpers: 0, status: "working",
+      desc: "Equitide runs ID checks through Plaid and sends Dandelions only a yes or no for each person. Paid per batch of completed checks.",
       milestones: [
-        { title: "Homes scheduled", points: 50, status: "approved", proof: ["Schedule, 12 homes"], votes: ["yes", "yes", "yes"] },
-        { title: "Gutters cleared and roofs checked", points: 400, status: "review", proof: ["Before: 418 Elm gutter", "After: 418 Elm gutter", "Roof check sheet", "After: 502 Elm gutter", "Dump receipt"], votes: ["yes"] }
+        { title: "October checks", points: 300, status: "approved", proof: ["Batch report, no personal info"], votes: ["yes", "yes", "yes"] },
+        { title: "November checks", points: 300, status: "todo", proof: [], votes: [] },
+        { title: "December checks", points: 300, status: "todo", proof: [], votes: [] }
       ]
     }
   ],
 
+  directory: [
+    { name: "Rivera Handyman Services", id: "b1", county: "Fresno County, CA", services: "Small home repairs, drywall, plumbing fixtures", takes: "Points or dollars", offer: "10% off repairs paid in points" },
+    { name: "Summit Roofing", id: "b2", county: "Fresno County, CA", services: "Roof repair, gutters, inspections", takes: "Points or dollars" },
+    { name: "Oak Street Rentals", county: "Fresno County, CA", services: "Rental homes and small offices", takes: "Part of rent in points" },
+    { name: "Lupita's Kitchen", county: "Kern County, CA", services: "Restaurant and catering", takes: "Points or dollars", offer: "Free drink with a meal paid in points" },
+    { name: "Valley Buzz Media", county: "Fresno County, CA", services: "Social media and video", takes: "Points or dollars" },
+    { name: "Bright Coat Painting", county: "Tulare County, CA", services: "Interior and exterior painting", takes: "Points or dollars" }
+  ],
+
+  wallet: {
+    business: { name: "Rivera Handyman Services", balance: 1240 },
+    personal: { name: "Sam Rivera", balance: 85 },
+    history: [
+      { when: "Oct 27", what: "From Dandelions: Handyman helper, milestone 1", amt: 100, wallet: "business" },
+      { when: "Oct 24", what: "From Oak Street Rentals: repairs, 1220 Oak St", amt: 340, wallet: "business" },
+      { when: "Oct 22", what: "To Valley Lumber: drywall and screws", amt: -180, wallet: "business" },
+      { when: "Oct 20", what: "From a member: old mountain bike", amt: 85, wallet: "personal" },
+      { when: "Oct 18", what: "To Lupita's Kitchen: lunch for the crew", amt: -60, wallet: "business" }
+    ]
+  },
+
+  talk: {
+    rooms: [
+      { name: "Fresno County", members: 412, new: 6 },
+      { name: "California", members: 3870, new: 14 },
+      { name: "Everyone, nationwide", members: 21440, new: 52 },
+      { name: "Topic: Pay to train", members: 980, new: 3 },
+      { name: "Topic: Common good", members: 1210, new: 9 }
+    ],
+    ideas: [
+      { id: "i1", title: "Fund a weekend trades class at Fresno City College", by: "Dana C.", backers: 7, need: 10, weight: "Light", scope: "Fresno County", replies: 12 },
+      { id: "i2", title: "Add \"tree care\" as a Common good category", by: "Marcus T.", backers: 64, need: 100, weight: "Heavy", scope: "Nationwide", replies: 31 }
+    ],
+    ballot: { title: "Make storm drains a top priority in Fresno County this winter", weight: "Light", rule: "Passes with 51% of votes cast", yes: 132, no: 41, ends: "Nov 4" }
+  },
+
+  dispute: {
+    id: "1042", title: "Storm drain milestone sent back", county: "Fresno County, CA",
+    sides: ["Summit Roofing", "Checker panel for p5"],
+    claim: "Summit says 6 of the 40 drains were cleared but the photos were taken at night, so the panel couldn't see them. Summit has daytime photos now.",
+    steps: [
+      { name: "Filed", when: "Oct 20", done: true },
+      { name: "Talk it out (7 days)", when: "Oct 20 to 27", done: true, note: "No agreement" },
+      { name: "Screening", when: "Oct 28", done: true, note: "Sent to a panel" },
+      { name: "Panel of 3 random checkers", when: "Decides by Nov 3", now: true },
+      { name: "Ruling posted", when: "" },
+      { name: "One appeal, if asked for", when: "" }
+    ],
+    evidence: ["Night photos, 6 drains", "Daytime photos, same 6 drains", "Panel notes from Oct 19"],
+    frozen: 400
+  },
+
   log: [
     { when: "Oct 27, 9:12", what: "points.released 100 to Rivera Handyman Services (p2, milestone 1, 3 of 5 checkers yes)" },
     { when: "Oct 27, 8:40", what: "check.vote checker 77: yes (p2, milestone 1)" },
-    { when: "Oct 26, 16:03", what: "milestone.proof_added p2 milestone 1, 3 files" },
-    { when: "Oct 25, 10:30", what: "project.posted p2 home upkeep, 3 milestones, 600 points" }
+    { when: "Oct 26, 16:03", what: "milestone.proof_added p2 milestone 1, 2 files" },
+    { when: "Oct 25, 10:30", what: "project.posted p2 pay to train, 3 milestones, 600 points" }
   ]
 };
