@@ -37,7 +37,7 @@ window.SAMPLE = {
       size: { grossUsd: 185000, grossPts: 2400, employees: 2 },
       track: { done: 7, onTime: 6, disputes: 0, largest: 600, average: 380 },
       limit: { now: 3000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
-      busy: 55,
+      busy: 55, insured: true, tradeLicenses: [],
       hiring: [
         { title: "Handyman helper", kind: "Temp, 6 weeks", note: "Basic tools, own ride" },
         { title: "Office help, 10 hrs a week", kind: "Part-time", note: "Scheduling and invoices" }
@@ -50,7 +50,7 @@ window.SAMPLE = {
       size: { grossUsd: 1400000, grossPts: 5100, employees: 11 },
       track: { done: 12, onTime: 12, disputes: 1, largest: 2400, average: 900 },
       limit: { now: 12000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
-      busy: 40,
+      busy: 40, insured: true, tradeLicenses: ["CSLB C-39 roofing"],
       hiring: [{ title: "Roofing laborer", kind: "Permanent", note: "Will train" }]
     }
   ],
@@ -59,7 +59,55 @@ window.SAMPLE = {
   local: {
     "Fresno County, CA": { busy: 52, reporting: 23, lookingForWork: 31, materials: "Available" },
     "Kern County, CA": { busy: 68, reporting: 14, lookingForWork: 19, materials: "Available" },
-    "Tulare County, CA": { busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" }
+    "Tulare County, CA": { busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" },
+    "California": { busy: 58, reporting: 412, lookingForWork: 2140, materials: "Available" },
+    "Nationwide": { busy: 61, reporting: 1906, lookingForWork: 11800, materials: "Mostly available" }
+  },
+
+  // The three area levels on the Work page, and the bar a business has to clear to run projects at each one.
+  areas: [
+    { key: "county", name: "Fresno County, CA", short: "County", need: { done: 0, onTime: 0, open: 2 }, typical: "Up to your size limit" },
+    { key: "state", name: "California", short: "State", need: { done: 5, onTime: 80, open: 3 }, typical: "Usually 2,000 to 10,000 points" },
+    { key: "nation", name: "Nationwide", short: "Nationwide", need: { done: 15, onTime: 90, open: 3 }, typical: "Usually 5,000 points and up" }
+  ],
+
+  // Categories under each project type. "open" lists the area levels where local data says there's room for it right now.
+  categories: {
+    train: [
+      { name: "Home repair helper", open: ["county", "state", "nation"], onsite: true, max: 1200 },
+      { name: "Painting trainee", open: ["county", "state", "nation"], onsite: true, max: 1200 },
+      { name: "Roofing trainee", open: ["county", "state"], onsite: true, max: 1500, license: "CSLB C-39 roofing" },
+      { name: "Electrical trainee", open: ["state", "nation"], onsite: true, max: 2000, license: "CSLB C-10 electrical", why: "No local electricians have room to train right now" },
+      { name: "Restaurant kitchen trainee", open: ["county", "state", "nation"], onsite: true, max: 900 },
+      { name: "Auto repair trainee", open: ["nation"], onsite: true, max: 1200, why: "Local shops are 85% booked and few members want this work" }
+    ],
+    common: [
+      { name: "Storm drains", open: ["county", "state"], onsite: true, max: 2000 },
+      { name: "Trail upkeep", open: ["county", "state", "nation"], onsite: true, max: 3000 },
+      { name: "Creek cleanup", open: ["county", "state", "nation"], onsite: true, max: 2500 },
+      { name: "Graffiti removal", open: ["county"], onsite: true, max: 800 },
+      { name: "Wildfire brush clearing for seniors", open: ["state"], onsite: true, max: 8000, why: "Run statewide so crews can go where the risk is" },
+      { name: "Tree care", open: [], onsite: true, max: 0, why: "Not a category yet. It's gaining support in Talk" }
+    ],
+    word: [
+      { name: "Social posts and video", open: ["county", "state", "nation"], onsite: false, max: 2000 },
+      { name: "Podcast and radio spots", open: ["county", "state", "nation"], onsite: false, max: 3000 },
+      { name: "Sign up a business's suppliers", open: ["county", "state"], onsite: false, max: 600 },
+      { name: "Local events and booths", open: ["county"], onsite: true, max: 800 }
+    ],
+    run: [
+      { name: "Support and moderation", open: ["state", "nation"], onsite: false, max: 4000, why: "Run at state level and up" },
+      { name: "Hosting and nodes", open: ["nation"], onsite: false, max: 9000, why: "Run nationwide only" },
+      { name: "Member data and reports", open: ["county", "state", "nation"], onsite: false, max: 1500 }
+    ]
+  },
+
+  // How each type splits its points into milestones when you start one. Owners can rename steps.
+  milestoneTemplates: {
+    train: [["Trainee starts, training plan posted", 0.15], ["Halfway skills check", 0.35], ["Final skills check", 0.5]],
+    common: [["Plan and map posted", 0.1], ["Work done, before and after photos", 0.9]],
+    word: [["Content or outreach plan", 0.15], ["Posts or calls done", 0.25], ["Results: views and pledges", 0.6]],
+    run: [["First month", 0.34], ["Second month", 0.33], ["Third month", 0.33]]
   },
 
   // What points are created for: work usually paid by taxes or charity, running Dandelions, and paid training.
@@ -73,7 +121,7 @@ window.SAMPLE = {
 
   projects: [
     {
-      id: "p2", type: "train", title: "Handyman helper, 6 weeks", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
+      id: "p2", level: "county", type: "train", title: "Handyman helper, 6 weeks", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
       county: "Fresno County, CA", points: 600, helpers: 0, status: "working",
       desc: "Rivera takes on one helper who wants to learn repair work, and pays them in dollars. The points go to Rivera to cover the time spent training and the materials.",
       milestones: [
@@ -83,7 +131,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p5", type: "common", title: "Clear storm drains before the rain", owner: "Summit Roofing", ownerId: "b2",
+      id: "p5", level: "county", type: "common", title: "Clear storm drains before the rain", owner: "Summit Roofing", ownerId: "b2",
       county: "Fresno County, CA", points: 450, helpers: 2, status: "working",
       desc: "The city pays for this with taxes but hasn't gotten to the east side this year. Clear and photograph 40 storm drains before the rains.",
       milestones: [
@@ -92,7 +140,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p1", type: "word", title: "Tell the Central Valley about Dandelions", owner: "Valley Buzz Media",
+      id: "p1", level: "county", type: "word", title: "Tell the Central Valley about Dandelions", owner: "Valley Buzz Media",
       county: "Fresno County, CA", points: 1200, helpers: 3, status: "open",
       desc: "A main project for local creators. Valley Buzz plans the posts and creators start their own sub-projects under it. Every paid post says it's paid (#ad).",
       subs: ["Podcast spot: Working Class Hour", "Short videos: Fresno food spots", "Instagram series: fix-it Fridays"],
@@ -103,7 +151,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p3", type: "word", title: "Sign up Lupita's Kitchen suppliers", owner: "Lupita's Kitchen",
+      id: "p3", level: "county", type: "word", title: "Sign up Lupita's Kitchen suppliers", owner: "Lupita's Kitchen",
       county: "Kern County, CA", points: 300, helpers: 0, status: "open",
       desc: "Lupita's Kitchen joined last week. This project reaches out to its 8 regular suppliers: produce, meat, tortillas, paper goods and the linen service.",
       milestones: [
@@ -112,7 +160,7 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p4", type: "train", title: "Paint crew trainee, 8 weeks", owner: "Bright Coat Painting",
+      id: "p4", level: "county", type: "train", title: "Paint crew trainee, 8 weeks", owner: "Bright Coat Painting",
       county: "Tulare County, CA", points: 800, helpers: 0, status: "open",
       desc: "Bright Coat takes on one trainee for 8 weeks and pays them at least minimum wage in dollars. The points go to Bright Coat as a training subsidy, for materials and costs.",
       milestones: [
@@ -122,7 +170,27 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "p6", type: "run", title: "ID checks for new members", owner: "Equitide",
+      id: "ps1", level: "state", type: "common", title: "Brush clearing for seniors in fire zones", owner: "Golden State Fire Safe",
+      county: "California", points: 6000, helpers: 6, status: "open",
+      desc: "Clear brush around the homes of seniors who can't do it themselves, in high fire risk areas across the state. Usually paid by grants and charity, and the waitlist is long.",
+      milestones: [
+        { title: "Homes picked with the local fire departments", points: 600, status: "approved", proof: ["List of 50 homes, no addresses public"], votes: ["yes", "yes", "yes"] },
+        { title: "First 25 homes cleared", points: 2700, status: "todo", proof: [], votes: [] },
+        { title: "All 50 homes cleared", points: 2700, status: "todo", proof: [], votes: [] }
+      ]
+    },
+    {
+      id: "pn1", level: "nation", type: "run", title: "Public log viewer anyone can check", owner: "Open Ledger Co-op",
+      county: "Nationwide", points: 8000, helpers: 0, status: "open",
+      desc: "Build a simple open-source page where anyone can read the public log and check the daily fingerprint for themselves.",
+      milestones: [
+        { title: "Design posted for comment", points: 1000, status: "todo", proof: [], votes: [] },
+        { title: "Working viewer, open source", points: 4000, status: "todo", proof: [], votes: [] },
+        { title: "Three months running", points: 3000, status: "todo", proof: [], votes: [] }
+      ]
+    },
+    {
+      id: "p6", level: "nation", type: "run", title: "ID checks for new members", owner: "Equitide",
       county: "Nationwide", points: 900, helpers: 0, status: "working",
       desc: "Equitide runs ID checks through Plaid and sends Dandelions only a yes or no for each person. Paid per batch of completed checks.",
       milestones: [
@@ -163,7 +231,7 @@ window.SAMPLE = {
       { name: "Topic: Common good", members: 1210, new: 9 }
     ],
     ideas: [
-      { id: "i1", title: "Fund a weekend trades class at Fresno City College", by: "Dana C.", backers: 7, need: 10, weight: "Light", scope: "Fresno County", replies: 12 },
+      { id: "i1", title: "Fund a weekend trades class at Fresno City College", by: "Dana C.", backers: 7, need: 10, weight: "Light", scope: "Fresno County, CA", replies: 12 },
       { id: "i2", title: "Add \"tree care\" as a Common good category", by: "Marcus T.", backers: 64, need: 100, weight: "Heavy", scope: "Nationwide", replies: 31 }
     ],
     ballot: { title: "Make storm drains a top priority in Fresno County this winter", weight: "Light", rule: "Passes with 51% of votes cast", yes: 132, no: 41, ends: "Nov 4" }
