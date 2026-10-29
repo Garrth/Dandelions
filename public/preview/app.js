@@ -38,7 +38,7 @@
   };
   icon.directory = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M8 8h6M8 12h6"/></svg>';
   icon.hub = icon.home;
-  const tabOf = { project: "projects", business: "directory", dispute: "talk" };
+  const tabOf = { project: "projects", checks: "projects", business: "directory", dispute: "talk" };
   const tab = (key, href, label) =>
     '<a href="' + href + '"' + ((tabOf[page] || page) === key ? ' aria-current="page"' : "") + ">" + icon[key] + label + "</a>";
   document.body.insertAdjacentHTML("beforeend",
@@ -65,7 +65,7 @@
 
       '<div class="card"><div class="spread"><h2>Your path</h2><span class="small muted">Step ' + m.step + " of 6</span></div>" +
         '<div class="ladder">' + steps.map((s, i) => '<div class="' + (i + 1 < m.step ? "done" : i + 1 === m.step ? "now" : "") + '">' + s + "</div>").join("") + "</div>" +
-        '<p class="small" style="margin-top:14px"><b>Next: ' + esc(m.nextStep.name) + '.</b> <span class="muted">Checkers get picked at random to look at proof, and can serve on dispute panels.</span></p>' +
+        '<p class="small" style="margin-top:14px"><b>Next: ' + esc(m.nextStep.name) + '.</b> <span class="muted">Checkers go look at finished work and say what they saw, and can serve on dispute panels.</span> <a href="/preview/checks.html">Take the short course →</a></p>' +
         '<div class="stack" style="margin-top:10px">' + m.nextStep.needs.map((n) =>
           '<div><div class="spread small"><span>' + esc(n.text) + '</span><span class="muted">' + n.done + " of " + n.of + '</span></div><div class="bar"><span style="width:' + Math.round(n.done / n.of * 100) + '%"></span></div></div>').join("") + "</div>" +
       "</div>" +
@@ -188,6 +188,7 @@
       '<div class="spread" style="margin-bottom:12px"><span class="small muted">' + S.projects.length + ' projects near you</span><button class="btn small" id="start" type="button">Start a project</button></div>' +
       '<div class="filters" id="filters"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="mine" aria-pressed="false">Mine</button>' +
         S.types.map((t) => '<button type="button" data-f="' + t.key + '" aria-pressed="false">' + esc(t.name) + "</button>").join("") + "</div>" +
+      '<a class="card screen-link" href="/preview/checks.html" style="margin-bottom:12px"><span class="ico">🔍</span><span><b>Checker work</b><br><span class="small muted">' + S.checks.tickets.length + ' checks near you need checkers. Your business earns a fee for each.</span></span></a>' +
       '<div id="list" class="stack"></div>' +
       '<p class="small muted" style="margin-top:18px">Visitors can browse every project. Taking or starting one needs an ID check and a business license.</p>';
     draw();
@@ -366,6 +367,7 @@
          ["🏪", "/preview/business.html?id=b1", "Business profile", "Services, track record, size limit, how busy, hiring."],
          ["📋", "/preview/projects.html", "Funded work", "Pay to train, common good, spread the word, run Dandelions."],
          ["✅", "/preview/project.html?id=p5", "A project, start to payment", "Milestones, proof, random checkers."],
+         ["🔍", "/preview/checks.html", "Checker work", "Short course, pick up a check, photos, AI review, paid."],
          ["📒", "/preview/directory.html", "Directory", "Member businesses, what they offer, who takes points."],
          ["👛", "/preview/wallet.html", "Wallet", "Business and personal points, send and receive."],
          ["💬", "/preview/talk.html", "Talk and vote", "Rooms, ideas gaining support, what's on the ballot."],
@@ -478,6 +480,138 @@
         i.backers += 1; saved.backed = (saved.backed || []).concat(i.id); save(); draw();
         if (i.backers >= i.need) toast("That's enough backers. It goes to a vote.");
       }
+    });
+  }
+
+  // ---------- Checker work: course, pick up a ticket, check, review, paid ----------
+  if (page === "checks") {
+    const C = S.checks;
+    const ck = saved.ck = saved.ck || { read: [], answers: {}, passed: false, ticket: null, photos: {}, notes: {}, sent: false, vote: null, path: "paid" };
+    const shots = {}; // object URLs for photos picked this visit; they stay on the phone
+    const project = (id) => S.projects.find((p) => p.id === id) || {};
+    const stage = () => (!ck.passed ? 0 : !ck.ticket ? 1 : !ck.sent ? 2 : 3);
+    const stepper = () => {
+      const names = ["Learn", "Pick up", "Check", "Review", "Paid"];
+      const at = stage() === 3 && ck.path === "paid" && ck.vote === "yes" ? 4 : stage();
+      return '<div class="ladder" style="margin-bottom:14px">' + names.map((n, i) => '<div class="' + (i < at ? "done" : i === at ? "now" : "") + '">' + n + "</div>").join("") + "</div>";
+    };
+
+    function course() {
+      const score = C.quiz.filter((q, i) => ck.answers[i] === q.right).length;
+      const allIn = Object.keys(ck.answers).length === C.quiz.length;
+      return '<div class="page-head"><div class="eyebrow">Become a checker</div><h1>Be a fair pair of eyes.</h1><p>Any business can qualify. Checkers go look at finished work, take their own photos and say what they saw. Your business gets a fee for each check, the same whether you say yes or no.</p></div>' +
+        '<h2 class="section-title">Short course, about 15 minutes</h2><div class="card">' + C.course.map((l, i) =>
+          '<details data-lesson="' + i + '" style="padding:10px 0;border-bottom:1px solid var(--line)"><summary style="cursor:pointer"><b>' + (i + 1) + ". " + esc(l.title) + "</b> " +
+          (ck.read.includes(i) ? '<span class="chip ok">Read</span>' : "") + '</summary><p class="small" style="margin-top:6px">' + esc(l.text) + "</p></details>").join("") +
+        '<p class="small muted" style="margin-top:10px">' + ck.read.length + " of " + C.course.length + " read</p></div>" +
+        '<h2 class="section-title">Quick quiz</h2><div class="card">' + C.quiz.map((q, i) =>
+          '<fieldset style="border:0;padding:8px 0;margin:0"><legend class="small"><b>' + (i + 1) + ". " + esc(q.q) + "</b></legend>" +
+          q.a.map((a, j) => '<label class="small" style="display:flex;gap:8px;align-items:center;padding:4px 0"><input type="radio" name="q' + i + '" value="' + j + '"' + (ck.answers[i] === j ? " checked" : "") + ">" + esc(a) + "</label>").join("") + "</fieldset>").join("") +
+        '<button class="btn" type="button" id="grade" style="margin-top:8px;width:100%"' + (allIn && ck.read.length === C.course.length ? "" : " disabled") + ">Check my answers</button>" +
+        '<p class="small muted" style="margin-top:6px">' + (ck.read.length < C.course.length ? "Read all five parts to unlock this." : allIn ? score + " of 5 right so far. You need 4." : "Answer all five.") + "</p></div>" +
+        '<p class="small muted" style="margin-top:12px">To qualify you also need an ID check, a business in good standing for 3 months and no open disputes. The preview skips the wait.</p>';
+    }
+
+    function queue() {
+      return '<div class="page-head"><div class="eyebrow">Checks near you</div><h1>Pick one up.</h1><p>When a business finishes a milestone, a ticket goes to 5 checkers nearby with no ties to them. The first 3 to accept do the check. If nobody takes it in a day, it goes to the next 5.</p></div>' +
+        '<div class="card stats"><div class="stat"><b>' + C.tickets.length + '</b><span>Offered to you</span></div><div class="stat"><b>' + C.me.done + '</b><span>Checks done</span></div><div class="stat"><b>' + C.me.earned + '</b><span>Fees earned, pts</span></div></div>' +
+        '<div class="stack" style="margin-top:12px">' + C.tickets.map((t) =>
+          '<div class="card"><div class="spread"><span class="chip">' + esc(typeName(t.type)) + '</span><span class="pts">' + t.fee + " pts fee</span></div>" +
+          '<h3 style="margin:8px 0 2px">' + esc(t.title) + '</h3><p class="small muted">' + esc(t.owner) + " · " + esc(project(t.project).title || "") + "</p>" +
+          '<div class="row small" style="margin-top:8px"><span class="chip">' + esc(t.how) + '</span>' + (t.where !== t.how ? '<span class="chip">' + esc(t.where) + '</span>' : "") + '<span class="chip">Done by ' + esc(t.by) + "</span></div>" +
+          '<div class="spread small" style="margin-top:10px"><span>' + t.taken + " of 3 checker spots taken</span><span class=\"muted\">Offered to " + t.offered + "</span></div>" +
+          '<div class="bar"><span style="width:' + Math.round(t.taken / 3 * 100) + '%"></span></div>' +
+          '<div class="row" style="margin-top:12px"><button class="btn small" type="button" data-take="' + t.id + '">Accept</button><button class="btn ghost small" type="button" data-pass="' + t.id + '">Pass</button></div></div>').join("") + "</div>" +
+        '<p class="note" style="margin-top:12px">' + C.hiddenMine + " ticket for your own business isn't shown to you. You also won't get tickets from your customers, suppliers or competitors.</p>";
+    }
+
+    function check() {
+      const t = C.tickets.find((x) => x.id === ck.ticket);
+      const onSite = t.how === "On site";
+      const ready = t.items.every((_, i) => ck.photos[i]);
+      return '<div class="page-head"><div class="eyebrow">Your check · ' + esc(t.owner) + '</div><h1 style="font-size:32px">' + esc(t.title) + "</h1><p>" + esc(t.what) + "</p></div>" +
+        '<div class="card">' + t.items.map((it, i) =>
+          '<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="spread"><b>' + esc(it) + "</b>" + (ck.photos[i] ? '<span class="chip ok">' + (onSite ? "Photo in" : "Checked") + "</span>" : '<span class="chip">To do</span>') + "</div>" +
+          (shots[i] ? '<div class="proof" style="margin-top:8px"><figure><img src="' + shots[i] + '" alt="Your photo"></figure></div>' : ck.photos[i] && onSite ? '<div class="proof" style="margin-top:8px"><figure>Sample photo</figure></div>' : "") +
+          (onSite ? '<label class="upload" style="margin-top:8px"><input type="file" accept="image/*" capture="environment" data-shot="' + i + '"><span class="small"><b>' + (ck.photos[i] ? "Retake" : "Take photo") + '</b> <span class="muted">Time and place are added for you</span></span></label>'
+            : '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:6px"><input type="checkbox" data-tick="' + i + '"' + (ck.photos[i] ? " checked" : "") + "> Looks right</label>") +
+          '<input class="small" data-note="' + i + '" value="' + esc(ck.notes[i] || "") + '" placeholder="Comment (optional)" style="width:100%;margin-top:8px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--card)"></div>').join("") +
+        (onSite ? '<button class="btn ghost small" type="button" id="fill" style="margin-top:10px">Preview only: use sample photos</button>' : "") + "</div>" +
+        '<h2 class="section-title">What did you see?</h2><div class="card">' +
+          '<textarea id="overall" placeholder="Overall comment for the business (needed if you say it needs work)">' + esc(ck.notes.all || "") + "</textarea>" +
+          '<div class="row" style="margin-top:10px"><button class="btn small" type="button" data-verdict="yes"' + (ready ? "" : " disabled") + '>Yes, it\'s done</button><button class="btn ghost small" type="button" data-verdict="no"' + (ready ? "" : " disabled") + ">Needs work</button></div>" +
+          '<p class="small muted" style="margin-top:8px">' + (ready ? "You won't see the other two checkers' answers until you send yours." : "Finish every item to send.") + "</p></div>" +
+        '<button class="btn ghost small" type="button" id="drop" style="margin-top:12px">Give this ticket back</button>';
+    }
+
+    function result() {
+      const t = C.tickets.find((x) => x.id === ck.ticket);
+      const p = project(t.project);
+      const m = (p.milestones || [])[t.milestone] || { points: 0 };
+      const path = ck.vote === "no" ? "split" : ck.path;
+      const votes = [{ who: "You", vote: ck.vote, note: ck.notes.all || (ck.vote === "yes" ? "All done." : "") }].concat(C.others);
+      const ai = C.ai.slice(0, path === "split" ? 3 : 4).concat(path === "flag" ? [C.aiFlag] : []).concat(path === "split" ? [{ ok: false, text: "Checkers don't agree: 2 say done, 1 says needs work." }] : []);
+      const out = {
+        paid: '<div class="card" style="border-color:var(--leaf)"><h3>Paid ✓</h3><p class="small" style="margin-top:4px"><b>' + fmt(m.points) + " points</b> released to " + esc(t.owner) + ". <b>" + t.fee + " points</b> check fee to " + esc(S.businesses[0].name) + ".</p><p class=\"small muted\" style=\"margin-top:6px\">3 of 3 checkers said done and the AI found nothing odd, so the code released the points on its own.</p></div>",
+        flag: '<div class="card" style="border-color:var(--warn)"><h3>Closer look</h3><p class="small" style="margin-top:4px">The checkers said done, but the AI noticed something. It doesn\'t decide. Two more checkers look, and ' + esc(t.owner) + " can explain. Majority of the 5 decides.</p><p class=\"small muted\" style=\"margin-top:6px\">Your " + t.fee + " point fee is paid now either way.</p></div>",
+        split: '<div class="card" style="border-color:var(--warn)"><h3>Checkers split</h3><p class="small" style="margin-top:4px">Two more checkers are picked. Majority of the 5 decides. If it\'s sent back, ' + esc(t.owner) + " gets every comment, fixes it and sends again. If they think it's wrong, they can open a dispute.</p><p class=\"small muted\" style=\"margin-top:6px\">Your " + t.fee + " point fee is paid now either way.</p></div>"
+      }[path];
+      return '<div class="page-head"><div class="eyebrow">Review · ' + esc(t.owner) + '</div><h1 style="font-size:32px">' + esc(t.title) + "</h1></div>" +
+        '<h2 class="section-title">The three checkers</h2><div class="card">' + votes.map((v) =>
+          '<div class="skill"><div><b>' + esc(v.who) + '</b><div class="small muted">' + esc(v.note) + '</div></div><div><span class="chip ' + (v.vote === "yes" ? "ok" : "warn") + '">' + (v.vote === "yes" ? "Done" : "Needs work") + "</span></div></div>").join("") + "</div>" +
+        '<h2 class="section-title">AI review</h2><div class="card">' + ai.map((a) =>
+          '<div class="spread small" style="padding:6px 0;align-items:flex-start;justify-content:flex-start;gap:10px"><span aria-hidden="true">' + (a.ok ? "✅" : "⚠️") + "</span><span>" + esc(a.text) + "</span></div>").join("") +
+          '<p class="small muted" style="margin-top:8px">The AI points things out. It never approves or blocks points. People do.</p></div>' +
+        '<h2 class="section-title">Result</h2>' + out +
+        (ck.vote === "yes" ? '<div class="viewas" id="whatif" style="margin-top:12px" role="group" aria-label="Show what happens if"><button type="button" data-path="paid" aria-pressed="' + (path === "paid") + '">All clear</button><button type="button" data-path="flag" aria-pressed="' + (path === "flag") + '">If the AI flags</button></div>' : "") +
+        '<h2 class="section-title">Public log</h2><div class="card log"><ul>' +
+          (path === "paid" ? '<li><span class="when">Just now</span><br>points.released ' + m.points + " to " + esc(t.owner) + " (" + t.project + ", 3 of 3 checkers done, no AI flags)</li>" : '<li><span class="when">Just now</span><br>check.more_checkers 2 picked (' + t.project + ", " + (path === "flag" ? "AI flag" : "split") + ")</li>") +
+          '<li><span class="when">Just now</span><br>points.released ' + t.fee + " check fee to checker 301's business</li>" +
+          '<li><span class="when">Just now</span><br>check.submitted checker 301: ' + (ck.vote === "yes" ? "done" : "needs work") + " (" + t.project + ")</li></ul></div>" +
+        '<p class="small muted" style="margin-top:10px">Checkers whose answers often don\'t match the others get spot-checked themselves.</p>' +
+        '<button class="btn ghost small" type="button" id="again" style="margin-top:12px">Start the checker preview over</button>';
+    }
+
+    const draw = () => { main.innerHTML = stepper() + [course, queue, check, result][stage()](); };
+    draw();
+
+    main.addEventListener("toggle", (e) => {
+      const d = e.target.closest && e.target.closest("[data-lesson]");
+      if (d && d.open && !ck.read.includes(+d.dataset.lesson)) { ck.read.push(+d.dataset.lesson); save(); const sy = scrollY; draw(); main.querySelector('[data-lesson="' + d.dataset.lesson + '"]').open = true; scrollTo(0, sy); }
+    }, true);
+    main.addEventListener("change", (e) => {
+      const el = e.target;
+      if (el.name && el.name[0] === "q") { ck.answers[+el.name.slice(1)] = +el.value; save(); const sy = scrollY; draw(); scrollTo(0, sy); }
+      if (el.dataset.shot !== undefined && el.files && el.files[0]) { shots[el.dataset.shot] = URL.createObjectURL(el.files[0]); ck.photos[el.dataset.shot] = true; save(); draw(); }
+      if (el.dataset.tick !== undefined) { ck.photos[el.dataset.tick] = el.checked; save(); const sy = scrollY; draw(); scrollTo(0, sy); }
+    });
+    main.addEventListener("input", (e) => {
+      if (e.target.dataset.note !== undefined) { ck.notes[e.target.dataset.note] = e.target.value; save(); }
+      if (e.target.id === "overall") { ck.notes.all = e.target.value; save(); }
+    });
+    main.addEventListener("click", (e) => {
+      const go = (fn) => { fn(); save(); draw(); scrollTo(0, 0); };
+      if (e.target.closest("#grade")) {
+        const score = C.quiz.filter((q, i) => ck.answers[i] === q.right).length;
+        if (score >= 4) go(() => { ck.passed = true; toast("You passed. You're a checker now 🔍"); });
+        else toast(score + " of 5. Read the parts again and try once more.");
+        return;
+      }
+      const take = e.target.closest("[data-take]");
+      if (take) { go(() => { ck.ticket = take.dataset.take; ck.photos = {}; ck.notes = {}; }); toast("It's yours. 2 more checkers will join."); return; }
+      const pass = e.target.closest("[data-pass]");
+      if (pass) { pass.closest(".card").remove(); toast("Passed. It goes to the next checker."); return; }
+      if (e.target.closest("#fill")) { const t = C.tickets.find((x) => x.id === ck.ticket); t.items.forEach((_, i) => { ck.photos[i] = true; }); save(); draw(); return; }
+      if (e.target.closest("#drop")) { go(() => { ck.ticket = null; }); return; }
+      const v = e.target.closest("[data-verdict]");
+      if (v) {
+        if (v.dataset.verdict === "no" && !(ck.notes.all || "").trim()) { toast("Say what's missing so the business can fix it"); return; }
+        go(() => { ck.vote = v.dataset.verdict; ck.sent = true; ck.path = "paid"; C.me.done += 1; });
+        return;
+      }
+      const w = e.target.closest("[data-path]");
+      if (w) { ck.path = w.dataset.path; save(); draw(); return; }
+      if (e.target.closest("#again")) { saved.ck = null; save(); location.reload(); }
     });
   }
 

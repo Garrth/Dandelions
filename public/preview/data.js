@@ -185,6 +185,59 @@ window.SAMPLE = {
     frozen: 400
   },
 
+  // Checker work. Checking is "Run Dandelions" work, so the fee goes to the checker's business, yes or no.
+  checks: {
+    course: [
+      { title: "What a check is", text: "A business says a milestone is done. You go look, take your own photos and say what you saw. You're not the boss of the project. You're a fair pair of eyes." },
+      { title: "Who you can't check", text: "Your own business, your customers, your suppliers, your competitors, family and friends. If a ticket comes to you by mistake, pass on it and say why." },
+      { title: "Taking proof", text: "Photograph what the checklist asks for, in daylight, with the whole thing in the frame. The app adds the time and place. No faces, no house numbers, no license plates." },
+      { title: "Saying no", text: "\"Needs work\" is not a punishment. Say exactly what's missing so the business can fix it. You get paid the same for yes or no, so just call it like you see it." },
+      { title: "Staying safe", text: "Don't climb, enter private property without the owner, or go after dark. If a site isn't safe, stop and report it. That still counts as a finished check." }
+    ],
+    quiz: [
+      { q: "A ticket is for your brother-in-law's business. What do you do?", a: ["Take it, you know the work is good", "Pass and say it's family"], right: 1 },
+      { q: "Do you get paid more for saying yes?", a: ["Yes, a little", "No, same fee either way"], right: 1 },
+      { q: "The checklist asks for drain 12 but it's under a parked car.", a: ["Use the owner's photo instead", "Say so in your notes and photograph what you can"], right: 1 },
+      { q: "When do you see the other checkers' answers?", a: ["After you send yours", "Before, so you can match them"], right: 0 },
+      { q: "Who decides if the work gets paid?", a: ["The AI", "The checkers"], right: 1 }
+    ],
+    tickets: [
+      {
+        id: "t1", project: "p5", milestone: 1, owner: "Summit Roofing", title: "Storm drains cleared", type: "common",
+        where: "East Fresno, 6 miles away", how: "On site", fee: 25, by: "Nov 2", offered: 5, taken: 1,
+        what: "The app picked 4 of the 40 drains at random. Photograph each one and say if it's clear.",
+        items: ["Drain 3, Cedar and Belmont", "Drain 12, Clovis Ave", "Drain 21, Tulare St", "Drain 34, Kings Canyon Rd"]
+      },
+      {
+        id: "t2", project: "p4", milestone: 1, owner: "Bright Coat Painting", title: "Week 4 skills check", type: "train",
+        where: "Visalia, 38 miles away", how: "On site", fee: 30, by: "Nov 6", offered: 5, taken: 0,
+        what: "Watch the trainee prep and paint one wall. Check off each skill you see.",
+        items: ["Sets up drop cloths and tape", "Patches and sands a hole", "Cuts in a clean edge", "Cleans brushes and site"]
+      },
+      {
+        id: "t3", project: "p6", milestone: 1, owner: "Equitide", title: "November ID check batch", type: "run",
+        where: "Online", how: "Online", fee: 15, by: "Dec 3", offered: 5, taken: 2,
+        what: "Compare the batch report with the sign-up log. Counts should match and the report should hold no personal info.",
+        items: ["Count matches the log", "No names, IDs or addresses in the report", "Every yes has a date"]
+      }
+    ],
+    hiddenMine: 1,
+    // What the other two checkers on t1 said. Sample only.
+    others: [
+      { who: "Checker 214", vote: "yes", note: "All 4 clear. Drain 21 has a little new leaf litter, fine." },
+      { who: "Checker 88", vote: "yes", note: "Clear. Photos attached." }
+    ],
+    // What the AI looks at once all three checks are in. It points things out; people decide.
+    ai: [
+      { ok: true, text: "Every photo was taken at the right drain, within 30 meters" },
+      { ok: true, text: "Photos taken in daylight, after the owner said the work was done" },
+      { ok: true, text: "No photo has been used before, on this or any other project" },
+      { ok: true, text: "All three checkers saw the same thing" }
+    ],
+    aiFlag: { ok: false, text: "The owner's photo of drain 13 matches a photo from a different project in March. Asking the owner to explain, and two more checkers to look." },
+    me: { done: 0, agree: null, earned: 0 }
+  },
+
   log: [
     { when: "Oct 27, 9:12", what: "points.released 100 to Rivera Handyman Services (p2, milestone 1, 3 of 5 checkers yes)" },
     { when: "Oct 27, 8:40", what: "check.vote checker 77: yes (p2, milestone 1)" },
