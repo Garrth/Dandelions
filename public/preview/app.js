@@ -565,6 +565,11 @@
         '<div class="viewas" id="which"><button type="button" data-w="business" aria-pressed="' + (which === "business") + '">Business</button><button type="button" data-w="personal" aria-pressed="' + (which === "personal") + '">Personal</button></div>' +
         '<div class="row" style="margin-bottom:14px"><button class="btn" type="button" id="send">Send</button><button class="btn ghost" type="button" id="recv">Receive</button></div>' +
         '<div id="pane"></div>' +
+        (which === "business" ? '<div class="card"><div class="spread"><b>Points you take this month</b><span class="small muted">You set this</span></div>' +
+          '<div class="bar" style="margin-top:8px"><span style="width:' + Math.round(w.cap.taken / w.cap.month * 100) + '%"></span></div>' +
+          '<div class="spread small" style="margin-top:4px"><span>' + fmt(w.cap.taken) + " of " + fmt(w.cap.month) + ' taken from customers</span><button class="btn ghost small" type="button" id="cap">Change</button></div>' +
+          '<p class="small muted" style="margin-top:8px">Only take as many points as you can spend. Raise it as more of your suppliers join.</p></div>' : "") +
+        '<a class="card screen-link" href="/preview/directory.html" style="margin-top:12px"><span class="ico">📒</span><span><b>Where to spend</b><br><span class="small muted">' + w.cap.spendHere + " member businesses near " + esc(S.me.town) + " take points.</span></span></a>" +
         '<h2 class="section-title">History</h2><div class="card">' + w.history.filter((h) => h.wallet === which).map((h) =>
           '<div class="skill"><div><b>' + esc(h.what) + '</b><div class="small muted">' + esc(h.when) + '</div></div><div class="pts" style="color:' + (h.amt > 0 ? "var(--leaf)" : "var(--ink)") + '">' + (h.amt > 0 ? "+" : "") + fmt(h.amt) + "</div></div>").join("") + "</div>" +
         '<p class="small muted" style="margin-top:12px">' + (which === "business" ? "Only businesses get paid from Dandelions. " : "Your personal wallet holds points you get from other members, like selling a bike. ") +
@@ -574,6 +579,11 @@
     main.addEventListener("click", (e) => {
       const b = e.target.closest("[data-w]");
       if (b) { which = b.dataset.w; draw(); return; }
+      if (e.target.closest("#cap")) {
+        const n = Math.floor(+prompt("Most points to take from customers each month", w.cap.month));
+        if (n > 0) { w.cap.month = n; saved.wallet = { business: w.business, personal: w.personal, history: w.history, cap: w.cap }; save(); draw(); toast("Monthly limit set to " + fmt(n)); }
+        return;
+      }
       if (e.target.closest("#recv")) {
         $("#pane").innerHTML = '<div class="card" style="text-align:center"><div style="width:160px;height:160px;margin:0 auto;border-radius:12px;background:repeating-conic-gradient(var(--ink) 0 25%, var(--card) 0 50%) 0 0/20px 20px;border:8px solid var(--card);outline:1px solid var(--line)"></div><p class="small muted" style="margin-top:8px">Show this code to get paid. (Pretend code.)</p></div>';
       }
@@ -588,7 +598,7 @@
         if (amt > w[which].balance) { toast("Not enough points"); return; }
         w[which].balance -= amt;
         w.history.unshift({ when: "Today", what: "To " + to + (why ? ": " + why : ""), amt: -amt, wallet: which });
-        saved.wallet = { business: w.business, personal: w.personal, history: w.history }; save();
+        saved.wallet = { business: w.business, personal: w.personal, history: w.history, cap: w.cap }; save();
         draw(); toast("Sent " + fmt(amt) + " points");
       }
     });
@@ -666,7 +676,7 @@
 
     function queue() {
       return '<div class="page-head"><div class="eyebrow">Checks near you</div><h1>Pick one up.</h1><p>When a business finishes a milestone, a ticket goes to 5 checkers nearby with no ties to them. The first 3 to accept do the check. If nobody takes it in a day, it goes to the next 5.</p></div>' +
-        '<div class="card stats"><div class="stat"><b>' + C.tickets.length + '</b><span>Offered to you</span></div><div class="stat"><b>' + C.me.done + '</b><span>Checks done</span></div><div class="stat"><b>' + C.me.earned + '</b><span>Fees earned, pts</span></div></div>' +
+        '<div class="card stats"><div class="stat"><b>' + C.pool.checkers + '</b><span>Checkers in ' + esc(C.pool.place) + '</span></div><div class="stat"><b>' + C.me.done + '</b><span>Checks done</span></div><div class="stat"><b>' + C.me.earned + '</b><span>Fees earned, pts</span></div></div>' +
         '<div class="stack" style="margin-top:12px">' + C.tickets.map((t) =>
           '<div class="card"><div class="spread"><span class="chip">' + esc(typeName(t.type)) + '</span><span class="pts">' + t.fee + " pts fee</span></div>" +
           '<h3 style="margin:8px 0 2px">' + esc(t.title) + '</h3><p class="small muted">' + esc(t.owner) + " · " + esc(project(t.project).title || "") + "</p>" +
@@ -943,17 +953,20 @@
     const trail = [];
     for (let x = pl; x; x = S.places.find((y) => y.id === x.parent)) trail.unshift(x);
     const kids = S.places.filter((x) => x.parent === pl.id);
+    // Stages count by county, so a town shows its share but not a stage of its own.
+    const town = trail.length === 4;
+    const booked = (x) => x.busy ? x.busy + "% booked" : "No reports yet";
     main.innerHTML =
       '<p class="small" style="margin:4px 0 10px">' + trail.map((x, i) => i < trail.length - 1 ? '<a href="/preview/place.html?at=' + x.id + '">' + esc(x.name) + "</a> › " : "<b>" + esc(x.name) + "</b>").join("") + "</p>" +
       '<div class="page-head" style="padding-top:0"><div class="eyebrow">Sample numbers</div><h1 style="font-size:32px">' + esc(pl.name) + "</h1></div>" +
-      '<div class="card"><div class="spread"><b>Stage: ' + stageOf(pl.pct) + '</b><span class="small muted">' + (pl.pct * 100).toFixed(1) + "% of people</span></div>" +
+      '<div class="card"><div class="spread"><b>' + (town ? "Counts toward " + esc(trail[2].name) : trail.length < 3 ? "Stages go by county" : "Stage: " + stageOf(pl.pct)) + '</b><span class="small muted">' + (pl.pct * 100).toFixed(pl.pct < 0.001 ? 3 : 1) + "% of people</span></div>" +
         '<div class="bar" style="margin-top:8px"><span style="width:' + Math.min(100, Math.round(pl.pct / 0.1 * 100)) + '%"></span></div><p class="small muted" style="margin-top:4px">Sprout at 1%, Bloom at 5%, Puffball at 10%</p>' +
         '<div class="stats" style="margin-top:12px">' +
-          [[fmt(pl.members), "Members"], [fmt(pl.businesses), "Businesses"], [pl.busy + "%", "How booked businesses are"], [fmt(pl.looking), "Looking for work"], [fmt(pl.open), "Funded projects open"], [fmt(pl.created - pl.retired), "Points in use"]]
+          [[fmt(pl.members), "Members"], [fmt(pl.businesses), "Businesses"], [pl.busy ? pl.busy + "%" : "–", "How booked businesses are"], [fmt(pl.looking), "Looking for work"], [fmt(pl.open), "Funded projects open"], [fmt(pl.created - pl.retired), "Points in use"]]
             .map((n) => '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>").join("") + "</div>" +
-        '<p class="note" style="margin-top:12px"><b>AI note:</b> ' + esc(pl.note) + "</p></div>" +
-      (kids.length ? '<h2 class="section-title">' + (pl.id === "us" ? "States" : "Counties") + '</h2><div class="stack">' + kids.map((k) =>
-        '<a class="card pcard" href="/preview/place.html?at=' + k.id + '"><div class="spread"><h3 style="margin:0">' + esc(k.name) + '</h3><span class="chip">' + stageOf(k.pct) + '</span></div><p class="small muted" style="margin-top:4px">' + fmt(k.members) + " members · " + k.busy + "% booked · " + fmt(k.looking) + " looking for work</p></a>").join("") + "</div>" : "") +
+        '<p class="note" style="margin-top:12px">' + esc(pl.note) + "</p></div>" +
+      (kids.length ? '<h2 class="section-title">' + ["States", "Counties", "Towns"][trail.length - 1] + '</h2><div class="stack">' + kids.map((k) =>
+        '<a class="card pcard" href="/preview/place.html?at=' + k.id + '"><div class="spread"><h3 style="margin:0">' + esc(k.name) + '</h3><span class="chip">' + (trail.length === 3 ? (k.pct * 100).toFixed(1) + "%" : stageOf(k.pct)) + '</span></div><p class="small muted" style="margin-top:4px">' + fmt(k.members) + " members · " + booked(k) + " · " + fmt(k.looking) + " looking for work</p></a>").join("") + "</div>" : "") +
       '<p class="small muted" style="margin-top:12px">Only a sample of places is filled in. The real map covers every state and county, from the public log and Census data.</p>';
   }
 
