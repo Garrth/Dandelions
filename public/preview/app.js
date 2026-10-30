@@ -902,7 +902,7 @@
             '<span style="position:absolute;left:' + pos(acct.min) + "%;right:" + (100 - pos(acct.max)) + '%;top:0;bottom:0;background:color-mix(in srgb, var(--leaf) 25%, transparent);border-radius:9px"></span>' +
             '<span style="position:absolute;left:calc(' + Math.min(100, pos(acct.balance)) + '% - 3px);top:-4px;width:6px;height:26px;border-radius:3px;background:var(--ink)"></span></div>' +
           '<div class="spread small muted"><span>Low line ' + fmt(acct.min) + "</span><span>High line " + fmt(acct.max) + "</span></div>" +
-          '<p class="small muted" style="margin-top:8px">Below the low line, new points are created to bring it back to the start, only if local workers and materials can cover the work. Above the high line, extra points are retired. Both go on the public log.</p>' +
+          '<p class="small muted" style="margin-top:8px">Below the low line, new points are created to bring it back to the start, only within the county\'s monthly budget. Above the high line, extra points are retired. Both go on the public log.</p>' +
           '<div class="row" style="margin-top:10px"><button class="btn small" type="button" id="busy">Preview: a busy week of payouts</button><button class="btn ghost small" type="button" id="back">Preview: lots of points come back</button></div></div>' +
         '<h2 class="section-title">Recent activity</h2><div class="card">' + events.concat(O.payouts).map((h) =>
           '<div class="skill"><div><b>' + esc(h.what) + '</b><div class="small muted">' + esc(h.when) + '</div></div><div class="pts" style="color:' + (h.amt > 0 ? "var(--leaf)" : "var(--ink)") + '">' + (h.amt > 0 ? "+" : "") + fmt(h.amt) + "</div></div>").join("") + "</div>" +
@@ -914,10 +914,10 @@
     main.addEventListener("click", (e) => {
       const log = (what, amt) => { events.unshift({ when: "Just now", what, amt }); };
       if (e.target.closest("#busy")) {
-        acct.balance -= 31000; log("Payouts for 62 milestones and checks", -31000);
+        acct.balance -= 12000; log("Payouts for 40 milestones and checks", -12000);
         if (acct.balance < acct.min) { const add = acct.start - acct.balance; log("Top-up: new points created by the rules", add); acct.balance = acct.start; toast("Below the low line. " + fmt(add) + " new points created."); }
       } else if (e.target.closest("#back")) {
-        acct.balance += 36000; log("Fines and returned points", 36000);
+        acct.balance += 24000; log("Fines and returned points", 24000);
         if (acct.balance > acct.max) { const cut = acct.balance - acct.start; log("Retired: extra points removed", -cut); acct.balance = acct.start; toast("Above the high line. " + fmt(cut) + " points retired."); }
       } else return;
       saved.opBalance = acct.balance; saved.opEvents = events; save(); draw();
@@ -985,6 +985,7 @@
   // ---------- Raindy's data: real public numbers for one place, simple view with details on tap ----------
   if (page === "raindy") {
     const R = window.RAINDY, W = R.working, LW = R.livingWage;
+    const F = Object.assign({ created: S.launch.budget.used }, S.launch.flow), MA = S.launch.memberAnswers;
     const ch = (now, then) => Math.round((now / then - 1) * 1000) / 10;
     const trend = (pctv, upIsGood = true) => {
       const col = pctv === 0 ? "var(--muted)" : (pctv > 0) === upIsGood ? "var(--leaf)" : "var(--warn)";
@@ -1010,7 +1011,7 @@
     };
     main.innerHTML =
       '<div class="page-head"><div class="eyebrow">Raindy\'s data</div><h1>' + esc(R.place) + ' by the numbers.</h1><p>The numbers Raindy, our AI, uses to spot good and bad trends. Ask Raindy about them in Talk.</p></div>' +
-      '<p class="note"><b>Real public numbers</b>, pulled ' + esc(R.pulled) + ". Dandelions isn't running here yet, so nothing comes from members or points yet.</p>" +
+      '<p class="note"><b>Public numbers are real</b>, pulled ' + esc(R.pulled) + ". Numbers from members and points are samples of what comes in once a county reaches 1%.</p>" +
       '<input id="q" type="search" placeholder="Search: dental, rent, restaurants, home care…" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin:14px 0 4px">' +
 
       '<div id="tiles"><h2 class="section-title">At a glance</h2><div class="stack">' +
@@ -1018,8 +1019,12 @@
         tile("Jobs here", fmt(R.jobs.now) + " " + trend(ch(R.jobs.now, R.jobs.yearAgo)), "Jobs located in the county, against a year ago. Still below 2019 (" + fmt(R.jobs.y2019) + ").") +
         tile("Average pay", "$" + R.hourly.now.toFixed(2) + '<span class="small"> an hour</span> ' + trend(ch(R.hourly.now, R.hourly.yearAgo)), "Living wage here: $" + LW.oneAdult.toFixed(2) + " for one adult, $" + LW.oneAdultOneChild.toFixed(2) + " for one adult with a child. Minimum wage is $" + LW.minimum.toFixed(2) + ".") +
         tile("Prices", "+" + R.prices.all + '%<span class="small"> a year</span>', "Eating out +" + R.prices.eatingOut + "%, groceries +" + R.prices.groceries + "%, housing +" + R.prices.shelter + "% (" + esc(R.prices.region) + ", year to " + esc(R.prices.month) + "). Median rent here $" + fmt(R.people.medianRent) + " a month.") +
-        '<div class="card" style="background:var(--soft)"><div class="eyebrow">Points moving</div><div style="font-family:var(--display);font-size:24px;margin:4px 0">Starts at 1%</div>' +
-          '<p class="small muted">Once points start: points earned and by how many businesses, where they\'re spent by category, how many days a point sits before it\'s spent, and how many times it changes hands here before it leaves. Totals only, never a person\'s trail.</p></div>' +
+        '<div class="card" style="background:var(--soft)"><div class="eyebrow">Points moving · sample</div><div style="font-family:var(--display);font-size:30px;margin:4px 0">' + fmt(F.created) + '<span class="small"> created this month</span></div>' +
+          '<p class="small muted">Earned by ' + F.earnedBy + " businesses, spent at " + F.spentAt + ". A point sits about " + F.daysToSpend + " days before it's spent and changes hands " + F.handsBeforeLeaving + " times here before it leaves the county.</p>" +
+          '<div class="stack small" style="margin-top:8px">' + F.spentOn.map((x) => '<div><div class="spread"><span>' + esc(x[0]) + "</span><span>" + x[1] + '%</span></div><div class="bar"><span style="width:' + x[1] + '%"></span></div></div>').join("") + "</div>" +
+          '<p class="small muted" style="margin-top:8px">Totals only, never a person\'s trail. A number shows only when at least 10 businesses are behind it.</p></div>' +
+        '<div class="card" style="background:var(--soft)"><div class="eyebrow">From members · sample</div><div style="font-family:var(--display);font-size:30px;margin:4px 0">' + MA.twoJobs + '%<span class="small"> work two jobs</span></div>' +
+          '<p class="small muted">' + MA.underLivingWage + "% earn under the living wage and " + fmt(MA.lookingForWork) + " are looking for work. From " + fmt(MA.answered) + " members who answered the optional work questions.</p></div>" +
       "</div></div>" +
 
       '<h2 class="section-title">Local businesses</h2><p class="small muted" style="margin-bottom:8px">Tap one for details. Living wage compares pay per worker with $' + fmt(LW.yearly) + " a year, a full-time living wage for one adult.</p>" +
@@ -1068,7 +1073,7 @@
         '<label class="small" style="display:block;margin-top:12px"><b>What is it about?</b><select id="dabout" ' + sel + '><option>A check result on my project</option><option>A payout that didn\'t come</option><option>A business didn\'t do what it agreed</option><option>A member broke the rules</option></select></label>' +
         '<label class="small"><b>Which project</b><select id="dproj" ' + sel + '>' + S.projects.map((p) => '<option value="' + p.id + '">' + esc(p.title) + '</option>').join("") + '</select></label>' +
         '<label class="small"><b>What happened?</b><textarea id="dwhat" placeholder="Just the facts: what, when, who"></textarea></label>' +
-        '<label class="small" style="display:block;margin-top:10px"><b>What would make it right?</b><input id="dwant" ' + sel + ' placeholder="Example: look at the daytime photos and pay the milestone"></label>' +
+        '<label class="small" style="display:block;margin-top:10px"><b>What would make it right?</b><input id="dwant" ' + sel + ' placeholder="Example: look at the fixed captions and pay the milestone"></label>' +
         '<label class="upload"><input type="file" accept="image/*,.pdf" multiple><span class="small"><b>Add evidence</b> <span class="muted">Photos, receipts, messages</span></span></label>' +
         '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="dtrue"> What I wrote is true to the best of my knowledge</label>' +
         '<button class="btn" type="button" id="dsend" style="width:100%;margin-top:12px">File the case</button>' +
@@ -1081,7 +1086,7 @@
         if (!$("#dtrue", back).checked) { toast("Tick the box to confirm it's true"); return; }
         const p = S.projects.find((x) => x.id === $("#dproj", back).value);
         const m = p.milestones.find((x) => x.status !== "approved");
-        saved.newCase = { id: "1043", about: $("#dabout", back).value + " · " + p.title, what, with: p.mine ? "the checker panel" : p.owner, freeze: m ? m.points : 0 };
+        saved.newCase = { id: "1008", about: $("#dabout", back).value + " · " + p.title, what, with: p.mine ? "the checker panel" : p.owner, freeze: m ? m.points : 0 };
         save(); location.reload();
       });
       document.body.appendChild(back);
