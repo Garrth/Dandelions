@@ -1,11 +1,13 @@
-// Sample data for the preview screens. None of it is real, and nothing here talks to the database.
+// Sample data for the preview screens. People, businesses and projects are made up, and nothing here talks to the database.
+// The setting is Sonoma County, CA a few weeks after it reached 1% and points turned on. County numbers come from raindy-data.js.
 window.SAMPLE = {
   me: {
     name: "Sam Rivera",
-    county: "Fresno County, CA",
+    county: "Sonoma County, CA",
+    town: "Santa Rosa",
     step: 3,
-    verified: { by: "Equitide (Plaid)", on: "Oct 12, 2026" },
-    stats: { projects: 7, checks: 0, months: 2 },
+    verified: { by: "Equitide (Plaid)", on: "Sep 12, 2026" },
+    stats: { projects: 1, checks: 0, months: 2 },
     nextStep: {
       name: "Checker",
       needs: [
@@ -15,28 +17,38 @@ window.SAMPLE = {
       ]
     },
     // What the person can do, for matching with businesses that are hiring. Pay is left to the business and the person.
-    lookingFor: { open: true, kinds: ["Temp work", "Part-time"], area: "Within 20 miles of Fresno" },
+    lookingFor: { open: true, kinds: ["Temp work", "Part-time"], area: "Within 20 miles of Santa Rosa" },
     canDo: ["Drywall repair", "Plumbing fixtures", "Interior painting", "Doors and locks"],
     certs: ["OSHA 10-hour construction", "EPA lead-safe renovator (RRP)"],
     owns: ["b1"],
     badges: [
       { icon: "🌱", name: "Seed planter", got: true },
       { icon: "🔨", name: "First project", got: true },
-      { icon: "⭐", name: "5 projects done", got: true },
+      { icon: "⭐", name: "5 projects done", got: false },
       { icon: "🔍", name: "Checker", got: false },
       { icon: "🛠️", name: "Operator", got: false },
       { icon: "🗝️", name: "Keeper", got: false }
     ]
   },
 
+  // Where Sonoma County stands. Points start only when a county reaches 1% on its own.
+  launch: {
+    place: "Sonoma County, CA", stage: "Sprout", icon: "🌱", pct: 1.0, members: 4902, businesses: 593,
+    reached: "Oct 5, 2026", nextStage: "Bloom", nextPct: 5,
+    budget: { month: 20000, used: 6450, rule: "Set from what member businesses can spend at each other each month. It grows as more places to spend join." },
+    open: ["word", "run"],
+    openWhy: "At 1%, the first projects build Dandelions itself: getting the word out, signing up businesses and running the system.",
+    later: "Pay to train and Common good open later, when members vote them in."
+  },
+
   businesses: [
     {
-      id: "b1", name: "Rivera Handyman Services", owner: "Sam Rivera", county: "Fresno County, CA",
-      license: "City of Fresno business license, checked Oct 14, 2026",
+      id: "b1", name: "Rivera Handyman Services", owner: "Sam Rivera", county: "Sonoma County, CA", town: "Santa Rosa",
+      license: "City of Santa Rosa business tax certificate, checked Sep 14, 2026",
       services: ["Small home repairs", "Drywall and paint", "Plumbing fixtures", "Doors, locks and hardware"],
-      size: { grossUsd: 185000, grossPts: 2400, employees: 2 },
-      track: { done: 7, onTime: 6, disputes: 0, largest: 600, average: 380 },
-      limit: { now: 3000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
+      size: { grossUsd: 185000, grossPts: 240, employees: 2 },
+      track: { done: 1, onTime: 1, disputes: 0, largest: 300, average: 300 },
+      limit: { now: 800, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
       busy: 55, insured: true, tradeLicenses: [],
       hiring: [
         { title: "Handyman helper", kind: "Temp, 6 weeks", note: "Basic tools, own ride" },
@@ -44,61 +56,54 @@ window.SAMPLE = {
       ]
     },
     {
-      id: "b2", name: "Summit Roofing", owner: "Dana Cho", county: "Fresno County, CA",
-      license: "CSLB C-39 roofing license, checked Sep 30, 2026",
-      services: ["Roof repair", "Gutter cleaning and repair", "Roof inspections"],
-      size: { grossUsd: 1400000, grossPts: 5100, employees: 11 },
-      track: { done: 12, onTime: 12, disputes: 1, largest: 2400, average: 900 },
-      limit: { now: 12000, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
-      busy: 40, insured: true, tradeLicenses: ["CSLB C-39 roofing"],
-      hiring: [{ title: "Roofing laborer", kind: "Permanent", note: "Will train" }]
+      id: "b2", name: "Bright Coat Painting", owner: "Dana Cho", county: "Sonoma County, CA", town: "Petaluma",
+      license: "CSLB C-33 painting license, checked Sep 30, 2026",
+      services: ["Interior and exterior painting", "Deck staining", "Small drywall repair"],
+      size: { grossUsd: 920000, grossPts: 610, employees: 8 },
+      track: { done: 2, onTime: 2, disputes: 0, largest: 400, average: 350 },
+      limit: { now: 1500, rule: "Set from yearly gross, employees and track record. Grows as projects finish on time and pass checks." },
+      busy: 70, insured: true, tradeLicenses: ["CSLB C-33 painting"],
+      hiring: [{ title: "Painter's helper", kind: "Permanent", note: "Will train" }]
     }
   ],
 
-  // Local numbers behind funding decisions. In the real build these come from member reports and public data.
+  // Local numbers members report. Early on few businesses report, so the numbers are rough.
   local: {
-    "Fresno County, CA": { busy: 52, reporting: 23, lookingForWork: 31, materials: "Available" },
-    "Kern County, CA": { busy: 68, reporting: 14, lookingForWork: 19, materials: "Available" },
-    "Tulare County, CA": { busy: 47, reporting: 9, lookingForWork: 22, materials: "Available" },
-    "California": { busy: 58, reporting: 412, lookingForWork: 2140, materials: "Available" },
-    "Nationwide": { busy: 61, reporting: 1906, lookingForWork: 11800, materials: "Mostly available" }
+    "Sonoma County, CA": { busy: 62, reporting: 118, lookingForWork: 340, materials: "Available" },
+    "California": { busy: 62, reporting: 131, lookingForWork: 610, materials: "Available" },
+    "Nationwide": { busy: 60, reporting: 204, lookingForWork: 1450, materials: "Available" }
   },
 
   // The three area levels on the Work page, and the bar a business has to clear to run projects at each one.
   areas: [
-    { key: "county", name: "Fresno County, CA", short: "County", need: { done: 0, onTime: 0, open: 2 }, typical: "Up to your size limit" },
-    { key: "state", name: "California", short: "State", need: { done: 5, onTime: 80, open: 3 }, typical: "Usually 2,000 to 10,000 points" },
-    { key: "nation", name: "Nationwide", short: "Nationwide", need: { done: 15, onTime: 90, open: 3 }, typical: "Usually 5,000 points and up" }
+    { key: "county", name: "Sonoma County, CA", short: "County", need: { done: 0, onTime: 0, open: 2 }, typical: "Up to your size limit" },
+    { key: "state", name: "California", short: "State", need: { done: 5, onTime: 80, open: 3 }, typical: "Usually 1,000 to 5,000 points" },
+    { key: "nation", name: "Nationwide", short: "Nationwide", need: { done: 15, onTime: 90, open: 3 }, typical: "Usually 3,000 points and up" }
   ],
 
-  // Categories under each project type. "open" lists the area levels where local data says there's room for it right now.
+  // Categories under each project type. "open" lists the area levels where there's room for it right now.
   categories: {
     train: [
-      { name: "Home repair helper", open: ["county", "state", "nation"], onsite: true, max: 1200 },
-      { name: "Painting trainee", open: ["county", "state", "nation"], onsite: true, max: 1200 },
-      { name: "Roofing trainee", open: ["county", "state"], onsite: true, max: 1500, license: "CSLB C-39 roofing" },
-      { name: "Electrical trainee", open: ["state", "nation"], onsite: true, max: 2000, license: "CSLB C-10 electrical", why: "No local electricians have room to train right now" },
-      { name: "Restaurant kitchen trainee", open: ["county", "state", "nation"], onsite: true, max: 900 },
-      { name: "Auto repair trainee", open: ["nation"], onsite: true, max: 1200, why: "Local shops are 85% booked and few members want this work" }
+      { name: "Trade helper", open: [], onsite: true, max: 1200, why: "Opens later, when members vote it in" },
+      { name: "Restaurant kitchen trainee", open: [], onsite: true, max: 900, why: "Opens later, when members vote it in" },
+      { name: "Automation tech trainee", open: [], onsite: true, max: 2000, why: "Opens later, when members vote it in" }
     ],
     common: [
-      { name: "Storm drains", open: ["county", "state"], onsite: true, max: 2000 },
-      { name: "Trail upkeep", open: ["county", "state", "nation"], onsite: true, max: 3000 },
-      { name: "Creek cleanup", open: ["county", "state", "nation"], onsite: true, max: 2500 },
-      { name: "Graffiti removal", open: ["county"], onsite: true, max: 800 },
-      { name: "Wildfire brush clearing for seniors", open: ["state"], onsite: true, max: 8000, why: "Run statewide so crews can go where the risk is" },
-      { name: "Tree care", open: [], onsite: true, max: 0, why: "Not a category yet. It's gaining support in Talk" }
+      { name: "Creek cleanup", open: [], onsite: true, max: 2500, why: "Opens later, when members vote it in" },
+      { name: "Trail upkeep", open: [], onsite: true, max: 3000, why: "Opens later, when members vote it in" },
+      { name: "Wildfire brush clearing for seniors", open: [], onsite: true, max: 8000, why: "Opens later, when members vote it in" }
     ],
     word: [
-      { name: "Social posts and video", open: ["county", "state", "nation"], onsite: false, max: 2000 },
-      { name: "Podcast and radio spots", open: ["county", "state", "nation"], onsite: false, max: 3000 },
-      { name: "Sign up a business's suppliers", open: ["county", "state"], onsite: false, max: 600 },
-      { name: "Local events and booths", open: ["county"], onsite: true, max: 800 }
+      { name: "Social posts and video", open: ["county", "state", "nation"], onsite: false, max: 1200 },
+      { name: "Podcast and radio spots", open: ["county", "state", "nation"], onsite: false, max: 1500 },
+      { name: "Sign up a business's suppliers", open: ["county"], onsite: false, max: 400 },
+      { name: "Sign-up tables at markets and events", open: ["county"], onsite: true, max: 600 }
     ],
     run: [
-      { name: "Support and moderation", open: ["state", "nation"], onsite: false, max: 4000, why: "Run at state level and up" },
-      { name: "Hosting and nodes", open: ["nation"], onsite: false, max: 9000, why: "Run nationwide only" },
-      { name: "Member data and reports", open: ["county", "state", "nation"], onsite: false, max: 1500 }
+      { name: "Help desk and moderation", open: ["county", "state", "nation"], onsite: false, max: 800 },
+      { name: "Member data and reports", open: ["county", "state", "nation"], onsite: false, max: 1200 },
+      { name: "ID checks", open: ["nation"], onsite: false, max: 2000, why: "Run nationwide only" },
+      { name: "Hosting and nodes", open: ["nation"], onsite: false, max: 9000, why: "Run nationwide only" }
     ]
   },
 
@@ -106,77 +111,87 @@ window.SAMPLE = {
   milestoneTemplates: {
     train: [["Trainee starts, training plan posted", 0.15], ["Halfway skills check", 0.35], ["Final skills check", 0.5]],
     common: [["Plan and map posted", 0.1], ["Work done, before and after photos", 0.9]],
-    word: [["Content or outreach plan", 0.15], ["Posts or calls done", 0.25], ["Results: views and pledges", 0.6]],
+    word: [["Outreach plan", 0.15], ["Posts, calls or tables done", 0.25], ["Results: confirmed sign-ups", 0.6]],
     run: [["First month", 0.34], ["Second month", 0.33], ["Third month", 0.33]]
   },
 
-  // What points are created for: work usually paid by taxes or charity, running Dandelions, and paid training.
-  // Regular jobs between businesses (like repairs for a landlord) aren't funded; they're paid in points or dollars through the directory.
+  // What points are created for. Regular jobs between businesses (like repairs for a landlord) aren't funded;
+  // they're paid in points or dollars through the directory.
   types: [
+    { key: "word", name: "Spread the word", blurb: "Posts, videos, podcast spots, sign-up tables and signing up a business's suppliers. Paid mostly on confirmed sign-ups." },
+    { key: "run", name: "Run Dandelions", blurb: "The work of running the system: help desk, member data, ID checks, proof checks, hosting." },
     { key: "train", name: "Pay to train", blurb: "Take on someone who wants to learn a trade. Your business gets points to cover training; you pay the trainee in dollars." },
-    { key: "common", name: "Common good", blurb: "Work usually paid for by taxes or charity that isn't getting done: storm drains, trails, creek cleanups, public spaces." },
-    { key: "word", name: "Spread the word", blurb: "Posts, videos, podcast spots and outreach to new businesses. Paid mostly on results." },
-    { key: "run", name: "Run Dandelions", blurb: "The work of running the system: ID checks, proof checks, hosting, support, moderation." }
+    { key: "common", name: "Common good", blurb: "Work usually paid for by taxes or charity that isn't getting done: creeks, trails, brush clearing, public spaces." }
   ],
 
   projects: [
     {
-      id: "p2", level: "county", type: "train", title: "Handyman helper, 6 weeks", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
-      county: "Fresno County, CA", points: 600, helpers: 0, status: "working",
-      desc: "Rivera takes on one helper who wants to learn repair work, and pays them in dollars. The points go to Rivera to cover the time spent training and the materials.",
+      id: "p2", level: "county", type: "word", title: "Sign up my suppliers", owner: "Rivera Handyman Services", ownerId: "b1", mine: true,
+      county: "Sonoma County, CA", points: 300, helpers: 0, status: "working",
+      desc: "Rivera reaches out to the 6 places it buys from every month: the lumber yard, plumbing supply, paint store, tool rental, dump and bookkeeper. When they join, Rivera can spend the points it earns where it already shops.",
       milestones: [
-        { title: "Helper starts, training plan posted", points: 100, status: "approved", proof: ["Training plan", "Start date confirmed"], votes: ["yes", "yes", "yes"] },
-        { title: "Week 3 skills check", points: 200, status: "todo", proof: [], votes: [] },
-        { title: "Week 6 skills check", points: 300, status: "todo", proof: [], votes: [] }
+        { title: "Supplier list and first calls", points: 50, status: "approved", proof: ["List of 6 suppliers", "Call notes"], votes: ["yes", "yes", "yes"] },
+        { title: "3 suppliers signed up and taking points", points: 250, status: "todo", proof: [], votes: [] }
       ]
     },
     {
-      id: "p5", level: "county", type: "common", title: "Clear storm drains before the rain", owner: "Summit Roofing", ownerId: "b2",
-      county: "Fresno County, CA", points: 450, helpers: 2, status: "working",
-      desc: "The city pays for this with taxes but hasn't gotten to the east side this year. Clear and photograph 40 storm drains before the rains.",
+      id: "p5", level: "county", type: "word", title: "Sign-up table at the Santa Rosa farmers market", owner: "Bright Coat Painting", ownerId: "b2",
+      county: "Sonoma County, CA", points: 480, helpers: 2, status: "working",
+      desc: "Four Saturdays at a table at the downtown market. People sign up on their own phones. Bright Coat is paid for the table and for each sign-up that confirms by email. No one is promised jobs or points for joining.",
       milestones: [
-        { title: "Drains mapped", points: 50, status: "approved", proof: ["Map, 40 drains"], votes: ["yes", "yes", "yes"] },
-        { title: "Drains cleared", points: 400, status: "review", proof: ["Before: drain 12", "After: drain 12", "Before: drain 13", "After: drain 13", "Dump receipt"], votes: ["yes"] }
+        { title: "Table plan and dates", points: 40, status: "approved", proof: ["Market booth permit", "Flyer"], votes: ["yes", "yes", "yes"] },
+        { title: "First 2 Saturdays: 31 confirmed sign-ups", points: 220, status: "review", proof: ["Table, Oct 17", "Table, Oct 24", "Flyer up close", "Sign-up count from the app"], votes: ["yes"] },
+        { title: "Last 2 Saturdays", points: 220, status: "todo", proof: [], votes: [] }
       ]
     },
     {
-      id: "p1", level: "county", type: "word", title: "Tell the Central Valley about Dandelions", owner: "Valley Buzz Media",
-      county: "Fresno County, CA", points: 1200, helpers: 3, status: "open",
-      desc: "A main project for local creators. Valley Buzz plans the posts and creators start their own sub-projects under it. Every paid post says it's paid (#ad).",
-      subs: ["Podcast spot: Working Class Hour", "Short videos: Fresno food spots", "Instagram series: fix-it Fridays"],
+      id: "p1", level: "county", type: "word", title: "Tell Sonoma County about Dandelions", owner: "Laguna Creek Media",
+      county: "Sonoma County, CA", points: 1200, helpers: 3, status: "open",
+      desc: "A main project for local creators. Laguna Creek plans the posts and creators start their own sub-projects under it. Every paid post says it's paid (#ad). Paid mostly on sign-ups through each creator's link.",
+      subs: ["Podcast spot: North Bay small business show", "Short videos: Santa Rosa lunch spots that take points", "Instagram series: Fix-it Fridays"],
       milestones: [
-        { title: "Content plan", points: 150, status: "approved", proof: ["Content plan"], votes: ["yes", "yes", "yes"] },
-        { title: "10 posts live", points: 300, status: "todo", proof: [], votes: [] },
-        { title: "Results: 5,000 views and 25 pledges through the link", points: 750, status: "todo", proof: [], votes: [] }
+        { title: "Content plan", points: 100, status: "approved", proof: ["Content plan"], votes: ["yes", "yes", "yes"] },
+        { title: "10 posts live, each marked #ad", points: 300, status: "todo", proof: [], votes: [] },
+        { title: "Results: 50 confirmed sign-ups through the links", points: 800, status: "todo", proof: [], votes: [] }
       ]
     },
     {
       id: "p3", level: "county", type: "word", title: "Sign up Lupita's Kitchen suppliers", owner: "Lupita's Kitchen",
-      county: "Kern County, CA", points: 300, helpers: 0, status: "open",
-      desc: "Lupita's Kitchen joined last week. This project reaches out to its 8 regular suppliers: produce, meat, tortillas, paper goods and the linen service.",
+      county: "Sonoma County, CA", points: 300, helpers: 0, status: "open",
+      desc: "Lupita's Kitchen in Roseland joined last week. This project reaches out to its 8 regular suppliers: produce, meat, tortillas, paper goods and the linen service.",
       milestones: [
         { title: "Supplier list and first calls", points: 50, status: "todo", proof: [], votes: [] },
         { title: "4 suppliers signed up", points: 250, status: "todo", proof: [], votes: [] }
       ]
     },
     {
-      id: "p4", level: "county", type: "train", title: "Paint crew trainee, 8 weeks", owner: "Bright Coat Painting",
-      county: "Tulare County, CA", points: 800, helpers: 0, status: "open",
-      desc: "Bright Coat takes on one trainee for 8 weeks and pays them at least minimum wage in dollars. The points go to Bright Coat as a training subsidy, for materials and costs.",
+      id: "p4", level: "county", type: "run", title: "Sonoma help desk, first 3 months", owner: "Cotati Office Help",
+      county: "Sonoma County, CA", points: 600, helpers: 1, status: "working",
+      desc: "Answer member questions by email and chat, in English and Spanish, and keep the Sonoma Talk room friendly. Monthly report of questions asked, with no names.",
       milestones: [
-        { title: "Trainee starts, training plan posted", points: 100, status: "todo", proof: [], votes: [] },
-        { title: "Week 4 skills check", points: 300, status: "todo", proof: [], votes: [] },
-        { title: "Week 8 skills check", points: 400, status: "todo", proof: [], votes: [] }
+        { title: "First month", points: 200, status: "approved", proof: ["Monthly report: 412 questions answered"], votes: ["yes", "yes", "yes"] },
+        { title: "Second month", points: 200, status: "todo", proof: [], votes: [] },
+        { title: "Third month", points: 200, status: "todo", proof: [], votes: [] }
       ]
     },
     {
-      id: "ps1", level: "state", type: "common", title: "Brush clearing for seniors in fire zones", owner: "Golden State Fire Safe",
-      county: "California", points: 6000, helpers: 6, status: "open",
-      desc: "Clear brush around the homes of seniors who can't do it themselves, in high fire risk areas across the state. Usually paid by grants and charity, and the waitlist is long.",
+      id: "p7", level: "county", type: "run", title: "Find out why restaurants can't hire", owner: "North Bay Field Research",
+      county: "Sonoma County, CA", points: 900, helpers: 2, status: "open",
+      desc: "Sit-down restaurants here have about 10% fewer workers than in 2019. Talk to 40 restaurant owners and 60 people who left restaurant work, and post what they say. Raindy adds the results to its data.",
       milestones: [
-        { title: "Homes picked with the local fire departments", points: 600, status: "approved", proof: ["List of 50 homes, no addresses public"], votes: ["yes", "yes", "yes"] },
-        { title: "First 25 homes cleared", points: 2700, status: "todo", proof: [], votes: [] },
-        { title: "All 50 homes cleared", points: 2700, status: "todo", proof: [], votes: [] }
+        { title: "Questions posted for comment", points: 150, status: "todo", proof: [], votes: [] },
+        { title: "100 interviews done", points: 450, status: "todo", proof: [], votes: [] },
+        { title: "Report posted, no names", points: 300, status: "todo", proof: [], votes: [] }
+      ]
+    },
+    {
+      id: "ps1", level: "state", type: "word", title: "California small business podcast tour", owner: "Golden State Audio",
+      county: "California", points: 3000, helpers: 0, status: "open",
+      desc: "Spots on 12 California podcasts that small business owners listen to. Each spot says it's paid. Paid mostly on confirmed sign-ups through the show's link.",
+      milestones: [
+        { title: "Shows picked and booked", points: 300, status: "approved", proof: ["List of 12 shows"], votes: ["yes", "yes", "yes"] },
+        { title: "All 12 spots aired", points: 900, status: "todo", proof: [], votes: [] },
+        { title: "Results: confirmed sign-ups through the links", points: 1800, status: "todo", proof: [], votes: [] }
       ]
     },
     {
@@ -202,45 +217,49 @@ window.SAMPLE = {
   ],
 
   directory: [
-    { name: "Rivera Handyman Services", id: "b1", county: "Fresno County, CA", services: "Small home repairs, drywall, plumbing fixtures", takes: "Points or dollars", offer: "10% off repairs paid in points" },
-    { name: "Summit Roofing", id: "b2", county: "Fresno County, CA", services: "Roof repair, gutters, inspections", takes: "Points or dollars" },
-    { name: "Oak Street Rentals", county: "Fresno County, CA", services: "Rental homes and small offices", takes: "Part of rent in points" },
-    { name: "Lupita's Kitchen", county: "Kern County, CA", services: "Restaurant and catering", takes: "Points or dollars", offer: "Free drink with a meal paid in points" },
-    { name: "Valley Buzz Media", county: "Fresno County, CA", services: "Social media and video", takes: "Points or dollars" },
-    { name: "Bright Coat Painting", county: "Tulare County, CA", services: "Interior and exterior painting", takes: "Points or dollars" }
+    { name: "Rivera Handyman Services", id: "b1", county: "Santa Rosa", services: "Small home repairs, drywall, plumbing fixtures", takes: "Points or dollars", offer: "10% off repairs paid in points" },
+    { name: "Bright Coat Painting", id: "b2", county: "Petaluma", services: "Interior and exterior painting, decks", takes: "Points or dollars" },
+    { name: "Lupita's Kitchen", county: "Santa Rosa", services: "Restaurant and catering", takes: "Points or dollars", offer: "Free agua fresca with a meal paid in points" },
+    { name: "Oak Street Rentals", county: "Santa Rosa", services: "Rental homes and small offices", takes: "Up to 10% of rent in points" },
+    { name: "Corner Lumber and Supply", county: "Santa Rosa", services: "Lumber, hardware, tool rental", takes: "Up to 500 points a month" },
+    { name: "Laguna Creek Media", county: "Sebastopol", services: "Social media and video", takes: "Points or dollars" },
+    { name: "Mill Street Barbers", county: "Healdsburg", services: "Haircuts and shaves", takes: "Points or dollars", offer: "Fifth cut free in points" },
+    { name: "Cotati Office Help", county: "Cotati", services: "Bookkeeping, scheduling, help desk", takes: "Points or dollars" }
   ],
 
   wallet: {
-    business: { name: "Rivera Handyman Services", balance: 1240 },
-    personal: { name: "Sam Rivera", balance: 85 },
+    business: { name: "Rivera Handyman Services", balance: 310 },
+    personal: { name: "Sam Rivera", balance: 60 },
     history: [
-      { when: "Oct 27", what: "From Dandelions: Handyman helper, milestone 1", amt: 100, wallet: "business" },
-      { when: "Oct 24", what: "From Oak Street Rentals: repairs, 1220 Oak St", amt: 340, wallet: "business" },
-      { when: "Oct 22", what: "To Valley Lumber: drywall and screws", amt: -180, wallet: "business" },
-      { when: "Oct 20", what: "From a member: old mountain bike", amt: 85, wallet: "personal" },
-      { when: "Oct 18", what: "To Lupita's Kitchen: lunch for the crew", amt: -60, wallet: "business" }
+      { when: "Oct 27", what: "From Dandelions: Sign up my suppliers, milestone 1", amt: 50, wallet: "business" },
+      { when: "Oct 24", what: "From Oak Street Rentals: repairs, 1220 Oak St", amt: 240, wallet: "business" },
+      { when: "Oct 22", what: "To Corner Lumber and Supply: drywall and screws", amt: -120, wallet: "business" },
+      { when: "Oct 20", what: "From a member: old mountain bike", amt: 60, wallet: "personal" },
+      { when: "Oct 18", what: "To Lupita's Kitchen: lunch for the crew", amt: -45, wallet: "business" }
     ]
   },
 
   talk: {
     rooms: [
-      { name: "Fresno County", members: 412, new: 6 },
-      { name: "California", members: 3870, new: 14 },
-      { name: "Everyone, nationwide", members: 21440, new: 52 },
-      { name: "Topic: Pay to train", members: 980, new: 3 },
-      { name: "Topic: Common good", members: 1210, new: 9 }
+      { name: "Sonoma County", members: 1240, new: 11 },
+      { name: "Santa Rosa", members: 610, new: 4 },
+      { name: "Petaluma", members: 220, new: 2 },
+      { name: "California", members: 1980, new: 6 },
+      { name: "Everyone, nationwide", members: 5120, new: 23 },
+      { name: "Topic: What opens next", members: 740, new: 9 }
     ],
     ideas: [
-      { id: "i1", title: "Fund a weekend trades class at Fresno City College", by: "Dana C.", backers: 7, need: 10, weight: "Light", scope: "Fresno County, CA", replies: 12 },
-      { id: "i2", title: "Add \"tree care\" as a Common good category", by: "Marcus T.", backers: 64, need: 100, weight: "Heavy", scope: "Nationwide", replies: 31 }
+      { id: "i1", title: "Open Pay to train in Sonoma County next", by: "Dana C.", backers: 182, need: 250, weight: "Heavy", scope: "Sonoma County, CA", replies: 64 },
+      { id: "i2", title: "Add a sign-up table at the Petaluma market", by: "Marcus T.", backers: 7, need: 10, weight: "Light", scope: "Sonoma County, CA", replies: 5 },
+      { id: "i3", title: "Add \"automation tech trainee\" as a Pay to train category", by: "Lupe R.", backers: 64, need: 100, weight: "Heavy", scope: "Nationwide", replies: 31 }
     ],
-    ballot: { title: "Make storm drains a top priority in Fresno County this winter", weight: "Light", rule: "Passes with 51% of votes cast", yes: 132, no: 41, ends: "Nov 4" }
+    ballot: { title: "Raise Sonoma County's monthly point budget from 20,000 to 30,000", weight: "Light", rule: "Proposed by the Sonoma data analysts, who voted 4 to 1 for it. Passes with 51% of votes cast.", yes: 312, no: 88, ends: "Nov 4" }
   },
 
   dispute: {
-    id: "1042", title: "Storm drain milestone sent back", county: "Fresno County, CA",
-    sides: ["Summit Roofing", "Checker panel for p5"],
-    claim: "Summit says 6 of the 40 drains were cleared but the photos were taken at night, so the panel couldn't see them. Summit has daytime photos now.",
+    id: "1007", title: "Posts milestone sent back", county: "Sonoma County, CA",
+    sides: ["Laguna Creek Media", "Checker panel for p1"],
+    claim: "The panel said 3 of the 10 posts didn't say they were paid. Laguna says the #ad was in the video itself, and has since added it to the captions too.",
     steps: [
       { name: "Filed", when: "Oct 20", done: true },
       { name: "Talk it out (7 days)", when: "Oct 20 to 27", done: true, note: "No agreement" },
@@ -249,8 +268,8 @@ window.SAMPLE = {
       { name: "Ruling posted", when: "" },
       { name: "One appeal, if asked for", when: "" }
     ],
-    evidence: ["Night photos, 6 drains", "Daytime photos, same 6 drains", "Panel notes from Oct 19"],
-    frozen: 400
+    evidence: ["Screenshots of the 3 posts", "The videos, with #ad on screen", "Captions after the fix", "Panel notes from Oct 19"],
+    frozen: 300
   },
 
   // Sign-up: visitor > verified member > business. Dandelions keeps the yes and the date from the ID check, never ID papers.
@@ -268,15 +287,15 @@ window.SAMPLE = {
 
   // An operator runs a node, a distribution account and file storage, as a Run Dandelions project.
   operator: {
-    name: "Valley Node Co-op", since: "Sep 2026", pay: 400,
-    node: { uptime: 99.94, entries: 1284410, peers: 7, lastPrint: "Oct 29, 11:59 pm", print: "9f3a 61d0 … 7c21 e04b" },
-    account: { balance: 48200, min: 20000, max: 80000, start: 50000 },
-    storage: { gb: 38, files: 12400, copies: 3 },
+    name: "North Bay Node Co-op", since: "Oct 2026", pay: 400,
+    node: { uptime: 99.94, entries: 48210, peers: 3, lastPrint: "Oct 29, 11:59 pm", print: "9f3a 61d0 … 7c21 e04b" },
+    account: { balance: 18400, min: 10000, max: 40000, start: 20000 },
+    storage: { gb: 4, files: 1630, copies: 3 },
     payouts: [
-      { when: "Oct 29", what: "Rivera Handyman Services, p2 milestone 1", amt: -100 },
+      { when: "Oct 29", what: "Rivera Handyman Services, p2 milestone 1", amt: -50 },
       { when: "Oct 28", what: "Equitide, p6 October checks", amt: -300 },
-      { when: "Oct 27", what: "Check fees, 14 checks", amt: -310 },
-      { when: "Oct 25", what: "Fine from case 1031, back into the account", amt: 120 }
+      { when: "Oct 27", what: "Check fees, 9 checks", amt: -195 },
+      { when: "Oct 25", what: "Cotati Office Help, p4 first month", amt: -200 }
     ],
     become: ["Checker for a year in good standing", "A small always-on server and a backup", "Sign the operator agreement", "Picked by member vote, with no more than 2 operators per state"]
   },
@@ -287,47 +306,52 @@ window.SAMPLE = {
     principles: [
       "There's plenty to do. Points are created only for verified work.",
       "Points created are capped by the workers and materials available locally. The market comes first.",
-      "AI recommends. People decide. Code pays only for verified work.",
+      "AI shows the data. People decide. Code pays only for verified work.",
       "One person, one vote. Votes are free and can't be bought or sold.",
       "Every step goes on the public log, with no personal info.",
       "No one holds ID papers. ID checks send back only yes or no."
     ],
     proposal: {
       title: "Add a principle: Dandelions never runs or promotes a dollar exchange for points",
-      by: "Keeper seat 3", backers: 1240, need: 1072,
-      yes: 6120, no: 980, turnout: 33, needTurnout: 25, needYes: 75,
-      waitEnds: "Nov 28", signed: 0, signNeed: 4, seats: 9,
+      by: "Keeper seat 3", backers: 1010, need: 930,
+      yes: 5230, no: 910, turnout: 33, needTurnout: 25, needYes: 75,
+      waitEnds: "Nov 28", signed: 0, signNeed: 2, seats: 9,
       steps: ["5% of members back it", "Open discussion, 14 days", "Vote: 75% yes, 25% turnout", "30-day wait", "Keepers sign (2 of 3)", "Live, new fingerprint posted"], at: 3
     },
     keepers: [
       { seat: 1, who: "Founder", note: "Founder seat, handed off by 2028", ends: "2028" },
-      { seat: 2, who: "Dana C.", note: "Elected", ends: "2029" },
-      { seat: 3, who: "Marcus T.", note: "Elected", ends: "2027" },
-      { seat: 4, who: "Random seat", note: "Picked at random from checkers", ends: "2027" },
-      { seat: 5, who: "Lupe R.", note: "Elected", ends: "2028" },
-      { seat: 6, who: "Open", note: "Seat opens as members grow", ends: "" },
+      { seat: 2, who: "Dana C.", note: "Picked by the founder for the first term", ends: "2027" },
+      { seat: 3, who: "Marcus T.", note: "Picked by the founder for the first term", ends: "2027" },
+      { seat: 4, who: "Open", note: "Seats open as members grow", ends: "" },
+      { seat: 5, who: "Open", note: "", ends: "" },
+      { seat: 6, who: "Open", note: "", ends: "" },
       { seat: 7, who: "Open", note: "", ends: "" },
       { seat: 8, who: "Open", note: "", ends: "" },
       { seat: 9, who: "Open", note: "", ends: "" }
     ],
     fast: {
-      title: "Paused payouts on one project after reused proof photos", by: "4 of 5 keepers", when: "Oct 26", expires: "Nov 25",
-      why: "The AI and two checkers found the same photos on an older project. Payouts paused so no points go out while it's looked at. Nothing else changed.",
-      yes: 812, no: 90
+      title: "Paused payouts on one project after repeat sign-ups", by: "3 of 3 keepers", when: "Oct 26", expires: "Nov 25",
+      why: "Raindy and two checkers found 14 sign-ups made from the same phone in one hour. Payouts paused so no points go out while it's looked at. Nothing else changed.",
+      yes: 402, no: 31
     }
   },
 
-  // Places for the stats drill-down. Stage: Seed (first pledge), Sprout 1%, Bloom 5%, Puffball 10%.
+  // Places for the stats drill-down. Stage: Seed (first pledge), Sprout 1%, Bloom 5%, Puffball 10%. Members here are verified members.
   places: [
-    { id: "us", name: "Nationwide", parent: null, members: 21440, pct: 0.006, businesses: 1906, busy: 61, looking: 11800, open: 214, created: 38200, retired: 4100, note: "Most growth is in small trade businesses. Pay to train projects are filling fastest." },
-    { id: "ca", name: "California", parent: "us", members: 3870, pct: 0.01, businesses: 412, busy: 58, looking: 2140, open: 41, created: 7900, retired: 600, note: "Wildfire brush clearing is the biggest common-good need statewide." },
-    { id: "tx", name: "Texas", parent: "us", members: 2210, pct: 0.007, businesses: 240, busy: 66, looking: 1300, open: 22, created: 4100, retired: 300, note: "Businesses here are busy. New funding is slowing so it doesn't pull workers from paying jobs." },
-    { id: "ny", name: "New York", parent: "us", members: 1640, pct: 0.008, businesses: 151, busy: 63, looking: 980, open: 17, created: 3000, retired: 250, note: "Lots of members want restaurant work. Kitchen trainee projects would fit." },
-    { id: "or", name: "Oregon", parent: "us", members: 940, pct: 0.022, businesses: 120, busy: 49, looking: 610, open: 15, created: 2100, retired: 90, note: "Fastest growing state for its size. Trail and creek work is open." },
-    { id: "fresno", name: "Fresno County, CA", parent: "ca", members: 412, pct: 0.014, businesses: 38, busy: 52, looking: 31, open: 5, created: 2900, retired: 120, note: "Lots of people here want trade work and repair businesses have room. Pay to train projects would fit well right now." },
-    { id: "kern", name: "Kern County, CA", parent: "ca", members: 260, pct: 0.0028, businesses: 21, busy: 68, looking: 19, open: 2, created: 900, retired: 40, note: "Restaurants are joining. Signing up their suppliers is the best next step." },
-    { id: "tulare", name: "Tulare County, CA", parent: "ca", members: 190, pct: 0.004, businesses: 14, busy: 47, looking: 22, open: 2, created: 700, retired: 0, note: "Painting and repair shops have room to take trainees." },
-    { id: "la", name: "Los Angeles County, CA", parent: "ca", members: 1320, pct: 0.0013, businesses: 130, busy: 57, looking: 760, open: 12, created: 2300, retired: 300, note: "Big county, early days. Spread the word projects matter most here." }
+    { id: "us", name: "Nationwide", parent: null, members: 18600, pct: 0.0055, businesses: 1420, busy: 60, looking: 1450, open: 3, created: 8250, retired: 0, note: "Sonoma County is the only county at 1% so far. Nationwide projects are Run Dandelions work like ID checks." },
+    { id: "ca", name: "California", parent: "us", members: 9400, pct: 0.024, businesses: 790, busy: 62, looking: 610, open: 1, created: 6450, retired: 0, note: "One county at 1%. Marin and Napa are next closest." },
+    { id: "tx", name: "Texas", parent: "us", members: 1100, pct: 0.0036, businesses: 70, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
+    { id: "or", name: "Oregon", parent: "us", members: 820, pct: 0.019, businesses: 61, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
+    { id: "sonoma", name: "Sonoma County, CA", parent: "ca", members: 4902, pct: 1.0, businesses: 593, busy: 62, looking: 340, open: 6, created: 6450, retired: 0, note: "Reached 1% on Oct 5, 2026. Points turned on that day." },
+    { id: "marin", name: "Marin County, CA", parent: "ca", members: 610, pct: 0.24, businesses: 48, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 2,560 members for 1%." },
+    { id: "napa", name: "Napa County, CA", parent: "ca", members: 420, pct: 0.31, businesses: 36, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 1,340 members for 1%." },
+    { id: "la", name: "Los Angeles County, CA", parent: "ca", members: 900, pct: 0.009, businesses: 52, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 97,000 members for 1%." },
+    { id: "santarosa", name: "Santa Rosa", parent: "sonoma", members: 2050, pct: 1.16, businesses: 268, busy: 63, looking: 160, open: 4, created: 3900, retired: 0, note: "Most of the county's members and businesses so far." },
+    { id: "petaluma", name: "Petaluma", parent: "sonoma", members: 640, pct: 1.08, businesses: 84, busy: 66, looking: 41, open: 1, created: 980, retired: 0, note: "Painting and repair businesses joined early." },
+    { id: "rohnert", name: "Rohnert Park and Cotati", parent: "sonoma", members: 520, pct: 0.92, businesses: 57, busy: 58, looking: 52, open: 1, created: 820, retired: 0, note: "The help desk project is run from here." },
+    { id: "westcounty", name: "Sebastopol and west county", parent: "sonoma", members: 610, pct: 0.97, businesses: 92, busy: 55, looking: 38, open: 0, created: 450, retired: 0, note: "Lots of one-person businesses." },
+    { id: "northcounty", name: "Windsor, Healdsburg and north county", parent: "sonoma", members: 580, pct: 0.81, businesses: 62, busy: 68, looking: 31, open: 0, created: 220, retired: 0, note: "Wineries are joining slowly." },
+    { id: "sonomavalley", name: "Sonoma Valley", parent: "sonoma", members: 502, pct: 1.0, businesses: 30, busy: 64, looking: 18, open: 0, created: 80, retired: 0, note: "Few businesses yet." }
   ],
 
   // Checker work. Checking is "Run Dandelions" work, so the fee goes to the checker's business, yes or no.
@@ -342,22 +366,22 @@ window.SAMPLE = {
     quiz: [
       { q: "A ticket is for your brother-in-law's business. What do you do?", a: ["Take it, you know the work is good", "Pass and say it's family"], right: 1 },
       { q: "Do you get paid more for saying yes?", a: ["Yes, a little", "No, same fee either way"], right: 1 },
-      { q: "The checklist asks for drain 12 but it's under a parked car.", a: ["Use the owner's photo instead", "Say so in your notes and photograph what you can"], right: 1 },
+      { q: "The checklist asks for a photo of the flyer, but the table ran out.", a: ["Use the owner's photo instead", "Say so in your notes and photograph what you can"], right: 1 },
       { q: "When do you see the other checkers' answers?", a: ["After you send yours", "Before, so you can match them"], right: 0 },
       { q: "Who decides if the work gets paid?", a: ["The AI", "The checkers"], right: 1 }
     ],
     tickets: [
       {
-        id: "t1", project: "p5", milestone: 1, owner: "Summit Roofing", title: "Storm drains cleared", type: "common",
-        where: "East Fresno, 6 miles away", how: "On site", fee: 25, by: "Nov 2", offered: 5, taken: 1,
-        what: "The app picked 4 of the 40 drains at random. Photograph each one and say if it's clear.",
-        items: ["Drain 3, Cedar and Belmont", "Drain 12, Clovis Ave", "Drain 21, Tulare St", "Drain 34, Kings Canyon Rd"]
+        id: "t1", project: "p5", milestone: 1, owner: "Bright Coat Painting", title: "Sign-up table, first 2 Saturdays", type: "word",
+        where: "Downtown Santa Rosa, 2 miles away", how: "On site", fee: 25, by: "Nov 2", offered: 5, taken: 1,
+        what: "Visit the table this Saturday between 9 and 11 am. Photograph it and check each item. The sign-up count is checked by the app.",
+        items: ["Table is staffed and has the Dandelions sign", "Flyer says points have no cash value", "People sign up on their own phones, no paper forms", "No one is promised jobs or pay"]
       },
       {
-        id: "t2", project: "p4", milestone: 1, owner: "Bright Coat Painting", title: "Week 4 skills check", type: "train",
-        where: "Visalia, 38 miles away", how: "On site", fee: 30, by: "Nov 6", offered: 5, taken: 0,
-        what: "Watch the trainee prep and paint one wall. Check off each skill you see.",
-        items: ["Sets up drop cloths and tape", "Patches and sands a hole", "Cuts in a clean edge", "Cleans brushes and site"]
+        id: "t2", project: "p1", milestone: 1, owner: "Laguna Creek Media", title: "10 posts live", type: "word",
+        where: "Online", how: "Online", fee: 15, by: "Nov 6", offered: 5, taken: 0,
+        what: "Open each of the 10 posts from the list. Check each one is live, says it's paid and uses the creator's sign-up link.",
+        items: ["All 10 posts are live", "Each says #ad or \"paid\"", "Each link goes to the Dandelions sign-up page", "No promises of jobs, pay or returns"]
       },
       {
         id: "t3", project: "p6", milestone: 1, owner: "Equitide", title: "November ID check batch", type: "run",
@@ -369,24 +393,25 @@ window.SAMPLE = {
     hiddenMine: 1,
     // What the other two checkers on t1 said. Sample only.
     others: [
-      { who: "Checker 214", vote: "yes", note: "All 4 clear. Drain 21 has a little new leaf litter, fine." },
-      { who: "Checker 88", vote: "yes", note: "Clear. Photos attached." }
+      { who: "Checker 214", vote: "yes", note: "Table staffed, sign up, flyers fine. Busy morning." },
+      { who: "Checker 88", vote: "yes", note: "All good. Photos attached." }
     ],
     // What the AI looks at once all three checks are in. It points things out; people decide.
     ai: [
-      { ok: true, text: "Every photo was taken at the right drain, within 30 meters" },
-      { ok: true, text: "Photos taken in daylight, after the owner said the work was done" },
+      { ok: true, text: "Every photo was taken at the market, during market hours" },
+      { ok: true, text: "The app counts 31 confirmed sign-ups from the table's link" },
       { ok: true, text: "No photo has been used before, on this or any other project" },
       { ok: true, text: "All three checkers saw the same thing" }
     ],
-    aiFlag: { ok: false, text: "The owner's photo of drain 13 matches a photo from a different project in March. Asking the owner to explain, and two more checkers to look." },
+    aiFlag: { ok: false, text: "4 sign-ups came from one phone within 10 minutes. They don't count until each person confirms their own email and ID." },
     me: { done: 0, agree: null, earned: 0 }
   },
 
   log: [
-    { when: "Oct 27, 9:12", what: "points.released 100 to Rivera Handyman Services (p2, milestone 1, 3 of 5 checkers yes)" },
+    { when: "Oct 27, 9:12", what: "points.released 50 to Rivera Handyman Services (p2, milestone 1, 3 of 5 checkers yes)" },
     { when: "Oct 27, 8:40", what: "check.vote checker 77: yes (p2, milestone 1)" },
     { when: "Oct 26, 16:03", what: "milestone.proof_added p2 milestone 1, 2 files" },
-    { when: "Oct 25, 10:30", what: "project.posted p2 pay to train, 3 milestones, 600 points" }
+    { when: "Oct 25, 10:30", what: "project.posted p2 spread the word, 2 milestones, 300 points" },
+    { when: "Oct 5, 0:00", what: "county.stage Sonoma County, CA reached 1% (Sprout). Points on, budget 20,000 a month" }
   ]
 };

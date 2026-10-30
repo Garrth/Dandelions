@@ -8,7 +8,7 @@
   const typeName = (k) => (S.types.find((t) => t.key === k) || {}).name || k;
 
   // Changes made while clicking around are kept in this browser so the preview feels real.
-  const KEY = "dandelions-preview-v4";
+  const KEY = "dandelions-preview-v5";
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { saved = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* preview still works */ } };
@@ -213,7 +213,7 @@
       const list = S.projects.filter(inArea).filter((p) => filter === "all" || (filter === "mine" ? p.mine : p.type === filter));
       const ok = qualifies(a);
       main.innerHTML =
-        '<div class="page-head"><div class="eyebrow">Funded work</div><h1>There\'s plenty to do.</h1><p>Points are created only for work the market doesn\'t pay for: training people, common-good work usually paid by taxes or charity, and running Dandelions. Every project is run by a business.</p></div>' +
+        '<div class="page-head"><div class="eyebrow">Funded work</div><h1>There\'s plenty to do.</h1><p>Points are created only for work the market doesn\'t pay for, and every project is run by a business. ' + esc(S.launch.openWhy) + ' ' + esc(S.launch.later) + '</p></div>' +
         '<div class="viewas" id="area" role="group" aria-label="Area">' + S.areas.map((x) => '<button type="button" data-area="' + x.key + '" aria-pressed="' + (x.key === lvl) + '">' + esc(x.short) + "</button>").join("") + "</div>" +
         '<div class="card"><div class="spread"><b>' + esc(a.name) + '</b><span class="small muted">' + esc(a.typical) + "</span></div>" +
           '<div class="stats" style="margin-top:10px"><div class="stat"><b>' + (here.busy || "–") + '%</b><span>How booked businesses are</span></div><div class="stat"><b>' + fmt(here.lookingForWork || 0) + '</b><span>Looking for work</span></div><div class="stat"><b>' + esc(here.materials || "–") + "</b><span>Materials</span></div></div></div>" +
@@ -229,7 +229,7 @@
         '<h2 class="section-title">Projects</h2>' +
         '<div class="filters" id="filters"><button type="button" data-f="all" aria-pressed="' + (filter === "all") + '">All</button><button type="button" data-f="mine" aria-pressed="' + (filter === "mine") + '">Mine</button>' +
           S.types.map((t) => '<button type="button" data-f="' + t.key + '" aria-pressed="' + (filter === t.key) + '">' + esc(t.name) + "</button>").join("") + "</div>" +
-        '<div class="stack">' + (list.length ? list.map(card).join("") : '<p class="muted">No projects of this kind here yet.</p>') + "</div>" +
+        '<div class="stack">' + (list.length ? list.map(card).join("") : '<p class="muted">' + (S.launch.open.includes(filter) || filter === "all" || filter === "mine" ? "No projects of this kind here yet." : esc(typeName(filter)) + " opens later, when members vote it in.") + "</p>") + "</div>" +
         '<a class="card screen-link" href="/preview/checks.html" style="margin-top:12px"><span class="ico">🔍</span><span><b>Checker work</b><br><span class="small muted">' + S.checks.tickets.length + ' checks near you need checkers. Your business earns a fee for each.</span></span></a>' +
 
         ideas() +
@@ -253,7 +253,10 @@
       const a = A();
       const back = sheet(head("Pick a project type") +
         '<p class="small muted" style="margin:6px 0 14px">In ' + esc(a.name) + ". Each type comes with its milestones and proof rules already set.</p>" +
-        S.types.map((t) => '<button class="tpl" type="button" data-type="' + t.key + '"><b>' + esc(t.name) + '</b><span class="chip">' + S.categories[t.key].filter((c) => c.open.includes(a.key)).length + ' open</span><span class="small muted" style="grid-column:1/-1">' + esc(t.blurb) + "</span></button>").join(""));
+        S.types.map((t) => {
+          const n = S.categories[t.key].filter((c) => c.open.includes(a.key)).length;
+          return '<button class="tpl" type="button" data-type="' + t.key + '"' + (n ? "" : " disabled") + '><b>' + esc(t.name) + '</b><span class="chip">' + (n ? n + " open" : "Opens later") + '</span><span class="small muted" style="grid-column:1/-1">' + esc(t.blurb) + "</span></button>";
+        }).join(""));
       const box = back.querySelector(".sheet");
       let t, cat, size;
       const form = () => {
@@ -282,7 +285,7 @@
             (closed.length ? '<optgroup label="Not open here right now">' + closed.map((c) => "<option disabled>" + esc(c.name) + "</option>").join("") + "</optgroup>" : "") +
           "</select></label>" +
           (closed.length ? '<details class="small" style="margin:-4px 0 12px"><summary class="muted" style="cursor:pointer">Why some aren\'t open here</summary>' + closed.map((c) => "<p style=\"margin-top:4px\"><b>" + esc(c.name) + ":</b> " + esc(c.why || "Not open at this level") + "</p>").join("") + "</details>" : "") +
-          '<label class="small"><b>Name it</b><input id="ptitle" ' + sel + ' value="' + esc(saved.draftTitle || cat.name + ", " + (a.key === "county" ? "Fresno" : a.short)) + '"></label>' +
+          '<label class="small"><b>Name it</b><input id="ptitle" ' + sel + ' value="' + esc(saved.draftTitle || cat.name + ", " + (a.key === "county" ? S.me.town : a.short)) + '"></label>' +
           '<label class="small"><b>Size: <span class="pts" id="sz">' + fmt(size) + "</span> pts</b><input id=\"size\" type=\"range\" min=\"100\" max=\"" + max + '" step="50" value="' + size + '" style="width:100%;margin:6px 0 2px"></label>' +
           '<p class="small muted" style="margin-bottom:12px">Up to ' + fmt(max) + " pts: the smaller of your limit and this category's cap.</p>" +
           '<b class="small">Milestones, filled in for you</b><div class="card" style="margin:6px 0 12px">' + ms.map((m, i) =>
@@ -389,7 +392,7 @@
           '<button class="btn ghost small" type="button" id="simulate" style="margin-top:8px">Preview only: pretend the checkers voted</button>';
       }
       if (isCur && view === "checker" && m.status === "review" && p.mine) {
-        body += '<p class="note" style="margin-top:10px">You can\'t check your own project. <a href="/preview/project.html?id=p5">Try checking Summit Roofing\'s project</a> instead.</p>';
+        body += '<p class="note" style="margin-top:10px">You can\'t check your own project. <a href="/preview/project.html?id=p5">Try checking Bright Coat Painting\'s project</a> instead.</p>';
       }
       if (isCur && view === "checker" && m.status === "review" && !p.mine) {
         body += '<div class="card" style="margin-top:10px;background:var(--soft)"><b>You were picked to check this.</b>' +
@@ -416,11 +419,11 @@
           (view === "visitor" ? '<button class="btn" type="button" id="help" style="margin-top:14px;width:100%">Help on this project</button>' : "") +
         "</div>" +
         (p.subs ? '<h2 class="section-title">Sub-projects</h2><div class="card">' + p.subs.map((s) => '<div class="spread" style="padding-block:6px"><span>' + esc(s) + '</span><span class="chip">Creator</span></div>').join("") + "</div>" : "") +
-        (S.local[p.county] ? '<h2 class="section-title">Why this is funded now</h2><div class="card">' +
-          '<div class="stats"><div class="stat"><b>' + S.local[p.county].busy + '%</b><span>How booked local businesses in this work are</span></div>' +
-          '<div class="stat"><b>' + S.local[p.county].lookingForWork + '</b><span>Members nearby looking for this kind of work</span></div>' +
-          '<div class="stat"><b>' + esc(S.local[p.county].materials) + '</b><span>Materials</span></div></div>' +
-          '<p class="small muted" style="margin-top:10px">From ' + S.local[p.county].reporting + ' businesses reporting in ' + esc(p.county) + '. Dandelions only funds work the market isn\'t paying for, and only as much as local workers and materials can cover. If local businesses fill up, new funding here pauses.</p></div>' : "") +
+        (p.county === S.launch.place ? '<h2 class="section-title">Why this is funded now</h2><div class="card">' +
+          '<div class="stats"><div class="stat"><b>' + esc(S.launch.stage) + " " + S.launch.icon + '</b><span>' + S.launch.pct.toFixed(1) + '% of the county has joined</span></div>' +
+          '<div class="stat"><b>' + fmt(S.launch.budget.month - S.launch.budget.used) + '</b><span>Points left in this month\'s county budget of ' + fmt(S.launch.budget.month) + '</span></div>' +
+          '<div class="stat"><b>' + fmt(S.local[p.county].reporting) + '</b><span>Member businesses reporting how busy they are</span></div></div>' +
+          '<p class="small muted" style="margin-top:10px">' + esc(S.launch.openWhy) + " " + esc(S.launch.budget.rule) + '</p></div>' : "") +
         '<h2 class="section-title">Milestones</h2><div class="card">' + p.milestones.map(milestone).join("") + "</div>" +
         '<h2 class="section-title">Public log</h2><div class="card log"><ul>' + S.log.slice(0, 6).map((l) => '<li><span class="when">' + esc(l.when) + "</span><br>" + esc(l.what) + "</li>").join("") + "</ul></div>" +
         '<p class="small muted" style="margin-top:10px">Every step goes on the public log, with no personal info. A fingerprint of the log is posted daily so history can\'t be changed quietly.</p>';
@@ -479,28 +482,40 @@
 
   // ---------- Home ----------
   if (page === "hub") {
-    const here = S.local[S.me.county];
-    const nat = [["21,440", "Members"], ["1,906", "Businesses"], ["412", "Projects done"], ["38,200", "Points created"], ["4,100", "Points retired"], ["+0.3%", "Price change, 12 months"]];
+    const L = S.launch, R = window.RAINDY, here = S.local[L.place];
+    const us = S.places.find((x) => x.id === "us");
+    const openHere = S.projects.filter((p) => p.county === L.place && p.milestones.some((m) => m.status !== "approved")).length;
+    const pct = (a, b) => { const c = (a - b) / b * 100; return (c > 0 ? "+" : "") + c.toFixed(1) + "%"; };
     main.innerHTML =
-      '<div class="page-head"><div class="eyebrow"><a href="/preview/place.html?at=us">Nationwide, sample numbers ›</a></div><h1>There\'s plenty to do.</h1></div>' +
-      '<div class="card"><div class="stats">' + nat.map((n) => '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>").join("") + "</div>" +
-        '<p class="small muted" style="margin-top:10px">Points changing hands this month: <b>9,870</b>. All numbers come from the public log.</p></div>' +
+      '<div class="page-head"><div class="eyebrow"><a href="/preview/place.html?at=sonoma">' + esc(L.place) + ' ›</a></div><h1>There\'s plenty to do.</h1></div>' +
+      '<div class="card"><div class="spread"><b>Stage: ' + esc(L.stage) + " " + L.icon + '</b><span class="small muted">' + L.pct.toFixed(1) + "% of the county</span></div>" +
+        '<div class="bar" style="margin-top:8px"><span style="width:' + Math.round(L.pct / L.nextPct * 100) + '%"></span></div><p class="small muted" style="margin-top:4px">' + esc(L.nextStage) + " at " + L.nextPct + "%. Reached 1% on " + esc(L.reached) + ", so points are on here.</p>" +
+        '<div class="stats" style="margin-top:12px"><div class="stat"><b>' + fmt(L.members) + '</b><span>Members</span></div><div class="stat"><b>' + fmt(L.businesses) + '</b><span>Businesses</span></div><div class="stat"><b>' + openHere + '</b><span>Funded projects open</span></div>' +
+        '<div class="stat"><b>' + fmt(L.budget.used) + '</b><span>Points created this month</span></div><div class="stat"><b>' + fmt(L.budget.month - L.budget.used) + '</b><span>Left in this month\'s budget</span></div><div class="stat"><b>' + fmt(here.lookingForWork) + "</b><span>Members looking for work</span></div></div>" +
+        '<p class="small muted" style="margin-top:10px">' + esc(L.budget.rule) + "</p></div>" +
 
-      '<h2 class="section-title">' + esc(S.me.county) + "</h2>" +
-      '<div class="card"><div class="spread"><b>Stage: Sprout 🌱</b><span class="small muted">1.4% of the county</span></div>' +
-        '<div class="bar" style="margin-top:8px"><span style="width:28%"></span></div><p class="small muted" style="margin-top:4px">Bloom at 5%</p>' +
-        '<div class="stats" style="margin-top:12px"><div class="stat"><b>412</b><span>Members</span></div><div class="stat"><b>38</b><span>Businesses</span></div><div class="stat"><b>' + here.busy + '%</b><span>How booked businesses are</span></div>' +
-        '<div class="stat"><b>' + here.lookingForWork + '</b><span>Looking for work</span></div><div class="stat"><b>5</b><span>Funded projects open</span></div><div class="stat"><b>' + esc(here.materials) + "</b><span>Materials</span></div></div>" +
-        '<p class="note" style="margin-top:12px"><b>AI note:</b> Lots of people here want trade work and repair businesses have room. Pay to train projects would fit well right now. <span class="muted">Based on 23 business reports and county job data.</span></p>' +
-        '<a class="btn ghost small" href="/preview/place.html?at=fresno" style="margin-top:12px;display:inline-block">See another place</a></div>' +
+      '<h2 class="section-title">What\'s open at 1%</h2><div class="card"><div class="stack">' +
+        S.types.map((t) => '<div class="spread small" style="justify-content:flex-start;gap:10px"><span aria-hidden="true">' + (L.open.includes(t.key) ? "✅" : "⏳") + "</span><span><b>" + esc(t.name) + '</b> <span class="muted">' + (L.open.includes(t.key) ? "Open now" : "Opens later") + "</span></span></div>").join("") + "</div>" +
+        '<p class="small muted" style="margin-top:10px">' + esc(L.openWhy) + " " + esc(L.later) + "</p>" +
+        '<a class="btn small" href="/preview/projects.html" style="margin-top:12px;display:inline-block">See the work</a></div>' +
+
+      '<h2 class="section-title">Raindy\'s numbers</h2><a class="card pcard" href="/preview/raindy.html"><div class="stats">' +
+        '<div class="stat"><b>' + fmt(R.working.now) + '</b><span>People here working, ' + pct(R.working.now, R.working.yearAgo) + " in a year</span></div>" +
+        '<div class="stat"><b>+' + R.prices.all + '%</b><span>Prices in a year (' + esc(R.prices.region) + ")</span></div>" +
+        '<div class="stat"><b>$' + R.livingWage.oneAdult.toFixed(2) + '</b><span>Living wage an hour, one adult</span></div></div>' +
+        '<p class="small muted" style="margin-top:10px">Public data for ' + esc(R.place) + ". Tap for work, pay and prices by kind of business ›</p></a>" +
+
+      '<h2 class="section-title">Nationwide</h2><a class="card pcard" href="/preview/place.html?at=us"><div class="stats">' +
+        '<div class="stat"><b>' + fmt(us.members) + '</b><span>Members</span></div><div class="stat"><b>' + fmt(us.businesses) + '</b><span>Businesses</span></div><div class="stat"><b>1</b><span>County at 1%</span></div>' +
+        '</div><p class="small muted" style="margin-top:10px">' + esc(us.note) + " See every state and county ›</p></a>" +
 
       '<h2 class="section-title">Preview screens</h2><div class="stack">' +
         [["🤖", "/preview/raindy.html", "Raindy's data: Sonoma County", "Real public numbers: work, pay, prices, local businesses."],
          ["👋", "/preview/join.html", "Sign up", "Email and ZIP, ID check, member agreement, add a business."],
          ["🌼", "/preview/profile.html", "Your profile", "Your path, what you can do, jobs near you, badges."],
          ["🏪", "/preview/business.html?id=b1", "Business profile", "Services, track record, size limit, how busy, hiring."],
-         ["📋", "/preview/projects.html", "Funded work", "Pay to train, common good, spread the word, run Dandelions."],
-         ["✅", "/preview/project.html?id=p5", "A project, start to payment", "Milestones, proof, random checkers."],
+         ["📋", "/preview/projects.html", "Funded work", "Open at 1%: spread the word and run Dandelions."],
+         ["✅", "/preview/project.html?id=p5", "A project, start to payment", "A sign-up table: milestones, proof, random checkers."],
          ["🔍", "/preview/checks.html", "Checker work", "Short course, pick up a check, photos, AI review, paid."],
          ["📒", "/preview/directory.html", "Directory", "Member businesses, what they offer, who takes points."],
          ["👛", "/preview/wallet.html", "Wallet", "Business and personal points, send and receive."],
