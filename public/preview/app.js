@@ -8,7 +8,7 @@
   const typeName = (k) => (S.types.find((t) => t.key === k) || {}).name || k;
 
   // Changes made while clicking around are kept in this browser so the preview feels real.
-  const KEY = "dandelions-preview-v3";
+  const KEY = "dandelions-preview-v4";
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { saved = {}; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) { /* preview still works */ } };
@@ -163,13 +163,35 @@
     if (j) j.addEventListener("click", () => toast("Posting jobs comes with the real build"));
   }
 
-  // ---------- Project board ----------
+  // ---------- Project board: find, qualify, start, suggest ----------
   if (page === "projects") {
     let filter = "all";
+    let lvl = saved.area || "county";
+    const A = () => S.areas.find((a) => a.key === lvl);
+    const biz = S.businesses.find((b) => S.me.owns.includes(b.id));
+    const sel = 'style="width:100%;margin:4px 0 12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card)"';
+    const inArea = (p) => lvl === "nation" ? true
+      : lvl === "state" ? p.level !== "nation" && (p.county === "California" || /, CA$/.test(p.county))
+      : p.level === "county" && p.county === S.me.county;
     const progress = (p) => {
       const done = p.milestones.filter((x) => x.status === "approved").reduce((a, x) => a + x.points, 0);
       return Math.round(done / p.points * 100);
     };
+    // The checklist for running projects at an area level. Each line: [label, ok, detail]
+    const checklist = (a) => {
+      const open = S.projects.filter((p) => p.ownerId === biz.id && p.milestones.some((m) => m.status !== "approved")).length;
+      const onTime = Math.round(biz.track.onTime / biz.track.done * 100);
+      return [
+        ["ID checked", true, S.me.verified.by],
+        ["Business license checked", true, biz.license],
+        ["Projects finished", biz.track.done >= a.need.done, biz.track.done + " done" + (a.need.done ? ", need " + a.need.done : ", none needed at county level")],
+        ["Finished on time", !a.need.onTime || onTime >= a.need.onTime, onTime + "%" + (a.need.onTime ? ", need " + a.need.onTime + "%" : "")],
+        ["No open disputes", true, biz.track.disputes + " past disputes, none open"],
+        ["Insurance for on-site work", biz.insured, biz.insured ? "General liability on file" : "Needed for on-site projects"],
+        ["Projects open at once", open < a.need.open, open + " open, up to " + a.need.open]
+      ];
+    };
+    const qualifies = (a) => checklist(a).every((c) => c[1]);
     const card = (p) =>
       '<a class="card pcard" href="/preview/project.html?id=' + p.id + '">' +
         '<div class="spread"><span class="type">' + esc(typeName(p.type)) + '</span>' + (p.mine ? '<span class="chip sun">Yours</span>' : "") + "</div>" +
@@ -179,44 +201,154 @@
         '<div class="meta"><span><b class="pts">' + fmt(p.points) + "</b> points</span><span><b>" + p.milestones.length + "</b> milestones</span>" +
           (p.helpers ? "<span><b>" + p.helpers + "</b> helper spot" + (p.helpers === 1 ? "" : "s") + " open</span>" : "") + "</div>" +
       "</a>";
-    const draw = () => {
-      const list = S.projects.filter((p) => filter === "all" || (filter === "mine" ? p.mine : p.type === filter));
-      $("#list").innerHTML = list.length ? list.map(card).join("") : '<p class="muted">No projects of this kind yet.</p>';
+    const ideas = () => {
+      const scope = A().name;
+      const list = (saved.newIdeas || []).concat(S.talk.ideas).filter((i) => i.scope === scope);
+      return '<h2 class="section-title">Ideas gaining support here</h2>' +
+        (list.length ? '<div class="stack">' + list.map((i) => '<a class="card pcard" href="/preview/talk.html"><div class="spread"><span class="chip">' + esc(i.weight) + '</span><span class="small muted">' + i.backers + " of " + i.need + ' backers</span></div><h3 style="margin-top:6px">' + esc(i.title) + "</h3></a>").join("") + "</div>"
+          : '<p class="muted small">No ideas for this area yet.</p>');
     };
-    main.innerHTML =
-      '<div class="page-head"><div class="eyebrow">Funded work</div><h1>There\'s plenty to do.</h1><p>Points are created only for work the market doesn\'t pay for: training people, common-good work usually paid by taxes or charity, and running Dandelions. Every project is run by a business.</p></div>' +
-      '<div class="spread" style="margin-bottom:12px"><span class="small muted">' + S.projects.length + ' projects near you</span><button class="btn small" id="start" type="button">Start a project</button></div>' +
-      '<div class="filters" id="filters"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="mine" aria-pressed="false">Mine</button>' +
-        S.types.map((t) => '<button type="button" data-f="' + t.key + '" aria-pressed="false">' + esc(t.name) + "</button>").join("") + "</div>" +
-      '<a class="card screen-link" href="/preview/checks.html" style="margin-bottom:12px"><span class="ico">🔍</span><span><b>Checker work</b><br><span class="small muted">' + S.checks.tickets.length + ' checks near you need checkers. Your business earns a fee for each.</span></span></a>' +
-      '<div id="list" class="stack"></div>' +
-      '<p class="small muted" style="margin-top:18px">Visitors can browse every project. Taking or starting one needs an ID check and a business license.</p>';
+    const draw = () => {
+      const a = A(), here = S.local[a.name] || {};
+      const list = S.projects.filter(inArea).filter((p) => filter === "all" || (filter === "mine" ? p.mine : p.type === filter));
+      const ok = qualifies(a);
+      main.innerHTML =
+        '<div class="page-head"><div class="eyebrow">Funded work</div><h1>There\'s plenty to do.</h1><p>Points are created only for work the market doesn\'t pay for: training people, common-good work usually paid by taxes or charity, and running Dandelions. Every project is run by a business.</p></div>' +
+        '<div class="viewas" id="area" role="group" aria-label="Area">' + S.areas.map((x) => '<button type="button" data-area="' + x.key + '" aria-pressed="' + (x.key === lvl) + '">' + esc(x.short) + "</button>").join("") + "</div>" +
+        '<div class="card"><div class="spread"><b>' + esc(a.name) + '</b><span class="small muted">' + esc(a.typical) + "</span></div>" +
+          '<div class="stats" style="margin-top:10px"><div class="stat"><b>' + (here.busy || "–") + '%</b><span>How booked businesses are</span></div><div class="stat"><b>' + fmt(here.lookingForWork || 0) + '</b><span>Looking for work</span></div><div class="stat"><b>' + esc(here.materials || "–") + "</b><span>Materials</span></div></div></div>" +
+
+        '<h2 class="section-title">Can ' + esc(biz.name) + " run projects here?</h2>" +
+        '<div class="card"><div class="spread"><b>' + (ok ? "Yes ✓" : "Not yet") + '</b><span class="chip ' + (ok ? "ok" : "") + '">' + esc(a.short) + " level</span></div>" +
+          '<div class="stack" style="margin-top:8px">' + checklist(a).map((c) =>
+            '<div class="spread small" style="align-items:flex-start;justify-content:flex-start;gap:10px"><span aria-hidden="true">' + (c[1] ? "✅" : "⬜") + "</span><span><b>" + esc(c[0]) + '</b><br><span class="muted">' + esc(c[2]) + "</span></span></div>").join("") + "</div>" +
+          '<p class="small muted" style="margin-top:10px">Largest project you can take now: <b class="pts">' + fmt(biz.limit.now) + " pts</b>. It grows with your yearly gross, employees and track record. Some categories also need a trade license.</p>" +
+          '<button class="btn" id="start" type="button" style="margin-top:12px;width:100%"' + (ok ? "" : " disabled") + ">Start a project " + (a.key === "nation" ? "nationwide" : "in " + esc(a.name)) + "</button>" +
+          (ok ? "" : '<p class="small muted" style="margin-top:6px">Finish more county projects on time to unlock this level.</p>') + "</div>" +
+
+        '<h2 class="section-title">Projects</h2>' +
+        '<div class="filters" id="filters"><button type="button" data-f="all" aria-pressed="' + (filter === "all") + '">All</button><button type="button" data-f="mine" aria-pressed="' + (filter === "mine") + '">Mine</button>' +
+          S.types.map((t) => '<button type="button" data-f="' + t.key + '" aria-pressed="' + (filter === t.key) + '">' + esc(t.name) + "</button>").join("") + "</div>" +
+        '<div class="stack">' + (list.length ? list.map(card).join("") : '<p class="muted">No projects of this kind here yet.</p>') + "</div>" +
+        '<a class="card screen-link" href="/preview/checks.html" style="margin-top:12px"><span class="ico">🔍</span><span><b>Checker work</b><br><span class="small muted">' + S.checks.tickets.length + ' checks near you need checkers. Your business earns a fee for each.</span></span></a>' +
+
+        ideas() +
+        '<div class="card" style="margin-top:12px;background:var(--soft)"><b>Something missing?</b><p class="small muted" style="margin:4px 0 10px">Any verified member can suggest a new project or category. It goes to Talk, and with enough backers it goes to a vote.</p><button class="btn ghost small" type="button" id="suggest">Suggest an idea</button></div>' +
+        '<p class="small muted" style="margin-top:18px">Visitors can browse every project. Starting one needs an ID check and a business license.</p>';
+    };
     draw();
-    $("#filters").addEventListener("click", (e) => {
-      const b = e.target.closest("button");
-      if (!b) return;
-      filter = b.dataset.f;
-      document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
-      draw();
-    });
-    const startForm = (t) => '<div class="spread"><h2 style="font-size:24px">' + esc(t.name) + '</h2><button class="btn ghost small" type="button" data-close>Close</button></div>' +
-      '<p class="small muted" style="margin:6px 0 14px">' + esc(t.blurb) + '</p>' +
-      '<label class="small"><b>Area</b><select style="width:100%;margin:4px 0 12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card)"><option>Fresno County, CA</option><option>California</option><option>Nationwide</option></select></label>' +
-      '<label class="small"><b>Category</b><select style="width:100%;margin:4px 0 12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card)"><option>Only categories open in this area show here</option></select></label>' +
-      '<p class="note">Concept only. The full form, with the categories and limits for each area, comes in the detail pass.</p>' +
-      '<button class="btn" type="button" data-close style="margin-top:12px;width:100%">Done</button>';
-    $("#start").addEventListener("click", () => {
+
+    const sheet = (html) => {
       const back = document.createElement("div");
       back.className = "sheet-back";
-      back.innerHTML = '<div class="sheet" role="dialog" aria-label="Start a project"><div class="spread"><h2 style="font-size:24px">Pick a project type</h2><button class="btn ghost small" type="button" data-close>Close</button></div>' +
-        '<p class="small muted" style="margin:6px 0 14px">Each type comes with its milestones and proof rules already set. You fill in the details.</p>' +
-        S.types.map((t) => '<button class="tpl" type="button"><b>' + esc(t.name) + '</b><span class="chip">Template</span><span class="small muted" style="grid-column:1/-1">' + esc(t.blurb) + "</span></button>").join("") +
-        '<p class="note" style="margin-top:14px">Before a project is approved, a capacity check makes sure the workers and materials exist, and that you\'re not asking for more points than your business can spend.</p></div>';
-      back.addEventListener("click", (e) => {
-        if (e.target === back || e.target.closest("[data-close]")) back.remove();
-        else if (e.target.closest(".tpl")) { const t = S.types[[...back.querySelectorAll(".tpl")].indexOf(e.target.closest(".tpl"))]; back.querySelector(".sheet").innerHTML = startForm(t); }
-      });
+      back.innerHTML = '<div class="sheet" role="dialog">' + html + "</div>";
+      back.addEventListener("click", (e) => { if (e.target === back || e.target.closest("[data-close]")) back.remove(); });
       document.body.appendChild(back);
+      return back;
+    };
+    const head = (t) => '<div class="spread"><h2 style="font-size:24px">' + esc(t) + '</h2><button class="btn ghost small" type="button" data-close>Close</button></div>';
+
+    // Start a project: type > category open in this area > size > milestones > checks > post
+    function startFlow() {
+      const a = A();
+      const back = sheet(head("Pick a project type") +
+        '<p class="small muted" style="margin:6px 0 14px">In ' + esc(a.name) + ". Each type comes with its milestones and proof rules already set.</p>" +
+        S.types.map((t) => '<button class="tpl" type="button" data-type="' + t.key + '"><b>' + esc(t.name) + '</b><span class="chip">' + S.categories[t.key].filter((c) => c.open.includes(a.key)).length + ' open</span><span class="small muted" style="grid-column:1/-1">' + esc(t.blurb) + "</span></button>").join(""));
+      const box = back.querySelector(".sheet");
+      let t, cat, size;
+      const form = () => {
+        const cats = S.categories[t.key];
+        const openCats = cats.filter((c) => c.open.includes(a.key));
+        const closed = cats.filter((c) => !c.open.includes(a.key));
+        cat = cat || openCats[0];
+        const licOk = !cat.license || biz.tradeLicenses.includes(cat.license);
+        const max = Math.min(biz.limit.now, cat.max);
+        size = Math.min(size || Math.round(max / 2 / 50) * 50, max);
+        const here = S.local[a.name] || {};
+        const ms = S.milestoneTemplates[t.key];
+        const checks = [
+          ["Category is open in " + a.name, true],
+          [cat.license ? "Your business has a " + cat.license + " license" : "No trade license needed", licOk],
+          ["Size fits your limit (" + fmt(biz.limit.now) + " pts)", size <= biz.limit.now],
+          ["Workers nearby: " + fmt(here.lookingForWork || 0) + " looking for work", (here.lookingForWork || 0) > 0],
+          ["Materials: " + (here.materials || "unknown"), true],
+          [cat.onsite ? "Insurance for on-site work" : "Not on site, no insurance needed", !cat.onsite || biz.insured]
+        ];
+        const pass = checks.every((c) => c[1]);
+        box.innerHTML = head(t.name) +
+          '<p class="small muted" style="margin:6px 0 14px">' + esc(a.name) + " · " + esc(biz.name) + "</p>" +
+          '<label class="small"><b>Category</b><select id="cat" ' + sel + ">" +
+            openCats.map((c) => '<option' + (c === cat ? " selected" : "") + ">" + esc(c.name) + "</option>").join("") +
+            (closed.length ? '<optgroup label="Not open here right now">' + closed.map((c) => "<option disabled>" + esc(c.name) + "</option>").join("") + "</optgroup>" : "") +
+          "</select></label>" +
+          (closed.length ? '<details class="small" style="margin:-4px 0 12px"><summary class="muted" style="cursor:pointer">Why some aren\'t open here</summary>' + closed.map((c) => "<p style=\"margin-top:4px\"><b>" + esc(c.name) + ":</b> " + esc(c.why || "Not open at this level") + "</p>").join("") + "</details>" : "") +
+          '<label class="small"><b>Name it</b><input id="ptitle" ' + sel + ' value="' + esc(saved.draftTitle || cat.name + ", " + (a.key === "county" ? "Fresno" : a.short)) + '"></label>' +
+          '<label class="small"><b>Size: <span class="pts" id="sz">' + fmt(size) + "</span> pts</b><input id=\"size\" type=\"range\" min=\"100\" max=\"" + max + '" step="50" value="' + size + '" style="width:100%;margin:6px 0 2px"></label>' +
+          '<p class="small muted" style="margin-bottom:12px">Up to ' + fmt(max) + " pts: the smaller of your limit and this category's cap.</p>" +
+          '<b class="small">Milestones, filled in for you</b><div class="card" style="margin:6px 0 12px">' + ms.map((m, i) =>
+            '<div class="spread small" style="padding:4px 0"><span>' + (i + 1) + ". " + esc(m[0]) + '</span><span class="pts" data-share="' + m[1] + '">' + fmt(Math.round(size * m[1])) + "</span></div>").join("") + "</div>" +
+          '<b class="small">Checks before it posts</b><div class="stack" style="margin:6px 0 12px">' + checks.map((c) =>
+            '<div class="small">' + (c[1] ? "✅ " : "❌ ") + esc(c[0]) + "</div>").join("") + "</div>" +
+          '<button class="btn" type="button" id="post" style="width:100%"' + (pass ? "" : " disabled") + ">" + (pass ? "Post the project" : "Can't post yet") + "</button>" +
+          (pass ? '<p class="small muted" style="margin-top:6px">It fits the rules and the local numbers, so it posts right away. Anything outside the rules goes to Talk for a vote instead.</p>'
+            : !licOk ? '<p class="small muted" style="margin-top:6px">This category needs a ' + esc(cat.license) + " license on file. Pick another category or add the license to your business profile.</p>" : "");
+      };
+      box.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-type]");
+        if (b) { t = S.types.find((x) => x.key === b.dataset.type); cat = null; size = 0; form(); return; }
+        if (e.target.closest("#post")) {
+          const ms = S.milestoneTemplates[t.key];
+          const id = "n" + Date.now().toString(36);
+          const title = $("#ptitle", box).value.trim() || cat.name;
+          S.projects.unshift({ id, level: a.key, type: t.key, title, owner: biz.name, ownerId: biz.id, mine: true, county: a.name, points: size, helpers: 0, status: "open",
+            desc: cat.name + " project in " + a.name + ", posted from the preview.",
+            milestones: ms.map((m) => ({ title: m[0], points: Math.round(size * m[1]), status: "todo", proof: [], votes: [] })) });
+          S.log.unshift({ when: "Just now", what: "project.posted " + id + " " + t.name.toLowerCase() + ", " + cat.name + ", " + fmt(size) + " points, passed area and capacity checks" });
+          saved.projects = S.projects; saved.log = S.log; save();
+          location.href = "/preview/project.html?id=" + id;
+        }
+      });
+      box.addEventListener("change", (e) => {
+        if (e.target.id === "cat") { cat = S.categories[t.key].find((c) => c.name === e.target.value); size = 0; form(); }
+      });
+      box.addEventListener("input", (e) => {
+        if (e.target.id === "size") {
+          size = +e.target.value;
+          $("#sz", box).textContent = fmt(size);
+          box.querySelectorAll("[data-share]").forEach((x) => { x.textContent = fmt(Math.round(size * +x.dataset.share)); });
+        }
+      });
+    }
+
+    // Suggest a new project or category. It lands in Talk as an idea that needs backers.
+    function suggestFlow() {
+      const back = sheet(head("Suggest an idea") +
+        '<p class="small muted" style="margin:6px 0 14px">Say what\'s missing. It goes to Talk, where people back it. With enough backers it goes to a vote.</p>' +
+        '<label class="small"><b>What should we fund?</b><input id="itext" ' + sel + ' placeholder="Example: Fix up the bleachers at Roosevelt High"></label>' +
+        '<label class="small"><b>Where</b><select id="iscope" ' + sel + ">" + S.areas.map((x) => "<option" + (x.key === lvl ? " selected" : "") + ' value="' + x.key + '">' + esc(x.name) + "</option>").join("") + "</select></label>" +
+        '<label class="small"><b>Closest type</b><select id="itype" ' + sel + ">" + S.types.map((x) => '<option value="' + x.key + '">' + esc(x.name) + "</option>").join("") + '<option value="new">Something new</option></select></label>' +
+        '<label class="small"><b>Why isn\'t it getting done now?</b><textarea id="iwhy" placeholder="Who usually pays for this, and why isn\'t it happening?"></textarea></label>' +
+        '<button class="btn" type="button" id="isend" style="width:100%;margin-top:12px">Send to Talk</button>' +
+        '<p class="small muted" style="margin-top:6px">County ideas are light decisions: 10 backers, then 51% of votes. State and nationwide ones are heavy: 100 backers, then 75%.</p>');
+      back.addEventListener("click", (e) => {
+        if (!e.target.closest("#isend")) return;
+        const title = $("#itext", back).value.trim();
+        if (!title) { toast("Say what you'd like funded"); return; }
+        const area = S.areas.find((x) => x.key === $("#iscope", back).value);
+        const heavy = area.key !== "county";
+        saved.newIdeas = [{ id: "u" + Date.now().toString(36), title, by: "You", backers: 1, need: heavy ? 100 : 10, weight: heavy ? "Heavy" : "Light", scope: area.name, replies: 0 }].concat(saved.newIdeas || []);
+        saved.backed = (saved.backed || []);
+        save(); back.remove(); draw(); toast("Sent to Talk. You're its first backer.");
+      });
+    }
+
+    main.addEventListener("click", (e) => {
+      const ar = e.target.closest("[data-area]");
+      if (ar) { lvl = ar.dataset.area; saved.area = lvl; save(); draw(); return; }
+      const f = e.target.closest("[data-f]");
+      if (f) { filter = f.dataset.f; draw(); return; }
+      if (e.target.closest("#start")) { startFlow(); return; }
+      if (e.target.closest("#suggest")) suggestFlow();
     });
   }
 
@@ -446,6 +578,7 @@
   // ---------- Talk and vote ----------
   if (page === "talk") {
     const T = S.talk;
+    if (saved.newIdeas) T.ideas = saved.newIdeas.concat(T.ideas);
     if (saved.backed) T.ideas.forEach((i) => { if (saved.backed.includes(i.id)) i.backers += 1; });
     if (saved.voted) T.ballot[saved.voted] += 1;
     const draw = () => {
