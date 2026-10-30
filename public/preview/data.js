@@ -40,7 +40,14 @@ window.SAMPLE = {
     budget: { month: 20000, used: 6450, rule: "Set from what member businesses can spend at each other each month. It grows as more places to spend join." },
     open: ["word", "run"],
     openWhy: "At 1%, the first projects build Dandelions itself: getting the word out, signing up businesses and running the system.",
-    later: "Pay to train and Common good open later, when members vote them in."
+    later: "Pay to train and Common good open later, when members vote them in.",
+    // Point flow, totals only. A number is shown only when at least 10 businesses are behind it.
+    flow: {
+      earnedBy: 14, spentAt: 63, daysToSpend: 9, handsBeforeLeaving: 2.4,
+      spentOn: [["Supplies and materials", 31], ["Food and restaurants", 26], ["Rent", 12], ["Office and services", 18], ["Other", 13]]
+    },
+    // What members told us at sign-up, added up. Sample numbers.
+    memberAnswers: { answered: 1310, twoJobs: 22, underLivingWage: 41, lookingForWork: 340 }
   },
 
   businesses: [
