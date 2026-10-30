@@ -38,7 +38,7 @@
   };
   icon.directory = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M8 8h6M8 12h6"/></svg>';
   icon.hub = icon.home;
-  const tabOf = { project: "projects", checks: "projects", business: "directory", dispute: "talk" };
+  const tabOf = { project: "projects", checks: "projects", join: "hub", operator: "hub", place: "hub", charter: "talk", business: "directory", dispute: "talk" };
   const tab = (key, href, label) =>
     '<a href="' + href + '"' + ((tabOf[page] || page) === key ? ' aria-current="page"' : "") + ">" + icon[key] + label + "</a>";
   document.body.insertAdjacentHTML("beforeend",
@@ -482,7 +482,7 @@
     const here = S.local[S.me.county];
     const nat = [["21,440", "Members"], ["1,906", "Businesses"], ["412", "Projects done"], ["38,200", "Points created"], ["4,100", "Points retired"], ["+0.3%", "Price change, 12 months"]];
     main.innerHTML =
-      '<div class="page-head"><div class="eyebrow">Nationwide, sample numbers</div><h1>There\'s plenty to do.</h1></div>' +
+      '<div class="page-head"><div class="eyebrow"><a href="/preview/place.html?at=us">Nationwide, sample numbers ›</a></div><h1>There\'s plenty to do.</h1></div>' +
       '<div class="card"><div class="stats">' + nat.map((n) => '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>").join("") + "</div>" +
         '<p class="small muted" style="margin-top:10px">Points changing hands this month: <b>9,870</b>. All numbers come from the public log.</p></div>' +
 
@@ -492,10 +492,11 @@
         '<div class="stats" style="margin-top:12px"><div class="stat"><b>412</b><span>Members</span></div><div class="stat"><b>38</b><span>Businesses</span></div><div class="stat"><b>' + here.busy + '%</b><span>How booked businesses are</span></div>' +
         '<div class="stat"><b>' + here.lookingForWork + '</b><span>Looking for work</span></div><div class="stat"><b>5</b><span>Funded projects open</span></div><div class="stat"><b>' + esc(here.materials) + "</b><span>Materials</span></div></div>" +
         '<p class="note" style="margin-top:12px"><b>AI note:</b> Lots of people here want trade work and repair businesses have room. Pay to train projects would fit well right now. <span class="muted">Based on 23 business reports and county job data.</span></p>' +
-        '<button class="btn ghost small" type="button" id="explore" style="margin-top:12px">See another place</button></div>' +
+        '<a class="btn ghost small" href="/preview/place.html?at=fresno" style="margin-top:12px;display:inline-block">See another place</a></div>' +
 
       '<h2 class="section-title">Preview screens</h2><div class="stack">' +
-        [["🌼", "/preview/profile.html", "Your profile", "Your path, what you can do, jobs near you, badges."],
+        [["👋", "/preview/join.html", "Sign up", "Email and ZIP, ID check, member agreement, add a business."],
+         ["🌼", "/preview/profile.html", "Your profile", "Your path, what you can do, jobs near you, badges."],
          ["🏪", "/preview/business.html?id=b1", "Business profile", "Services, track record, size limit, how busy, hiring."],
          ["📋", "/preview/projects.html", "Funded work", "Pay to train, common good, spread the word, run Dandelions."],
          ["✅", "/preview/project.html?id=p5", "A project, start to payment", "Milestones, proof, random checkers."],
@@ -503,10 +504,12 @@
          ["📒", "/preview/directory.html", "Directory", "Member businesses, what they offer, who takes points."],
          ["👛", "/preview/wallet.html", "Wallet", "Business and personal points, send and receive."],
          ["💬", "/preview/talk.html", "Talk and vote", "Rooms, ideas gaining support, what's on the ballot."],
-         ["⚖️", "/preview/dispute.html", "A dispute case", "Steps, deadlines, evidence, the panel."]]
+         ["⚖️", "/preview/dispute.html", "Disputes", "File one, then steps, deadlines, evidence, the panel."],
+         ["🖥️", "/preview/operator.html", "Operator view", "Node, distribution account, file storage."],
+         ["📜", "/preview/charter.html", "Charter and keepers", "Charter changes, keeper seats, fast-track."],
+         ["🗺️", "/preview/place.html?at=us", "Stats by place", "Nationwide, then states, then counties."]]
         .map((x) => '<a class="card screen-link" href="' + x[1] + '"><span class="ico">' + x[0] + "</span><span><b>" + x[2] + '</b><br><span class="small muted">' + x[3] + "</span></span></a>").join("") + "</div>" +
       '<button class="btn ghost small" type="button" id="reset" style="margin-top:16px">Reset the preview</button>';
-    $("#explore").addEventListener("click", () => toast("A map to pick any state or county comes later"));
     $("#reset").addEventListener("click", () => {
       try { localStorage.removeItem(KEY); } catch (e) { /* nothing saved */ }
       toast("Preview reset");
@@ -601,7 +604,7 @@
         }).join("") + "</div>" +
         '<h2 class="section-title">Rooms</h2><div class="card">' + T.rooms.map((r) =>
           '<div class="skill"><div><b>' + esc(r.name) + '</b><div class="small muted">' + fmt(r.members) + ' members</div></div><div><span class="chip">' + r.new + " new</span></div></div>").join("") + "</div>" +
-        '<p class="small muted" style="margin-top:12px">Light decisions pass with 51% of votes cast. Heavy ones need 75% and a minimum turnout. Charter changes need even more, then the keepers sign.</p>';
+        '<p class="small muted" style="margin-top:12px">Light decisions pass with 51% of votes cast. Heavy ones need 75% and a minimum turnout. Charter changes need even more, then the keepers sign. <a href="/preview/charter.html">See the charter →</a></p>';
     };
     draw();
     main.addEventListener("click", (e) => {
@@ -748,10 +751,208 @@
     });
   }
 
+  // Shared bits for the pages below
+  const inputStyle = 'style="width:100%;margin:4px 0 12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card)"';
+  const ladder = (names, at) => '<div class="ladder" style="margin-bottom:14px">' + names.map((n, i) => '<div class="' + (i < at ? "done" : i === at ? "now" : "") + '">' + esc(n) + "</div>").join("") + "</div>";
+  const stageOf = (pct) => (pct >= 0.1 ? "Puffball" : pct >= 0.05 ? "Bloom 🌼" : pct >= 0.01 ? "Sprout 🌱" : "Seed");
+
+  // ---------- Sign up: account, ID check, agreement, business ----------
+  if (page === "join") {
+    const J = S.join;
+    const st = saved.join = saved.join || { step: 0 };
+    const steps = ["Account", "ID check", "Agreement", "Business", "Done"];
+    const draw = () => {
+      let body = "";
+      if (st.step === 0) body =
+        '<div class="page-head"><div class="eyebrow">Join Dandelions</div><h1>Come help.</h1><p>Anyone can look around. Joining lets you back ideas, vote, comment and get a wallet. Running projects takes a business.</p></div>' +
+        '<div class="card"><label class="small"><b>Email</b><input id="jemail" type="email" ' + inputStyle + ' placeholder="you@example.com" value="' + esc(st.email || "") + '"></label>' +
+          '<label class="small"><b>ZIP code</b><input id="jzip" inputmode="numeric" maxlength="5" ' + inputStyle + ' placeholder="93721" value="' + esc(st.zip || "") + '"></label>' +
+          '<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="jage"' + (st.age ? " checked" : "") + "> I'm 18 or older</label>" +
+          '<button class="btn" type="button" id="j0" style="width:100%;margin-top:14px">Send me a link</button>' +
+          '<p class="small muted" style="margin-top:8px">We send a link to confirm your email. Your ZIP sets your county. That\'s all we keep at this step.</p></div>' +
+        '<p class="small muted" style="margin-top:12px">Just browsing? You can make a visitor profile and look at every project without the ID check.</p>';
+      if (st.step === 1) body =
+        '<div class="page-head"><div class="eyebrow">Step 2</div><h1 style="font-size:32px">Check your ID</h1><p>One person, one account. This is how we know you\'re real without keeping your papers.</p></div>' +
+        '<div class="card"><div class="stack small">' +
+          "<div>1. You go to Equitide's secure page. Equitide runs ID checks for Dandelions as a project.</div>" +
+          "<div>2. Plaid checks your ID and a selfie. Takes about 2 minutes.</div>" +
+          "<div>3. Dandelions gets back only <b>yes or no</b> and the date. No photos, no ID number, no birthday.</div></div>" +
+          (st.idFail ? '<p class="note" style="margin-top:12px">That check didn\'t go through. You can try again. Nothing from the failed check was kept.</p>' : "") +
+          '<button class="btn" type="button" id="j1" style="width:100%;margin-top:14px">Continue to Equitide</button></div>';
+      if (st.step === 1.5) body =
+        '<div class="card" style="border:2px dashed var(--line)"><p class="eyebrow">Pretend Equitide screen</p><h2 style="font-size:24px;margin:6px 0">ID check with Plaid</h2>' +
+          '<p class="small muted">In the real build this is Equitide\'s page, not ours. For the preview, pick how it goes.</p>' +
+          '<div class="row" style="margin-top:12px"><button class="btn small" type="button" data-id="yes">It passed</button><button class="btn ghost small" type="button" data-id="no">It failed</button></div></div>';
+      if (st.step === 2) body =
+        '<div class="page-head"><div class="eyebrow">Step 3</div><h1 style="font-size:32px">The member agreement</h1><p>Short and plain. Tick each one.</p></div>' +
+        '<div class="card">' + J.agreement.map((a, i) => '<label class="small" style="display:flex;gap:10px;align-items:flex-start;padding:6px 0"><input type="checkbox" data-agree="' + i + '"' + ((st.agreed || []).includes(i) ? " checked" : "") + ' style="margin-top:3px">' + esc(a) + "</label>").join("") +
+          '<label class="small" style="display:block;margin-top:10px"><b>Type your full name to sign</b><input id="jname" ' + inputStyle + ' value="' + esc(st.name || "") + '"></label>' +
+          '<p class="small muted">Also covers the terms of use (being written) and the <a href="/privacy.html">privacy policy</a>.</p>' +
+          '<button class="btn" type="button" id="j2" style="width:100%;margin-top:12px">Sign and continue</button></div>';
+      if (st.step === 3) body =
+        '<div class="page-head"><div class="eyebrow">Step 4, optional</div><h1 style="font-size:32px">Add your business</h1><p>Only businesses get paid from Dandelions. If you want points for your work, sign up as a business, even if it\'s just you.</p></div>' +
+        (st.bizSent ? '<div class="card"><span class="chip sun">License check pending</span><h3 style="margin:8px 0 4px">' + esc(st.biz.name) + '</h3><p class="small muted">A checker looks up your license on the public database. Usually 1 to 2 days. You\'ll get an email.</p>' +
+            '<button class="btn ghost small" type="button" id="jlic" style="margin-top:10px">Preview only: pretend it was checked</button></div>' :
+          '<div class="card"><label class="small"><b>Business name</b><input id="bname" ' + inputStyle + ' placeholder="Rivera Handyman Services"></label>' +
+          '<label class="small"><b>License type</b><select id="blic" ' + inputStyle + ">" + J.licenseTypes.map((l) => "<option>" + esc(l) + "</option>").join("") + "</select></label>" +
+          '<label class="small"><b>License number</b><input id="bnum" ' + inputStyle + ' placeholder="As shown on your license"></label>' +
+          '<label class="small"><b>What you do</b><input id="bserv" ' + inputStyle + ' placeholder="Small home repairs, drywall, painting"></label>' +
+          '<div class="row" style="gap:10px"><label class="small" style="flex:1"><b>Last year\'s gross, $</b><input id="bgross" type="number" min="0" ' + inputStyle + ' placeholder="185000"></label>' +
+          '<label class="small" style="flex:1"><b>Employees</b><input id="bemp" type="number" min="0" ' + inputStyle + ' placeholder="2"></label></div>' +
+          '<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bins"> I have liability insurance (needed for on-site projects)</label>' +
+          '<button class="btn" type="button" id="j3" style="width:100%;margin-top:14px">Send for license check</button>' +
+          '<p class="small muted" style="margin-top:8px">No license yet? Most cities issue one for $50 to $100. Your gross and employees set your starting project size. Only you and checkers see the dollar figure.</p></div>') +
+        '<button class="btn ghost small" type="button" id="jskip" style="margin-top:12px">Skip for now</button>';
+      if (st.step === 4) body =
+        '<div class="page-head"><div class="eyebrow">You\'re in</div><h1>Welcome, ' + esc((st.name || "friend").split(" ")[0]) + '.</h1><p>' + (st.bizDone ? "You're a verified member with a business." : "You're a verified member.") + "</p></div>" +
+        '<div class="card">' + ladder(["Visitor", "Verified", "Business", "Checker", "Operator", "Keeper"], st.bizDone ? 2 : 1) +
+          '<div class="stack small">' +
+          '<a href="/preview/talk.html">💬 Back ideas, vote and comment in Talk</a>' +
+          '<a href="/preview/wallet.html">👛 Your personal wallet is ready</a>' +
+          (st.bizDone ? '<a href="/preview/projects.html">📋 Start a county project</a><a href="/preview/checks.html">🔍 Take the checker course after 3 months</a>' : '<a href="#" id="jback">🏪 Add a business to get paid for projects</a>') +
+          "</div></div>" +
+        '<button class="btn ghost small" type="button" id="jreset" style="margin-top:12px">Start sign-up over</button>';
+      main.innerHTML = ladder(steps, Math.floor(st.step)) + body;
+    };
+    draw();
+    main.addEventListener("click", (e) => {
+      const go = (n) => { st.step = n; save(); draw(); scrollTo(0, 0); };
+      if (e.target.closest("#j0")) {
+        st.email = $("#jemail").value.trim(); st.zip = $("#jzip").value.trim(); st.age = $("#jage").checked;
+        if (!/^\S+@\S+\.\S+$/.test(st.email)) { toast("Add a real email"); return; }
+        if (!/^\d{5}$/.test(st.zip)) { toast("ZIP needs 5 numbers"); return; }
+        if (!st.age) { toast("You need to be 18 or older"); return; }
+        toast("Pretend link sent and clicked"); go(1); return;
+      }
+      if (e.target.closest("#j1")) { go(1.5); return; }
+      const id = e.target.closest("[data-id]");
+      if (id) { st.idFail = id.dataset.id === "no"; go(st.idFail ? 1 : 2); if (!st.idFail) toast("ID checked. Only the yes and the date were kept."); return; }
+      if (e.target.closest("#j2")) {
+        st.agreed = [...main.querySelectorAll("[data-agree]:checked")].map((x) => +x.dataset.agree); st.name = $("#jname").value.trim();
+        if (st.agreed.length < J.agreement.length) { toast("Tick every line to continue"); return; }
+        if (st.name.split(/\s+/).length < 2) { toast("Type your full name"); return; }
+        go(3); return;
+      }
+      if (e.target.closest("#j3")) {
+        const name = $("#bname").value.trim(), num = $("#bnum").value.trim();
+        if (!name || !num) { toast("Add the business name and license number"); return; }
+        st.biz = { name, lic: $("#blic").value, serv: $("#bserv").value.trim(), insured: $("#bins").checked }; st.bizSent = true; save(); draw(); return;
+      }
+      if (e.target.closest("#jlic")) { st.bizDone = true; toast("License checked. You're a business owner now."); go(4); return; }
+      if (e.target.closest("#jskip")) { go(4); return; }
+      if (e.target.closest("#jback")) { e.preventDefault(); go(3); return; }
+      if (e.target.closest("#jreset")) { saved.join = null; save(); location.reload(); }
+    });
+  }
+
+  // ---------- Operator: node, distribution account, storage ----------
+  if (page === "operator") {
+    const O = S.operator;
+    const acct = O.account;
+    if (saved.opBalance !== undefined) acct.balance = saved.opBalance;
+    const events = saved.opEvents || [];
+    const draw = () => {
+      const pos = (n) => Math.round(n / (acct.max * 1.25) * 100);
+      main.innerHTML =
+        '<div class="page-head"><div class="eyebrow">Operator view</div><h1 style="font-size:32px">' + esc(O.name) + '</h1><p>Runs a node, a distribution account and file storage, as a Run Dandelions project paid ' + O.pay + " points a month. Operators can't move points by hand. The code pays only for checked work.</p></div>" +
+        '<h2 class="section-title">Node</h2><div class="card"><div class="stats">' +
+          '<div class="stat"><b>' + O.node.uptime + '%</b><span>Up, last 30 days</span></div><div class="stat"><b>' + fmt(O.node.entries) + '</b><span>Log entries held</span></div><div class="stat"><b>' + O.node.peers + "</b><span>Other nodes it checks against</span></div></div>" +
+          '<p class="small" style="margin-top:10px"><b>Last daily fingerprint:</b> <code>' + esc(O.node.print) + "</code></p>" +
+          '<p class="small muted">Posted ' + esc(O.node.lastPrint) + ". Every node must get the same one, or the log has been changed.</p></div>" +
+        '<h2 class="section-title">Distribution account</h2><div class="card"><div class="spread"><b class="pts" style="font-size:26px">' + fmt(acct.balance) + ' pts</b><span class="small muted">Starts at ' + fmt(acct.start) + "</span></div>" +
+          '<div style="position:relative;height:18px;margin:14px 0 6px;border-radius:9px;background:var(--soft)">' +
+            '<span style="position:absolute;left:' + pos(acct.min) + "%;right:" + (100 - pos(acct.max)) + '%;top:0;bottom:0;background:color-mix(in srgb, var(--leaf) 25%, transparent);border-radius:9px"></span>' +
+            '<span style="position:absolute;left:calc(' + Math.min(100, pos(acct.balance)) + '% - 3px);top:-4px;width:6px;height:26px;border-radius:3px;background:var(--ink)"></span></div>' +
+          '<div class="spread small muted"><span>Low line ' + fmt(acct.min) + "</span><span>High line " + fmt(acct.max) + "</span></div>" +
+          '<p class="small muted" style="margin-top:8px">Below the low line, new points are created to bring it back to the start, only if local workers and materials can cover the work. Above the high line, extra points are retired. Both go on the public log.</p>' +
+          '<div class="row" style="margin-top:10px"><button class="btn small" type="button" id="busy">Preview: a busy week of payouts</button><button class="btn ghost small" type="button" id="back">Preview: lots of points come back</button></div></div>' +
+        '<h2 class="section-title">Recent activity</h2><div class="card">' + events.concat(O.payouts).map((h) =>
+          '<div class="skill"><div><b>' + esc(h.what) + '</b><div class="small muted">' + esc(h.when) + '</div></div><div class="pts" style="color:' + (h.amt > 0 ? "var(--leaf)" : "var(--ink)") + '">' + (h.amt > 0 ? "+" : "") + fmt(h.amt) + "</div></div>").join("") + "</div>" +
+        '<h2 class="section-title">File storage</h2><div class="card stats"><div class="stat"><b>' + O.storage.gb + ' GB</b><span>Proof photos and reports</span></div><div class="stat"><b>' + fmt(O.storage.files) + '</b><span>Files</span></div><div class="stat"><b>' + O.storage.copies + "</b><span>Copies on other operators</span></div></div>" +
+        '<h2 class="section-title">Become an operator</h2><div class="card"><div class="stack small">' + O.become.map((b) => "<div>• " + esc(b) + "</div>").join("") + "</div>" +
+          '<p class="small muted" style="margin-top:8px">Operators are not keepers. Keepers sign charter changes. Operators keep the system running.</p></div>';
+    };
+    draw();
+    main.addEventListener("click", (e) => {
+      const log = (what, amt) => { events.unshift({ when: "Just now", what, amt }); };
+      if (e.target.closest("#busy")) {
+        acct.balance -= 31000; log("Payouts for 62 milestones and checks", -31000);
+        if (acct.balance < acct.min) { const add = acct.start - acct.balance; log("Top-up: new points created by the rules", add); acct.balance = acct.start; toast("Below the low line. " + fmt(add) + " new points created."); }
+      } else if (e.target.closest("#back")) {
+        acct.balance += 36000; log("Fines and returned points", 36000);
+        if (acct.balance > acct.max) { const cut = acct.balance - acct.start; log("Retired: extra points removed", -cut); acct.balance = acct.start; toast("Above the high line. " + fmt(cut) + " points retired."); }
+      } else return;
+      saved.opBalance = acct.balance; saved.opEvents = events; save(); draw();
+    });
+  }
+
+  // ---------- Charter, keepers and fast-track ----------
+  if (page === "charter") {
+    const C = S.charter, P = C.proposal;
+    if (saved.fastVote) C.fast[saved.fastVote] += 1;
+    const draw = () => {
+      const tot = P.yes + P.no, yesPct = Math.round(P.yes / tot * 100);
+      const ft = C.fast.yes + C.fast.no;
+      main.innerHTML =
+        '<div class="page-head"><div class="eyebrow">Charter</div><h1>The rules behind the rules.</h1><p>The charter is the short list everything else has to follow. Changing it is the hardest decision there is, on purpose.</p></div>' +
+        '<div class="card"><div class="spread"><b>Version ' + esc(C.version) + '</b><span class="small muted">Adopted ' + esc(C.adopted) + "</span></div>" +
+          '<ol class="small" style="margin:10px 0 0 18px;display:grid;gap:6px">' + C.principles.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ol>" +
+          '<p class="small muted" style="margin-top:10px">Fingerprint <code>' + esc(C.print) + "</code>. Sample wording for the preview.</p></div>" +
+        '<h2 class="section-title">Proposed change</h2><div class="card"><span class="chip sun">Super heavy</span><h3 style="margin:8px 0 4px">' + esc(P.title) + '</h3><p class="small muted">Proposed by ' + esc(P.by) + "</p>" +
+          '<div style="margin-top:10px">' + P.steps.map((s, i) => '<div class="ms ' + (i < P.at ? "approved" : i === P.at ? "review" : "") + '"><div class="dot">' + (i < P.at ? "✓" : i + 1) + '</div><h3 style="font-size:15px">' + esc(s) + "</h3>" +
+            (i === 0 ? '<p class="small muted">' + fmt(P.backers) + " backers, needed " + fmt(P.need) + "</p>" : "") +
+            (i === 2 ? '<p class="small muted">' + yesPct + "% yes with " + P.turnout + "% turnout. Needed " + P.needYes + "% and " + P.needTurnout + "%.</p>" : "") +
+            (i === 3 ? '<p class="small muted">Ends ' + esc(P.waitEnds) + ". Time for anyone to raise a problem.</p>" : "") +
+            (i === 4 ? '<p class="small muted">' + P.signed + " of " + P.signNeed + " keeper signatures</p>" : "") + "</div>").join("") + "</div></div>" +
+        '<h2 class="section-title">Keepers</h2><div class="card">' + C.keepers.map((k) =>
+          '<div class="skill"><div><b>Seat ' + k.seat + ": " + esc(k.who) + '</b><div class="small muted">' + esc(k.note) + "</div></div><div>" + (k.ends ? '<span class="chip">Term to ' + esc(k.ends) + "</span>" : "") + "</div></div>").join("") +
+          '<p class="small muted" style="margin-top:8px">A paid trust role with legal costs covered. Terms are staggered so seats rotate. Keepers sign charter changes after members pass them. They can\'t make rules on their own.</p></div>' +
+        '<h2 class="section-title">Fast-track in effect</h2><div class="card" style="border-color:var(--warn)"><span class="chip warn">Stop-harm only</span><h3 style="margin:8px 0 4px">' + esc(C.fast.title) + '</h3>' +
+          '<p class="small">' + esc(C.fast.why) + '</p><p class="small muted" style="margin-top:6px">Approved by ' + esc(C.fast.by) + " on " + esc(C.fast.when) + ". Ends " + esc(C.fast.expires) + " unless members confirm it.</p>" +
+          '<div class="bar" style="margin-top:10px"><span style="width:' + Math.round(C.fast.yes / ft * 100) + '%"></span></div><div class="spread small" style="margin-top:4px"><span>Keep it: ' + fmt(C.fast.yes) + "</span><span>End it: " + fmt(C.fast.no) + "</span></div>" +
+          (saved.fastVote ? '<p class="small" style="margin-top:8px"><b>You voted.</b></p>' : '<div class="row" style="margin-top:10px"><button class="btn small" type="button" data-fv="yes">Keep the pause</button><button class="btn ghost small" type="button" data-fv="no">End it</button></div>') +
+          '<p class="small muted" style="margin-top:8px">Fast-track can only pause, freeze or take down. It can never create points or change the charter or vote rules. It needs 2 of 3 keepers and a public reason the same day.</p></div>';
+    };
+    draw();
+    main.addEventListener("click", (e) => {
+      const v = e.target.closest("[data-fv]");
+      if (v) { saved.fastVote = v.dataset.fv; C.fast[v.dataset.fv] += 1; save(); draw(); }
+    });
+  }
+
+  // ---------- Stats by place ----------
+  if (page === "place") {
+    const at = new URLSearchParams(location.search).get("at") || "us";
+    const pl = S.places.find((x) => x.id === at) || S.places[0];
+    const trail = [];
+    for (let x = pl; x; x = S.places.find((y) => y.id === x.parent)) trail.unshift(x);
+    const kids = S.places.filter((x) => x.parent === pl.id);
+    main.innerHTML =
+      '<p class="small" style="margin:4px 0 10px">' + trail.map((x, i) => i < trail.length - 1 ? '<a href="/preview/place.html?at=' + x.id + '">' + esc(x.name) + "</a> › " : "<b>" + esc(x.name) + "</b>").join("") + "</p>" +
+      '<div class="page-head" style="padding-top:0"><div class="eyebrow">Sample numbers</div><h1 style="font-size:32px">' + esc(pl.name) + "</h1></div>" +
+      '<div class="card"><div class="spread"><b>Stage: ' + stageOf(pl.pct) + '</b><span class="small muted">' + (pl.pct * 100).toFixed(1) + "% of people</span></div>" +
+        '<div class="bar" style="margin-top:8px"><span style="width:' + Math.min(100, Math.round(pl.pct / 0.1 * 100)) + '%"></span></div><p class="small muted" style="margin-top:4px">Sprout at 1%, Bloom at 5%, Puffball at 10%</p>' +
+        '<div class="stats" style="margin-top:12px">' +
+          [[fmt(pl.members), "Members"], [fmt(pl.businesses), "Businesses"], [pl.busy + "%", "How booked businesses are"], [fmt(pl.looking), "Looking for work"], [fmt(pl.open), "Funded projects open"], [fmt(pl.created - pl.retired), "Points in use"]]
+            .map((n) => '<div class="stat"><b>' + n[0] + "</b><span>" + n[1] + "</span></div>").join("") + "</div>" +
+        '<p class="note" style="margin-top:12px"><b>AI note:</b> ' + esc(pl.note) + "</p></div>" +
+      (kids.length ? '<h2 class="section-title">' + (pl.id === "us" ? "States" : "Counties") + '</h2><div class="stack">' + kids.map((k) =>
+        '<a class="card pcard" href="/preview/place.html?at=' + k.id + '"><div class="spread"><h3 style="margin:0">' + esc(k.name) + '</h3><span class="chip">' + stageOf(k.pct) + '</span></div><p class="small muted" style="margin-top:4px">' + fmt(k.members) + " members · " + k.busy + "% booked · " + fmt(k.looking) + " looking for work</p></a>").join("") + "</div>" : "") +
+      '<p class="small muted" style="margin-top:12px">Only a sample of places is filled in. The real map covers every state and county, from the public log and Census data.</p>';
+  }
+
   // ---------- Dispute case ----------
   if (page === "dispute") {
     const c = S.dispute;
+    const mine = saved.newCase;
     main.innerHTML =
+      '<div class="card" style="background:var(--soft)">' + (mine
+        ? '<span class="chip sun">Your case ' + esc(mine.id) + ' · Filed today</span><h3 style="margin:8px 0 4px">' + esc(mine.about) + '</h3><p class="small">' + esc(mine.what) + '</p>' +
+          '<p class="small muted" style="margin-top:6px">Next: 7 days to talk it out with ' + esc(mine.with) + '. If that doesn\'t settle it, screening, then a panel of 3 random checkers.</p>' +
+          (mine.freeze ? '<p class="note" style="margin-top:8px"><b>' + fmt(mine.freeze) + ' points frozen</b> on that milestone until the case ends.</p>' : '') +
+          '<button class="btn ghost small" type="button" id="dclear" style="margin-top:10px">Preview: clear my case</button>'
+        : '<b>Something not right?</b><p class="small muted" style="margin:4px 0 10px">Talk to the other side first. If that doesn\'t work, file a case. It\'s free and names stay private.</p><button class="btn small" type="button" id="dfile">File a dispute</button>') + '</div>' +
+      '<h2 class="section-title">An open case</h2>' +
       '<div class="page-head"><div class="eyebrow">Case ' + esc(c.id) + "</div><h1 style=\"font-size:32px\">" + esc(c.title) + "</h1><p>" + c.sides.map(esc).join(" and ") + " · " + esc(c.county) + "</p></div>" +
       '<div class="card"><p>' + esc(c.claim) + '</p><p class="note" style="margin-top:12px"><b>' + fmt(c.frozen) + " points frozen</b> until the case ends. Nothing else is frozen.</p></div>" +
       '<h2 class="section-title">Where it stands</h2><div class="card">' + c.steps.map((s, i) =>
@@ -761,6 +962,34 @@
       '<h2 class="section-title">The panel</h2><div class="card"><div class="votes"><i></i><i></i><i></i></div>' +
         '<p class="small muted" style="margin-top:6px">Three checkers picked at random, with no ties to either side. Their votes and reasons are posted with the ruling.</p></div>' +
       '<p class="small muted" style="margin-top:12px">Rulings are enforced on points and permissions only: unfreeze, redo a payment, a fine into a distribution account, or a step down. Anything about dollars or injuries goes to the regular courts. Names are hidden from the public.</p>';
+    const sel = 'style="width:100%;margin:4px 0 12px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card)"';
+    main.addEventListener("click", (e) => {
+      if (e.target.closest("#dclear")) { saved.newCase = null; save(); location.reload(); return; }
+      if (!e.target.closest("#dfile")) return;
+      const back = document.createElement("div");
+      back.className = "sheet-back";
+      back.innerHTML = '<div class="sheet" role="dialog" aria-label="File a dispute"><div class="spread"><h2 style="font-size:24px">File a dispute</h2><button class="btn ghost small" type="button" data-close>Close</button></div>' +
+        '<label class="small" style="display:block;margin-top:12px"><b>What is it about?</b><select id="dabout" ' + sel + '><option>A check result on my project</option><option>A payout that didn\'t come</option><option>A business didn\'t do what it agreed</option><option>A member broke the rules</option></select></label>' +
+        '<label class="small"><b>Which project</b><select id="dproj" ' + sel + '>' + S.projects.map((p) => '<option value="' + p.id + '">' + esc(p.title) + '</option>').join("") + '</select></label>' +
+        '<label class="small"><b>What happened?</b><textarea id="dwhat" placeholder="Just the facts: what, when, who"></textarea></label>' +
+        '<label class="small" style="display:block;margin-top:10px"><b>What would make it right?</b><input id="dwant" ' + sel + ' placeholder="Example: look at the daytime photos and pay the milestone"></label>' +
+        '<label class="upload"><input type="file" accept="image/*,.pdf" multiple><span class="small"><b>Add evidence</b> <span class="muted">Photos, receipts, messages</span></span></label>' +
+        '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="dtrue"> What I wrote is true to the best of my knowledge</label>' +
+        '<button class="btn" type="button" id="dsend" style="width:100%;margin-top:12px">File the case</button>' +
+        '<p class="small muted" style="margin-top:6px">Filing freezes only the points in question. Filing to harass someone is against the member agreement.</p></div>';
+      back.addEventListener("click", (ev) => {
+        if (ev.target === back || ev.target.closest("[data-close]")) { back.remove(); return; }
+        if (!ev.target.closest("#dsend")) return;
+        const what = $("#dwhat", back).value.trim();
+        if (!what) { toast("Say what happened"); return; }
+        if (!$("#dtrue", back).checked) { toast("Tick the box to confirm it's true"); return; }
+        const p = S.projects.find((x) => x.id === $("#dproj", back).value);
+        const m = p.milestones.find((x) => x.status !== "approved");
+        saved.newCase = { id: "1043", about: $("#dabout", back).value + " · " + p.title, what, with: p.mine ? "the checker panel" : p.owner, freeze: m ? m.points : 0 };
+        save(); location.reload();
+      });
+      document.body.appendChild(back);
+    });
   }
 
 })();

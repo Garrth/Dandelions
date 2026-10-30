@@ -253,6 +253,83 @@ window.SAMPLE = {
     frozen: 400
   },
 
+  // Sign-up: visitor > verified member > business. Dandelions keeps the yes and the date from the ID check, never ID papers.
+  join: {
+    agreement: [
+      "Points are for verified work and trade between members. They have no cash value, and Dandelions never buys or sells them.",
+      "I won't use points to pay anyone's wages. Wages are paid in dollars.",
+      "One person, one account, one vote.",
+      "What I post as proof is real, and I took it or have the right to share it.",
+      "I'll settle disagreements through the dispute steps first, and rulings apply to points and permissions only.",
+      "I'm 18 or older."
+    ],
+    licenseTypes: ["City or county business license", "State contractor license (like CSLB)", "Other state trade or professional license"]
+  },
+
+  // An operator runs a node, a distribution account and file storage, as a Run Dandelions project.
+  operator: {
+    name: "Valley Node Co-op", since: "Sep 2026", pay: 400,
+    node: { uptime: 99.94, entries: 1284410, peers: 7, lastPrint: "Oct 29, 11:59 pm", print: "9f3a 61d0 … 7c21 e04b" },
+    account: { balance: 48200, min: 20000, max: 80000, start: 50000 },
+    storage: { gb: 38, files: 12400, copies: 3 },
+    payouts: [
+      { when: "Oct 29", what: "Rivera Handyman Services, p2 milestone 1", amt: -100 },
+      { when: "Oct 28", what: "Equitide, p6 October checks", amt: -300 },
+      { when: "Oct 27", what: "Check fees, 14 checks", amt: -310 },
+      { when: "Oct 25", what: "Fine from case 1031, back into the account", amt: 120 }
+    ],
+    become: ["Checker for a year in good standing", "A small always-on server and a backup", "Sign the operator agreement", "Picked by member vote, with no more than 2 operators per state"]
+  },
+
+  // Sample charter wording, only to show how changes work. The real charter is the Dandelions Charter.
+  charter: {
+    version: "1.0", adopted: "Oct 2026", print: "a71c 9e02 … 52f0 04be",
+    principles: [
+      "There's plenty to do. Points are created only for verified work.",
+      "Points created are capped by the workers and materials available locally. The market comes first.",
+      "AI recommends. People decide. Code pays only for verified work.",
+      "One person, one vote. Votes are free and can't be bought or sold.",
+      "Every step goes on the public log, with no personal info.",
+      "No one holds ID papers. ID checks send back only yes or no."
+    ],
+    proposal: {
+      title: "Add a principle: Dandelions never runs or promotes a dollar exchange for points",
+      by: "Keeper seat 3", backers: 1240, need: 1072,
+      yes: 6120, no: 980, turnout: 33, needTurnout: 25, needYes: 75,
+      waitEnds: "Nov 28", signed: 0, signNeed: 4, seats: 9,
+      steps: ["5% of members back it", "Open discussion, 14 days", "Vote: 75% yes, 25% turnout", "30-day wait", "Keepers sign (2 of 3)", "Live, new fingerprint posted"], at: 3
+    },
+    keepers: [
+      { seat: 1, who: "Founder", note: "Founder seat, handed off by 2028", ends: "2028" },
+      { seat: 2, who: "Dana C.", note: "Elected", ends: "2029" },
+      { seat: 3, who: "Marcus T.", note: "Elected", ends: "2027" },
+      { seat: 4, who: "Random seat", note: "Picked at random from checkers", ends: "2027" },
+      { seat: 5, who: "Lupe R.", note: "Elected", ends: "2028" },
+      { seat: 6, who: "Open", note: "Seat opens as members grow", ends: "" },
+      { seat: 7, who: "Open", note: "", ends: "" },
+      { seat: 8, who: "Open", note: "", ends: "" },
+      { seat: 9, who: "Open", note: "", ends: "" }
+    ],
+    fast: {
+      title: "Paused payouts on one project after reused proof photos", by: "4 of 5 keepers", when: "Oct 26", expires: "Nov 25",
+      why: "The AI and two checkers found the same photos on an older project. Payouts paused so no points go out while it's looked at. Nothing else changed.",
+      yes: 812, no: 90
+    }
+  },
+
+  // Places for the stats drill-down. Stage: Seed (first pledge), Sprout 1%, Bloom 5%, Puffball 10%.
+  places: [
+    { id: "us", name: "Nationwide", parent: null, members: 21440, pct: 0.006, businesses: 1906, busy: 61, looking: 11800, open: 214, created: 38200, retired: 4100, note: "Most growth is in small trade businesses. Pay to train projects are filling fastest." },
+    { id: "ca", name: "California", parent: "us", members: 3870, pct: 0.01, businesses: 412, busy: 58, looking: 2140, open: 41, created: 7900, retired: 600, note: "Wildfire brush clearing is the biggest common-good need statewide." },
+    { id: "tx", name: "Texas", parent: "us", members: 2210, pct: 0.007, businesses: 240, busy: 66, looking: 1300, open: 22, created: 4100, retired: 300, note: "Businesses here are busy. New funding is slowing so it doesn't pull workers from paying jobs." },
+    { id: "ny", name: "New York", parent: "us", members: 1640, pct: 0.008, businesses: 151, busy: 63, looking: 980, open: 17, created: 3000, retired: 250, note: "Lots of members want restaurant work. Kitchen trainee projects would fit." },
+    { id: "or", name: "Oregon", parent: "us", members: 940, pct: 0.022, businesses: 120, busy: 49, looking: 610, open: 15, created: 2100, retired: 90, note: "Fastest growing state for its size. Trail and creek work is open." },
+    { id: "fresno", name: "Fresno County, CA", parent: "ca", members: 412, pct: 0.014, businesses: 38, busy: 52, looking: 31, open: 5, created: 2900, retired: 120, note: "Lots of people here want trade work and repair businesses have room. Pay to train projects would fit well right now." },
+    { id: "kern", name: "Kern County, CA", parent: "ca", members: 260, pct: 0.0028, businesses: 21, busy: 68, looking: 19, open: 2, created: 900, retired: 40, note: "Restaurants are joining. Signing up their suppliers is the best next step." },
+    { id: "tulare", name: "Tulare County, CA", parent: "ca", members: 190, pct: 0.004, businesses: 14, busy: 47, looking: 22, open: 2, created: 700, retired: 0, note: "Painting and repair shops have room to take trainees." },
+    { id: "la", name: "Los Angeles County, CA", parent: "ca", members: 1320, pct: 0.0013, businesses: 130, busy: 57, looking: 760, open: 12, created: 2300, retired: 300, note: "Big county, early days. Spread the word projects matter most here." }
+  ],
+
   // Checker work. Checking is "Run Dandelions" work, so the fee goes to the checker's business, yes or no.
   checks: {
     course: [
