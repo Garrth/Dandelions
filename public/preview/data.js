@@ -229,6 +229,8 @@ window.SAMPLE = {
 
   wallet: {
     business: { name: "Rivera Handyman Services", balance: 310 },
+    // Each business sets how many points it will take in a month, and raises it as more places to spend join.
+    cap: { month: 1000, taken: 240, spendHere: 41 },
     personal: { name: "Sam Rivera", balance: 60 },
     history: [
       { when: "Oct 27", what: "From Dandelions: Sign up my suppliers, milestone 1", amt: 50, wallet: "business" },
@@ -338,20 +340,20 @@ window.SAMPLE = {
 
   // Places for the stats drill-down. Stage: Seed (first pledge), Sprout 1%, Bloom 5%, Puffball 10%. Members here are verified members.
   places: [
-    { id: "us", name: "Nationwide", parent: null, members: 18600, pct: 0.0055, businesses: 1420, busy: 60, looking: 1450, open: 3, created: 8250, retired: 0, note: "Sonoma County is the only county at 1% so far. Nationwide projects are Run Dandelions work like ID checks." },
-    { id: "ca", name: "California", parent: "us", members: 9400, pct: 0.024, businesses: 790, busy: 62, looking: 610, open: 1, created: 6450, retired: 0, note: "One county at 1%. Marin and Napa are next closest." },
-    { id: "tx", name: "Texas", parent: "us", members: 1100, pct: 0.0036, businesses: 70, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
-    { id: "or", name: "Oregon", parent: "us", members: 820, pct: 0.019, businesses: 61, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
-    { id: "sonoma", name: "Sonoma County, CA", parent: "ca", members: 4902, pct: 1.0, businesses: 593, busy: 62, looking: 340, open: 6, created: 6450, retired: 0, note: "Reached 1% on Oct 5, 2026. Points turned on that day." },
-    { id: "marin", name: "Marin County, CA", parent: "ca", members: 610, pct: 0.24, businesses: 48, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 2,560 members for 1%." },
-    { id: "napa", name: "Napa County, CA", parent: "ca", members: 420, pct: 0.31, businesses: 36, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 1,340 members for 1%." },
-    { id: "la", name: "Los Angeles County, CA", parent: "ca", members: 900, pct: 0.009, businesses: 52, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 97,000 members for 1%." },
-    { id: "santarosa", name: "Santa Rosa", parent: "sonoma", members: 2050, pct: 1.16, businesses: 268, busy: 63, looking: 160, open: 4, created: 3900, retired: 0, note: "Most of the county's members and businesses so far." },
-    { id: "petaluma", name: "Petaluma", parent: "sonoma", members: 640, pct: 1.08, businesses: 84, busy: 66, looking: 41, open: 1, created: 980, retired: 0, note: "Painting and repair businesses joined early." },
-    { id: "rohnert", name: "Rohnert Park and Cotati", parent: "sonoma", members: 520, pct: 0.92, businesses: 57, busy: 58, looking: 52, open: 1, created: 820, retired: 0, note: "The help desk project is run from here." },
-    { id: "westcounty", name: "Sebastopol and west county", parent: "sonoma", members: 610, pct: 0.97, businesses: 92, busy: 55, looking: 38, open: 0, created: 450, retired: 0, note: "Lots of one-person businesses." },
-    { id: "northcounty", name: "Windsor, Healdsburg and north county", parent: "sonoma", members: 580, pct: 0.81, businesses: 62, busy: 68, looking: 31, open: 0, created: 220, retired: 0, note: "Wineries are joining slowly." },
-    { id: "sonomavalley", name: "Sonoma Valley", parent: "sonoma", members: 502, pct: 1.0, businesses: 30, busy: 64, looking: 18, open: 0, created: 80, retired: 0, note: "Few businesses yet." }
+    { id: "us", name: "Nationwide", parent: null, members: 18600, pct: 5.5e-05, businesses: 1420, busy: 60, looking: 1450, open: 3, created: 8250, retired: 0, note: "Sonoma County is the only county at 1% so far. Nationwide projects are Run Dandelions work like ID checks." },
+    { id: "ca", name: "California", parent: "us", members: 9400, pct: 0.00024, businesses: 790, busy: 62, looking: 610, open: 1, created: 6450, retired: 0, note: "One county at 1%. Marin and Napa are next closest." },
+    { id: "tx", name: "Texas", parent: "us", members: 1100, pct: 3.6e-05, businesses: 70, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
+    { id: "or", name: "Oregon", parent: "us", members: 820, pct: 0.00019, businesses: 61, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "No county at 1% yet, so no points here." },
+    { id: "sonoma", name: "Sonoma County, CA", parent: "ca", members: 4902, pct: 0.01, businesses: 593, busy: 62, looking: 340, open: 6, created: 6450, retired: 0, note: "Reached 1% on Oct 5, 2026. Points turned on that day." },
+    { id: "marin", name: "Marin County, CA", parent: "ca", members: 610, pct: 0.0024, businesses: 48, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 2,560 members for 1%." },
+    { id: "napa", name: "Napa County, CA", parent: "ca", members: 420, pct: 0.0031, businesses: 36, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 1,340 members for 1%." },
+    { id: "la", name: "Los Angeles County, CA", parent: "ca", members: 900, pct: 9e-05, businesses: 52, busy: 0, looking: 0, open: 0, created: 0, retired: 0, note: "Needs about 97,000 members for 1%." },
+    { id: "santarosa", name: "Santa Rosa", parent: "sonoma", members: 2050, pct: 0.0116, businesses: 268, busy: 63, looking: 160, open: 4, created: 3900, retired: 0, note: "Most of the county's members and businesses so far." },
+    { id: "petaluma", name: "Petaluma", parent: "sonoma", members: 640, pct: 0.0108, businesses: 84, busy: 66, looking: 41, open: 1, created: 980, retired: 0, note: "Painting and repair businesses joined early." },
+    { id: "rohnert", name: "Rohnert Park and Cotati", parent: "sonoma", members: 520, pct: 0.0092, businesses: 57, busy: 58, looking: 52, open: 1, created: 820, retired: 0, note: "The help desk project is run from here." },
+    { id: "westcounty", name: "Sebastopol and west county", parent: "sonoma", members: 610, pct: 0.0097, businesses: 92, busy: 55, looking: 38, open: 0, created: 450, retired: 0, note: "Lots of one-person businesses." },
+    { id: "northcounty", name: "Windsor, Healdsburg and north county", parent: "sonoma", members: 580, pct: 0.0081, businesses: 62, busy: 68, looking: 31, open: 0, created: 220, retired: 0, note: "Wineries are joining slowly." },
+    { id: "sonomavalley", name: "Sonoma Valley", parent: "sonoma", members: 502, pct: 0.01, businesses: 30, busy: 64, looking: 18, open: 0, created: 80, retired: 0, note: "Few businesses yet." }
   ],
 
   // Checker work. Checking is "Run Dandelions" work, so the fee goes to the checker's business, yes or no.
@@ -391,6 +393,8 @@ window.SAMPLE = {
       }
     ],
     hiddenMine: 1,
+    // Checkers so far in the county. Early on there are few, so tickets can go a little farther out.
+    pool: { checkers: 46, place: "Sonoma County" },
     // What the other two checkers on t1 said. Sample only.
     others: [
       { who: "Checker 214", vote: "yes", note: "Table staffed, sign up, flyers fine. Busy morning." },
