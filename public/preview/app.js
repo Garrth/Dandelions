@@ -38,7 +38,7 @@
   };
   icon.directory = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M8 8h6M8 12h6"/></svg>';
   icon.hub = icon.home;
-  const tabOf = { project: "projects", checks: "projects", join: "hub", operator: "hub", place: "hub", charter: "talk", business: "directory", dispute: "talk" };
+  const tabOf = { raindy: "hub", project: "projects", checks: "projects", join: "hub", operator: "hub", place: "hub", charter: "talk", business: "directory", dispute: "talk" };
   const tab = (key, href, label) =>
     '<a href="' + href + '"' + ((tabOf[page] || page) === key ? ' aria-current="page"' : "") + ">" + icon[key] + label + "</a>";
   document.body.insertAdjacentHTML("beforeend",
@@ -495,7 +495,8 @@
         '<a class="btn ghost small" href="/preview/place.html?at=fresno" style="margin-top:12px;display:inline-block">See another place</a></div>' +
 
       '<h2 class="section-title">Preview screens</h2><div class="stack">' +
-        [["👋", "/preview/join.html", "Sign up", "Email and ZIP, ID check, member agreement, add a business."],
+        [["🤖", "/preview/raindy.html", "Raindy's read: Sonoma County", "Real public numbers, what they hint at, what to work on."],
+         ["👋", "/preview/join.html", "Sign up", "Email and ZIP, ID check, member agreement, add a business."],
          ["🌼", "/preview/profile.html", "Your profile", "Your path, what you can do, jobs near you, badges."],
          ["🏪", "/preview/business.html?id=b1", "Business profile", "Services, track record, size limit, how busy, hiring."],
          ["📋", "/preview/projects.html", "Funded work", "Pay to train, common good, spread the word, run Dandelions."],
@@ -939,6 +940,111 @@
       (kids.length ? '<h2 class="section-title">' + (pl.id === "us" ? "States" : "Counties") + '</h2><div class="stack">' + kids.map((k) =>
         '<a class="card pcard" href="/preview/place.html?at=' + k.id + '"><div class="spread"><h3 style="margin:0">' + esc(k.name) + '</h3><span class="chip">' + stageOf(k.pct) + '</span></div><p class="small muted" style="margin-top:4px">' + fmt(k.members) + " members · " + k.busy + "% booked · " + fmt(k.looking) + " looking for work</p></a>").join("") + "</div>" : "") +
       '<p class="small muted" style="margin-top:12px">Only a sample of places is filled in. The real map covers every state and county, from the public log and Census data.</p>';
+  }
+
+  // ---------- Raindy's read: real public numbers for one place ----------
+  if (page === "raindy") {
+    const R = window.RAINDY;
+    const J = R.jobs, P = R.people;
+    const pct = (a, b) => Math.round((a / b - 1) * 100);
+    const arrow = (now, then, upIsGood) => {
+      const d = now - then;
+      const up = d > 0;
+      const good = upIsGood ? up : !up;
+      return '<span style="color:' + (Math.abs(d) < 1e-9 ? "var(--muted)" : good ? "var(--leaf)" : "var(--warn)") + '">' + (d === 0 ? "→" : up ? "↑" : "↓") + "</span>";
+    };
+    const verdict = (t) => {
+      const gap = t.payChange - R.priceRise2019to2023;
+      if (gap >= 5 && t.workersChange < 0) return ["Hard to hire", "warn", "Fewer workers even though pay rose faster than prices."];
+      if (gap >= 10) return ["Tight", "warn", "Pay rose well past prices. Busy enough to bid up workers."];
+      if (t.workersChange >= 10 && gap <= 0) return ["Growing", "ok", "More workers and pay near prices. Likely room to take on more."];
+      if (t.workersChange < 0 && gap < 0) return ["Slowing", "ok", "Fewer workers and pay behind prices. May have room."];
+      return ["Steady", "", "Pay kept up with prices and the workforce held. No strong sign either way."];
+    };
+    const recs = [
+      { text: "At 1%, fund only Spread the word, in-person sign-ups, supplier sign-ups and Dandelions' own infrastructure.", why: "The charter rule for the first stage. No trade data needed.", sure: "Rule" },
+      { text: "Sign up restaurants early, along with their suppliers.", why: "865 restaurants with staff. Restaurant and bar jobs are back above 2019 (18,000 vs 17,700). Food is where 200 points a week is easiest to spend.", sure: "Medium" },
+      { text: "When Pay to train opens, look at remodeling and painting first.", why: "Remodeling lost 6% of its workers while pay lagged prices. Painting is growing with pay below prices. Unemployment is 4.3%, up from 2.7% in 2019, so people are available.", sure: "Low until how-busy reports come in" },
+      { text: "Hold off on roofing and fast food projects.", why: "Pay rose 37% and 38% against prices up 19%. Points there would compete with paying customers for scarce workers.", sure: "Medium" },
+      { text: "Ask landlords what they spend on upkeep before setting rent caps.", why: "Median rent is $2,158. A landlord can only use points on upkeep and services, which public data doesn't show.", sure: "Data gap" }
+    ];
+    const gaps = [
+      ["How busy each trade is, month to month", "How busy report (every member business, monthly)"],
+      ["What things cost here: a plumber's hour, a haircut, a meal, a 2-bedroom", "Price check project"],
+      ["How long you wait for a plumber or electrician", "Wait-time calls project"],
+      ["Who's looking for what kind of work, and how far they'll travel", "Open to work on member profiles"],
+      ["What landlords spend on upkeep", "Landlord survey"],
+      ["Local materials: what's in stock and lead times", "Supplier check project"]
+    ];
+    const answers = [
+      [/plumb/i, "There are 262 plumbing and heating/air businesses with staff and about 2,050 workers. Pay rose 19% from 2019 to 2023, about the same as prices, and the workforce barely changed. That's steady: no clear shortage or surplus. The how busy reports would settle it."],
+      [/rent|landlord/i, "Median rent is $2,158 a month, and 37% of homes are rented, about 71,400 households. Landlords can likely use points for 10% to 15% of rent, on upkeep and services. I'd check that with real landlords first."],
+      [/restaurant|food|eat/i, "511 full-service restaurants and 354 counter-service places. Full-service lost 8% of its workers while pay rose 35%, so they're hard to hire for. Points spent eating out help them as customers. Projects shouldn't pull their workers away."],
+      [/roof/i, "65 roofing businesses with staff, about 490 workers. Pay rose 37% while prices rose 19%. That's a tight trade, so I'd hold off on roofing projects."],
+      [/job|work|unemploy/i, "Unemployment is 4.3% (September 2026), against 2.7% in 2019. There are 206,500 jobs, still below 2019's 209,000. More people are looking for work than a few years ago."],
+      [/inflation|price/i, "Prices in the West rose 3.2% in the year to June 2026. Eating out rose 2.9% and rent 2.4%. Points at 1% would be well under 1% of county spending, so the risk is local, not county-wide."]
+    ];
+    const card = (title, big, rows) => '<div class="card"><div class="eyebrow">' + title + '</div><div style="font-family:var(--display);font-size:28px;margin:4px 0 8px">' + big + "</div>" +
+      rows.map((r) => '<div class="spread small" style="padding:3px 0;gap:10px;align-items:baseline"><span class="muted">' + r[0] + '</span><span style="text-align:right">' + r[1] + "</span></div>").join("") + "</div>";
+    main.innerHTML =
+      '<div class="page-head"><div class="eyebrow">Raindy\'s read · ' + esc(R.place) + '</div><h1>Here\'s what the numbers say.</h1><p>That\'s Raindy. Our AI. Raindy reads the public numbers for a place and suggests what to work on. Raindy recommends. People decide.</p></div>' +
+      '<p class="note">These are <b>real public numbers</b>, pulled ' + esc(R.pulled) + '. Dandelions isn\'t running here yet, so there are no member reports. Everything else in the preview is sample data.</p>' +
+
+      '<h2 class="section-title">The read today</h2><div class="stack">' +
+        card("People and work", fmt(P.total) + ' <span class="small muted">people</span>', [
+          ["1% of the county", fmt(Math.round(P.total / 100)) + " people"],
+          ["Unemployment, " + J.unemployment.month, J.unemployment.now + "% " + arrow(J.unemployment.now, J.unemployment.y2019, false) + ' <span class="muted">(2.7% in 2019)</span>'],
+          ["Jobs", fmt(J.all.now) + " " + arrow(J.all.now, J.all.y2019, true) + ' <span class="muted">(' + fmt(J.all.y2019) + " in 2019)</span>"],
+          ["Average hourly pay", "$" + J.hourly.now.toFixed(2) + " " + arrow(J.hourly.now, J.hourly.yearAgo, true)]]) +
+        card("Room to grow", "Some", [
+          ["Construction jobs", fmt(J.construction.now) + " " + arrow(J.construction.now, J.construction.y2019, true) + ' <span class="muted">(' + fmt(J.construction.y2019) + " in 2019)</span>"],
+          ["Restaurant and bar jobs", fmt(J.food.now) + " " + arrow(J.food.now, J.food.y2019, true)],
+          ["Businesses", fmt(R.businesses.withStaff) + " with staff, " + fmt(R.businesses.onePerson) + " one-person"]]) +
+        card("Prices, " + R.prices.region + ", year to " + R.prices.month, "+" + R.prices.all + "%", [
+          ["Eating out", "+" + R.prices.eatingOut + "%"], ["Groceries", "+" + R.prices.groceries + "%"], ["Rent and housing", "+" + R.prices.shelter + "%"],
+          ["Median rent here", "$" + fmt(P.medianRent) + " a month"]]) +
+      "</div>" +
+
+      '<h2 class="section-title">Trades and everyday businesses</h2>' +
+      '<p class="small muted" style="margin-bottom:8px">Businesses with staff in 2023, and change since 2019. Prices rose about ' + R.priceRise2019to2023 + '% over the same years. Labels are hints, not proof.</p>' +
+      '<div class="stack">' + R.trades.map((t) => {
+        const v = verdict(t);
+        return '<div class="card"><div class="spread"><h3 style="margin:0">' + esc(t.name) + '</h3><span class="chip ' + v[1] + '">' + v[0] + "</span></div>" +
+          '<div class="small" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px 14px"><span><b>' + fmt(t.estab) + "</b> businesses</span><span><b>" + fmt(t.workers) + "</b> workers (" + (t.workersChange > 0 ? "+" : "") + t.workersChange + "%)</span><span><b>$" + t.pay.toFixed(1) + "k</b> pay (+" + t.payChange + "%)</span></div>" +
+          (t.licensed ? '<p class="small muted" style="margin-top:4px">' + fmt(t.licensed) + " active " + esc(t.licLabel) + (t.oneMan ? ", " + fmt(t.oneMan) + " with no employees" : "") + "</p>" : "") +
+          '<p class="small" style="margin-top:4px">' + v[2] + "</p></div>";
+      }).join("") + "</div>" +
+
+      '<h2 class="section-title">Raindy recommends</h2><div class="stack">' + recs.map((r, i) =>
+        '<div class="card"><div class="spread"><span class="chip">' + esc(r.sure) + '</span></div><h3 style="margin:8px 0 4px">' + esc(r.text) + '</h3><p class="small muted">' + esc(r.why) + "</p>" +
+        '<button class="btn ghost small" type="button" data-back-rec="' + i + '" style="margin-top:10px">Back this</button></div>').join("") + "</div>" +
+
+      '<h2 class="section-title">Watch out for</h2><div class="card" style="border-color:var(--warn)"><div class="stack small">' +
+        "<div>⚠️ <b>Child care and full-service restaurants are hard to hire for.</b> Projects shouldn't pull their workers away.</div>" +
+        "<div>⚠️ <b>Rent is high:</b> $2,158 median. If member rents rise faster than county rents, pause new rent caps.</div>" +
+        "<div>⚠️ <b>Roofing and fast food pay are running hot.</b> Don't add points there yet.</div></div></div>" +
+
+      '<h2 class="section-title">What I don\'t know yet</h2><div class="card">' + gaps.map((g) =>
+        '<div class="skill"><div><b>' + esc(g[0]) + '</b><div class="small muted">Filled by: ' + esc(g[1]) + "</div></div></div>").join("") + "</div>" +
+
+      '<h2 class="section-title">Ask Raindy</h2><div class="card"><input id="ask" type="search" placeholder="Try: plumbers, rent, restaurants, jobs" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card)">' +
+        '<div id="answer" class="small" style="margin-top:10px"></div></div>' +
+
+      '<h2 class="section-title">Sources</h2><div class="card small stack">' + R.sources.map((s) => '<a style="display:block" href="' + esc(s[1]) + '" rel="noopener">' + esc(s[0]) + "</a>").join("") + "</div>";
+
+    main.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-back-rec]");
+      if (!b) return;
+      const r = recs[+b.dataset.backRec];
+      saved.newIdeas = [{ id: "r" + b.dataset.backRec, title: r.text, by: "Raindy", backers: 1, need: 10, weight: "Light", scope: R.place, replies: 0 }].concat((saved.newIdeas || []).filter((x) => x.id !== "r" + b.dataset.backRec));
+      save(); b.disabled = true; b.textContent = "Backed. It's in Talk.";
+    });
+    $("#ask").addEventListener("input", (e) => {
+      const q = e.target.value.trim();
+      const hit = q && answers.find((a) => a[0].test(q));
+      $("#answer").innerHTML = !q ? "" : hit ? "<p>" + esc(hit[1]) + '</p><p class="muted" style="margin-top:6px">From the numbers on this page.</p>'
+        : '<p class="muted">In the preview I only know a few topics. In the real build I answer from all the data, with sources.</p>';
+    });
   }
 
   // ---------- Dispute case ----------
