@@ -20,6 +20,8 @@ window.SAMPLE = {
     lookingFor: { open: true, kinds: ["Temp work", "Part-time"], area: "Within 20 miles of Santa Rosa" },
     canDo: ["Drywall repair", "Plumbing fixtures", "Interior painting", "Doors and locks"],
     certs: ["OSHA 10-hour construction", "EPA lead-safe renovator (RRP)"],
+    // Optional and private. Only county totals are ever shown, never one person's answers.
+    work: { jobs: 1, hours: "40 to 50 a week", pay: "$25 to $35 an hour" },
     owns: ["b1"],
     badges: [
       { icon: "🌱", name: "Seed planter", got: true },
@@ -216,16 +218,22 @@ window.SAMPLE = {
     }
   ],
 
+  // A few of the county's member businesses. "kind" groups them for the filter.
   directory: [
-    { name: "Rivera Handyman Services", id: "b1", county: "Santa Rosa", services: "Small home repairs, drywall, plumbing fixtures", takes: "Points or dollars", offer: "10% off repairs paid in points" },
-    { name: "Bright Coat Painting", id: "b2", county: "Petaluma", services: "Interior and exterior painting, decks", takes: "Points or dollars" },
-    { name: "Lupita's Kitchen", county: "Santa Rosa", services: "Restaurant and catering", takes: "Points or dollars", offer: "Free agua fresca with a meal paid in points" },
-    { name: "Oak Street Rentals", county: "Santa Rosa", services: "Rental homes and small offices", takes: "Up to 10% of rent in points" },
-    { name: "Corner Lumber and Supply", county: "Santa Rosa", services: "Lumber, hardware, tool rental", takes: "Up to 500 points a month" },
-    { name: "Laguna Creek Media", county: "Sebastopol", services: "Social media and video", takes: "Points or dollars" },
-    { name: "Mill Street Barbers", county: "Healdsburg", services: "Haircuts and shaves", takes: "Points or dollars", offer: "Fifth cut free in points" },
-    { name: "Cotati Office Help", county: "Cotati", services: "Bookkeeping, scheduling, help desk", takes: "Points or dollars" }
+    { name: "Rivera Handyman Services", id: "b1", kind: "Home and repair", county: "Santa Rosa", services: "Small home repairs, drywall, plumbing fixtures", takes: "Points or dollars", offer: "10% off repairs paid in points" },
+    { name: "Bright Coat Painting", id: "b2", kind: "Home and repair", county: "Petaluma", services: "Interior and exterior painting, decks", takes: "Points or dollars" },
+    { name: "Corner Lumber and Supply", kind: "Home and repair", county: "Santa Rosa", services: "Lumber, hardware, tool rental", takes: "Up to 500 points a month" },
+    { name: "Lupita's Kitchen", kind: "Food", county: "Santa Rosa", services: "Restaurant and catering", takes: "Points or dollars", offer: "Free agua fresca with a meal paid in points" },
+    { name: "Roseland Corner Market", kind: "Food", county: "Santa Rosa", services: "Groceries, produce, meat counter", takes: "Up to 20% of a bill in points" },
+    { name: "Gravenstein Bakery", kind: "Food", county: "Sebastopol", services: "Bread, pastries, coffee", takes: "Points or dollars", offer: "Day-old bread half off in points" },
+    { name: "Mill Street Barbers", kind: "Personal care", county: "Healdsburg", services: "Haircuts and shaves", takes: "Points or dollars", offer: "Fifth cut free in points" },
+    { name: "Laguna Creek Media", kind: "Office and media", county: "Sebastopol", services: "Social media and video", takes: "Points or dollars" },
+    { name: "Cotati Office Help", kind: "Office and media", county: "Cotati", services: "Bookkeeping, scheduling, help desk", takes: "Points or dollars" },
+    { name: "Oak Street Rentals", kind: "Rentals", county: "Santa Rosa", services: "Rental homes and small offices", takes: "Up to 10% of rent in points" },
+    { name: "Stony Point Auto", kind: "Auto", county: "Rohnert Park", services: "Brakes, tires, oil changes", takes: "Up to 300 points a month" },
+    { name: "Two Rock Pet Care", kind: "Pets", county: "Petaluma", services: "Dog walking, pet sitting", takes: "Points or dollars" }
   ],
+
 
   wallet: {
     business: { name: "Rivera Handyman Services", balance: 310 },
@@ -255,7 +263,7 @@ window.SAMPLE = {
       { id: "i2", title: "Add a sign-up table at the Petaluma market", by: "Marcus T.", backers: 7, need: 10, weight: "Light", scope: "Sonoma County, CA", replies: 5 },
       { id: "i3", title: "Add \"automation tech trainee\" as a Pay to train category", by: "Lupe R.", backers: 64, need: 100, weight: "Heavy", scope: "Nationwide", replies: 31 }
     ],
-    ballot: { title: "Raise Sonoma County's monthly point budget from 20,000 to 30,000", weight: "Light", rule: "Proposed by the Sonoma data analysts, who voted 4 to 1 for it. Passes with 51% of votes cast.", yes: 312, no: 88, ends: "Nov 4" }
+    ballot: { title: "Raise Sonoma County's monthly point budget from 20,000 to 30,000", weight: "Light", rule: "Proposed by the Sonoma data analysts, who voted 4 to 1 for it. Passes with 51% of votes cast", yes: 312, no: 88, ends: "Nov 4" }
   },
 
   dispute: {

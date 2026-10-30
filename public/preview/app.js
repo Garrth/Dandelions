@@ -59,7 +59,7 @@
     main.innerHTML =
       '<div class="card hero-card"><div class="avatar"><img src="/images/andy.webp" alt=""></div><div>' +
         '<h1 style="font-size:28px">' + esc(m.name) + "</h1>" +
-        '<p class="muted small">' + esc(m.county) + "</p>" +
+        '<p class="muted small">' + esc(m.town + ", " + m.county) + "</p>" +
         '<div class="row" style="margin-top:6px"><span class="chip ok">ID checked</span><span class="chip sun">Business owner</span></div>' +
       "</div></div>" +
 
@@ -88,6 +88,13 @@
         '<p class="small" style="margin-top:12px"><b>Certifications</b></p><div class="row" style="margin-top:6px">' + m.certs.map((c) => '<span class="chip">' + esc(c) + "</span>").join("") + "</div>" +
       "</div>" +
 
+      '<h2 class="section-title">Your work, private</h2>' +
+      '<div class="card"><div class="stats">' +
+        '<div class="stat"><b>' + m.work.jobs + '</b><span>Jobs you hold</span></div>' +
+        '<div class="stat"><b>' + esc(m.work.hours) + '</b><span>Hours</span></div>' +
+        '<div class="stat"><b>' + esc(m.work.pay) + '</b><span>Pay range</span></div></div>' +
+        '<p class="small muted" style="margin-top:10px">Optional. Only you see this. Raindy adds everyone\'s answers into county totals, like how many people work two jobs, and never shows one person\'s answers.</p></div>' +
+
       '<h2 class="section-title">Hiring near you</h2>' +
       '<div class="card">' + hiring.map((b) => b.hiring.map((h) =>
         '<div class="skill"><div><b>' + esc(h.title) + '</b><div class="small muted">' + esc(b.name) + " · " + esc(h.note) + '</div></div><div style="text-align:right"><span class="chip">' + esc(h.kind) + '</span></div></div>').join("")).join("") +
@@ -113,7 +120,7 @@
 
     main.innerHTML =
       '<div class="page-head"><div class="eyebrow">Business profile</div><h1 style="font-size:32px">' + esc(b.name) + "</h1>" +
-        "<p>" + esc(b.county) + " · Owner: " + esc(b.owner) + "</p></div>" +
+        "<p>" + esc(b.town ? b.town + ", " + b.county : b.county) + " · Owner: " + esc(b.owner) + "</p></div>" +
       '<div class="card"><div class="row"><span class="chip ok">License checked</span><span class="chip">Accepts points</span><span class="chip">In the directory</span></div>' +
         '<p class="small muted" style="margin-top:8px">' + esc(b.license) + "</p></div>" +
 
@@ -535,9 +542,11 @@
 
   // ---------- Directory ----------
   if (page === "directory") {
-    let q = "";
+    let q = "", kind = "";
+    const kinds = S.directory.map((b) => b.kind).filter((k, i, a) => a.indexOf(k) === i);
     const draw = () => {
-      const list = S.directory.filter((b) => !q || (b.name + " " + b.services).toLowerCase().includes(q));
+      const list = S.directory.filter((b) => (!kind || b.kind === kind) && (!q || (b.name + " " + b.services + " " + b.kind).toLowerCase().includes(q)));
+      $("#kinds").innerHTML = ["All"].concat(kinds).map((k) => '<button type="button" data-k="' + esc(k === "All" ? "" : k) + '" aria-pressed="' + ((k === "All" ? "" : k) === kind) + '">' + esc(k) + "</button>").join("");
       $("#dir").innerHTML = list.map((b) => {
         const inner = '<div class="spread"><h3 style="margin:0">' + esc(b.name) + '</h3><span class="chip">' + esc(b.takes) + "</span></div>" +
           '<p class="small muted" style="margin-top:4px">' + esc(b.services) + " · " + esc(b.county) + "</p>" +
@@ -546,9 +555,12 @@
       }).join("") || '<p class="muted">No matches.</p>';
     };
     main.innerHTML =
-      '<div class="page-head"><div class="eyebrow">Directory</div><h1>Spend points locally.</h1><p>Member businesses and what they offer. Regular jobs, like repairs for a landlord, happen here, paid in points or dollars. Later this moves to 10spot.shop.</p></div>' +
+      '<div class="page-head"><div class="eyebrow">Directory</div><h1>Spend points locally.</h1><p>Member businesses and what they offer. Regular jobs, like repairs for a landlord, happen here, paid in points or dollars. Each business sets how many points it takes. Later this moves to 10spot.shop.</p></div>' +
       '<input id="q" type="search" placeholder="Search: plumber, lunch, painting…" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px">' +
-      '<div id="dir" class="stack"></div>';
+      '<div class="filters" id="kinds"></div>' +
+      '<div id="dir" class="stack"></div>' +
+      '<p class="small muted" style="margin-top:12px">' + fmt(S.launch.businesses) + " member businesses in " + esc(S.launch.place) + ". The preview shows a few.</p>";
+    $("#kinds").addEventListener("click", (e) => { const k = e.target.closest("[data-k]"); if (k) { kind = k.dataset.k; draw(); } });
     draw();
     $("#q").addEventListener("input", (e) => { q = e.target.value.trim().toLowerCase(); draw(); });
   }
@@ -792,7 +804,7 @@
       if (st.step === 0) body =
         '<div class="page-head"><div class="eyebrow">Join Dandelions</div><h1>Come help.</h1><p>Anyone can look around. Joining lets you back ideas, vote, comment and get a wallet. Running projects takes a business.</p></div>' +
         '<div class="card"><label class="small"><b>Email</b><input id="jemail" type="email" ' + inputStyle + ' placeholder="you@example.com" value="' + esc(st.email || "") + '"></label>' +
-          '<label class="small"><b>ZIP code</b><input id="jzip" inputmode="numeric" maxlength="5" ' + inputStyle + ' placeholder="93721" value="' + esc(st.zip || "") + '"></label>' +
+          '<label class="small"><b>ZIP code</b><input id="jzip" inputmode="numeric" maxlength="5" ' + inputStyle + ' placeholder="95404" value="' + esc(st.zip || "") + '"></label>' +
           '<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="jage"' + (st.age ? " checked" : "") + "> I'm 18 or older</label>" +
           '<button class="btn" type="button" id="j0" style="width:100%;margin-top:14px">Send me a link</button>' +
           '<p class="small muted" style="margin-top:8px">We send a link to confirm your email. Your ZIP sets your county. That\'s all we keep at this step.</p></div>' +
@@ -827,7 +839,7 @@
           '<label class="small" style="flex:1"><b>Employees</b><input id="bemp" type="number" min="0" ' + inputStyle + ' placeholder="2"></label></div>' +
           '<label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="bins"> I have liability insurance (needed for on-site projects)</label>' +
           '<button class="btn" type="button" id="j3" style="width:100%;margin-top:14px">Send for license check</button>' +
-          '<p class="small muted" style="margin-top:8px">No license yet? Most cities issue one for $50 to $100. Your gross and employees set your starting project size. Only you and checkers see the dollar figure.</p></div>') +
+          '<p class="small muted" style="margin-top:8px">No license yet? Your city or county issues one for a small fee. Your gross and employees set your starting project size. Only you and checkers see the dollar figure.</p></div>') +
         '<button class="btn ghost small" type="button" id="jskip" style="margin-top:12px">Skip for now</button>';
       if (st.step === 4) body =
         '<div class="page-head"><div class="eyebrow">You\'re in</div><h1>Welcome, ' + esc((st.name || "friend").split(" ")[0]) + '.</h1><p>' + (st.bizDone ? "You're a verified member with a business." : "You're a verified member.") + "</p></div>" +
