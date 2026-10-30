@@ -173,3 +173,4 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 
 .toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; z-index: 20; max-width: calc(100% - 32px); }
 .chip, .pts { white-space: nowrap; }
+.tpl[disabled] { opacity: .55; cursor: not-allowed; }
