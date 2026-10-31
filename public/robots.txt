@@ -1,3 +1,4 @@
 User-agent: *
 Disallow: /welcome.html
 Disallow: /preview/
+Disallow: /app/
