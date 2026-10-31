@@ -7,6 +7,7 @@ Do these once, in order, after the stage 1 PR is merged. Each step is small.
 1. Open Supabase, project **dandelions**, then **SQL Editor**, then **New query**.
 2. Paste everything in `supabase/migrations/20261031000000_profiles_id_checks.sql` and click **Run**.
 3. You should see "Success. No rows returned."
+4. New query again. Paste everything in `supabase/migrations/20261031010000_member_app_grants.sql` and click **Run**. This lets the profile page read and save your own rows.
 
 ## 2. Let log-in links land on the profile page
 
