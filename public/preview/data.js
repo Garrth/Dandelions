@@ -186,7 +186,7 @@ window.SAMPLE = {
     {
       id: "p7", level: "county", type: "run", title: "Find out why restaurants can't hire", owner: "North Bay Field Research",
       county: "Sonoma County, CA", points: 900, helpers: 2, status: "open",
-      desc: "Sit-down restaurants here have about 10% fewer workers than in 2019. Talk to 40 restaurant owners and 60 people who left restaurant work, and post what they say. Raindy adds the results to its data.",
+      desc: "Sit-down restaurants here have about 10% fewer workers than in 2019. Talk to 40 restaurant owners and 60 people who left restaurant work, and post what they say. Rai adds the results to its data.",
       milestones: [
         { title: "Questions posted for comment", points: 150, status: "todo", proof: [], votes: [] },
         { title: "100 interviews done", points: 450, status: "todo", proof: [], votes: [] },
@@ -348,7 +348,7 @@ window.SAMPLE = {
     ],
     fast: {
       title: "Paused payouts on one project after repeat sign-ups", by: "3 of 3 keepers", when: "Oct 26", expires: "Nov 25",
-      why: "Raindy and two checkers found 14 sign-ups made from the same phone in one hour. Payouts paused so no points go out while it's looked at. Nothing else changed.",
+      why: "Rai and two checkers found 14 sign-ups made from the same phone in one hour. Payouts paused so no points go out while it's looked at. Nothing else changed.",
       yes: 402, no: 31
     }
   },
