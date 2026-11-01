@@ -51,6 +51,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .banner b { color: var(--sun); }
 
 /* Header */
+.navlinks { display: flex; align-items: center; gap: 14px; }
+.navlinks a:not(.btn) { color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none; }
+.navlinks a:not(.btn):hover { text-decoration: underline; }
 .top { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; }
 .brand { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 20px; color: var(--ink); text-decoration: none; }
 .who { font-size: 14px; color: var(--ink); font-weight: 700; text-decoration: none; }
