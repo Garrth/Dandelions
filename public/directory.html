@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Directory | Dandelions</title>
+  <meta name="description" content="Member businesses near you and what they offer.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><a class="btn ghost small" href="/app/">Your profile</a></header>
+  <main>
+    <div class="page-head"><div class="eyebrow">Directory</div><h1>Member businesses.</h1><p>Local businesses that pledged, and what they offer members. Every one has had its license checked.</p></div>
+    <input id="q" type="search" placeholder="Search: plumber, lunch, painting..." style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px">
+    <select id="county" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px" hidden></select>
+    <div class="filters" id="kinds"></div>
+    <div id="dir" class="stack"><p class="muted">Loading...</p></div>
+    <div class="card" style="margin-top:16px"><b>Have a business?</b><p class="small muted" style="margin-top:4px"><a href="/#pledge">Pledge</a>, then add your business from <a href="/app/">your profile</a>. We check your license, then you're listed here.</p></div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/directory.js"></script>
+</body>
+</html>

@@ -126,6 +126,60 @@
     });
   });
 
+  // ---- Your business ----
+  var biz = null;
+  var BIZ_TEXT = {
+    pending: ["Waiting for a license check", "sun", "We check licenses by hand for now, usually within a few days. Then you show in the directory."],
+    listed: ["In the directory", "ok", "You're listed. People can find you in the directory."],
+    not_listed: ["Not listed yet", "warn", "We couldn't check your license. Email hello@dandelions.lol and we'll sort it out with you."]
+  };
+  function thisMonth() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-01"; }
+  function showBiz(b) {
+    biz = b;
+    var t = b && BIZ_TEXT[b.status];
+    $("b-head").hidden = !t;
+    if (t) { $("b-title").textContent = b.name; $("b-chip").textContent = t[0]; $("b-chip").className = "chip " + t[1]; $("b-text").textContent = t[2]; }
+    b = b || {};
+    $("b-name").value = b.name || ""; $("b-kind").value = b.kind || ""; $("b-town").value = b.town || "";
+    $("b-services").value = b.services || ""; $("b-license").value = b.license || ""; $("b-offer").value = b.offer || "";
+    $("b-limit").value = b.monthly_limit || 0;
+    $("b-save").textContent = biz ? "Save" : "Add my business";
+    $("busy").hidden = !biz;
+  }
+  $("biz").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var row = {
+      name: $("b-name").value.trim(), kind: $("b-kind").value, town: $("b-town").value.trim(),
+      services: $("b-services").value.trim(), license: $("b-license").value.trim(),
+      offer: $("b-offer").value.trim() || null, monthly_limit: Math.max(0, Math.round(+$("b-limit").value || 0))
+    };
+    var q = biz ? db.from("businesses").update(row).eq("id", biz.id) : db.from("businesses").insert(Object.assign({ owner_id: user.id }, row));
+    q.select(BIZ_COLS).single().then(function (r) {
+      if (r.error) { toast("Couldn't save. Check the fields and try again."); return; }
+      var added = !biz; showBiz(r.data); if (added) loadBusy();
+      toast(added ? "Added. We'll check your license soon." : "Saved");
+    });
+  });
+  var BIZ_COLS = "id,name,kind,town,services,license,offer,monthly_limit,status";
+  (function () {
+    var sel = $("busy-val");
+    for (var v = 0; v <= 100; v += 10) { var o = document.createElement("option"); o.value = v; o.textContent = v === 0 ? "No work booked" : v === 100 ? "Fully booked" : "About " + v + "% booked"; sel.appendChild(o); }
+    $("busy-month").textContent = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  })();
+  function loadBusy() {
+    if (!biz) return;
+    db.from("busy_reports").select("busy").eq("business_id", biz.id).eq("month", thisMonth()).maybeSingle().then(function (r) {
+      $("busy-val").value = r.data ? String(r.data.busy) : "";
+    });
+  }
+  $("busy").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if ($("busy-val").value === "") return;
+    db.from("busy_reports").upsert({ business_id: biz.id, month: thisMonth(), busy: +$("busy-val").value, updated_at: new Date().toISOString() }).then(function (r) {
+      toast(r.error ? "Couldn't save. Try again." : "Saved. Thanks.");
+    });
+  });
+
   $("signout").addEventListener("click", function () {
     db.auth.signOut().then(function () { location.href = "/"; });
   });
@@ -140,13 +194,15 @@
       db.from("profiles").select("display_name,town,open_to_work,can_do,certs").eq("id", user.id).maybeSingle(),
       db.from("work_answers").select("jobs,hours,pay").eq("member_id", user.id).maybeSingle(),
       loadId(),
-      fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; })
+      fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
+      db.from("businesses").select(BIZ_COLS).eq("owner_id", user.id).maybeSingle()
     ]).then(function (out) {
       var m = out[0].data || {}, c = m.county_fips && out[4][m.county_fips];
       $("where").textContent = c ? c[0] + ", " + c[1] : m.zip ? "ZIP " + m.zip : "Member";
       $("email").textContent = user.email || "";
       showProfile(out[1].data);
       showWork(out[2].data);
+      showBiz(out[5].data); loadBusy();
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
       // Pick up a check that finished while the page was closed.
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
