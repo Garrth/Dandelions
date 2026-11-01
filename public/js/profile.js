@@ -1,4 +1,4 @@
-// The member profile: ID check, about you, private work answers and the share link.
+// The member profile: ID check, about you, private work answers, your business and the share link.
 // Everything here reads and writes only the signed-in member's own rows (row level security).
 (function () {
   var cfg = window.DANDELIONS_CONFIG || {};

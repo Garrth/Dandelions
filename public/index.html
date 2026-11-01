@@ -3,6 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // Signed-in members go to their dashboard. "/?intro" (the About Dandelions link) always shows this page.
+    try {
+      if (!/[?&]intro\b/.test(location.search) && !location.hash) {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (/^sb-.*-auth-token$/.test(k) && localStorage.getItem(k)) { location.replace("/app/"); break; }
+        }
+      }
+    } catch (e) {}
+  </script>
   <title>Dandelions</title>
   <meta name="description" content="AI is going to change a lot of jobs. Dandelions has a plan, and it runs on people taking part. The goal: useful work for anyone who wants it.">
   <meta property="og:title" content="Dandelions: useful work for anyone who wants it">
