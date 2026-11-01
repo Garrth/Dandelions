@@ -93,7 +93,7 @@
         '<div class="stat"><b>' + m.work.jobs + '</b><span>Jobs you hold</span></div>' +
         '<div class="stat"><b>' + esc(m.work.hours) + '</b><span>Hours</span></div>' +
         '<div class="stat"><b>' + esc(m.work.pay) + '</b><span>Pay range</span></div></div>' +
-        '<p class="small muted" style="margin-top:10px">Optional. Only you see this. Raindy adds everyone\'s answers into county totals, like how many people work two jobs, and never shows one person\'s answers.</p></div>' +
+        '<p class="small muted" style="margin-top:10px">Optional. Only you see this. Rai adds everyone\'s answers into county totals, like how many people work two jobs, and never shows one person\'s answers.</p></div>' +
 
       '<h2 class="section-title">Hiring near you</h2>' +
       '<div class="card">' + hiring.map((b) => b.hiring.map((h) =>
@@ -506,7 +506,7 @@
         '<p class="small muted" style="margin-top:10px">' + esc(L.openWhy) + " " + esc(L.later) + "</p>" +
         '<a class="btn small" href="/preview/projects.html" style="margin-top:12px;display:inline-block">See the work</a></div>' +
 
-      '<h2 class="section-title">Raindy\'s numbers</h2><a class="card pcard" href="/preview/raindy.html"><div class="stats">' +
+      '<h2 class="section-title">Rai\'s numbers</h2><a class="card pcard" href="/preview/raindy.html"><div class="stats">' +
         '<div class="stat"><b>' + fmt(R.working.now) + '</b><span>People here working, ' + pct(R.working.now, R.working.yearAgo) + " in a year</span></div>" +
         '<div class="stat"><b>+' + R.prices.all + '%</b><span>Prices in a year (' + esc(R.prices.region) + ")</span></div>" +
         '<div class="stat"><b>$' + R.livingWage.oneAdult.toFixed(2) + '</b><span>Living wage an hour, one adult</span></div></div>' +
@@ -517,7 +517,7 @@
         '</div><p class="small muted" style="margin-top:10px">' + esc(us.note) + " See every state and county ›</p></a>" +
 
       '<h2 class="section-title">Preview screens</h2><div class="stack">' +
-        [["🤖", "/preview/raindy.html", "Raindy's data: Sonoma County", "Real public numbers: work, pay, prices, local businesses."],
+        [["🤖", "/preview/raindy.html", "Rai's data: Sonoma County", "Real public numbers: work, pay, prices, local businesses."],
          ["👋", "/preview/join.html", "Sign up", "Email and ZIP, ID check, member agreement, add a business."],
          ["🌼", "/preview/profile.html", "Your profile", "Your path, what you can do, jobs near you, badges."],
          ["🏪", "/preview/business.html?id=b1", "Business profile", "Services, track record, size limit, how busy, hiring."],
@@ -982,7 +982,7 @@
       '<p class="small muted" style="margin-top:12px">Only a sample of places is filled in. The real map covers every state and county, from the public log and Census data.</p>';
   }
 
-  // ---------- Raindy's data: real public numbers for one place, simple view with details on tap ----------
+  // ---------- Rai's data: real public numbers for one place, simple view with details on tap ----------
   if (page === "raindy") {
     const R = window.RAINDY, W = R.working, LW = R.livingWage;
     const F = Object.assign({ created: S.launch.budget.used }, S.launch.flow), MA = S.launch.memberAnswers;
@@ -1010,7 +1010,7 @@
       $("#cats").innerHTML = list.length ? list.map(row).join("") : '<p class="muted">Nothing matches. Try another word.</p>';
     };
     main.innerHTML =
-      '<div class="page-head"><div class="eyebrow">Raindy\'s data</div><h1>' + esc(R.place) + ' by the numbers.</h1><p>The numbers Raindy, our AI, uses to spot good and bad trends. Ask Raindy about them in Talk.</p></div>' +
+      '<div class="page-head"><div class="eyebrow">Rai\'s data</div><h1>' + esc(R.place) + ' by the numbers.</h1><p>The numbers Rai, our AI, uses to spot good and bad trends. Ask Rai about them in Talk.</p></div>' +
       '<p class="note"><b>Public numbers are real</b>, pulled ' + esc(R.pulled) + ". Numbers from members and points are samples of what comes in once a county reaches 1%.</p>" +
       '<input id="q" type="search" placeholder="Search: dental, rent, restaurants, home care…" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin:14px 0 4px">' +
 
