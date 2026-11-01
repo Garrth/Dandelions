@@ -129,9 +129,9 @@
   // ---- Your business ----
   var biz = null;
   var BIZ_TEXT = {
-    pending: ["Waiting for a license check", "sun", "We check licenses by hand for now, usually within a few days. Then you show in the directory."],
+    pending: ["In the directory", "ok", "You're listed. People can find you in the directory."],
     listed: ["In the directory", "ok", "You're listed. People can find you in the directory."],
-    not_listed: ["Not listed yet", "warn", "We couldn't check your license. Email hello@dandelions.lol and we'll sort it out with you."]
+    not_listed: ["Not listed", "warn", "Your business was taken out of the directory. Email hello@dandelions.lol and we'll sort it out with you."]
   };
   function thisMonth() { var d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-01"; }
   function showBiz(b) {
@@ -143,6 +143,7 @@
     $("b-name").value = b.name || ""; $("b-kind").value = b.kind || ""; $("b-town").value = b.town || "";
     $("b-services").value = b.services || ""; $("b-license").value = b.license || ""; $("b-offer").value = b.offer || "";
     $("b-limit").value = b.monthly_limit || 0;
+    $("b-attest").checked = !!b.license_attested;
     $("b-save").textContent = biz ? "Save" : "Add my business";
     $("busy").hidden = !biz;
   }
@@ -151,16 +152,17 @@
     var row = {
       name: $("b-name").value.trim(), kind: $("b-kind").value, town: $("b-town").value.trim(),
       services: $("b-services").value.trim(), license: $("b-license").value.trim(),
-      offer: $("b-offer").value.trim() || null, monthly_limit: Math.max(0, Math.round(+$("b-limit").value || 0))
+      offer: $("b-offer").value.trim() || null, monthly_limit: Math.max(0, Math.round(+$("b-limit").value || 0)),
+      license_attested: $("b-attest").checked
     };
     var q = biz ? db.from("businesses").update(row).eq("id", biz.id) : db.from("businesses").insert(Object.assign({ owner_id: user.id }, row));
     q.select(BIZ_COLS).single().then(function (r) {
       if (r.error) { toast("Couldn't save. Check the fields and try again."); return; }
       var added = !biz; showBiz(r.data); if (added) loadBusy();
-      toast(added ? "Added. We'll check your license soon." : "Saved");
+      toast(added ? "Added. You're in the directory." : "Saved");
     });
   });
-  var BIZ_COLS = "id,name,kind,town,services,license,offer,monthly_limit,status";
+  var BIZ_COLS = "id,name,kind,town,services,license,offer,monthly_limit,status,license_attested";
   (function () {
     var sel = $("busy-val");
     for (var v = 0; v <= 100; v += 10) { var o = document.createElement("option"); o.value = v; o.textContent = v === 0 ? "No work booked" : v === 100 ? "Fully booked" : "About " + v + "% booked"; sel.appendChild(o); }

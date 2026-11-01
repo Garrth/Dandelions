@@ -52,17 +52,18 @@
       <h2 class="section-title">Your business</h2>
       <form class="card" id="biz">
         <div class="spread" id="b-head" hidden><b id="b-title"></b><span class="chip" id="b-chip"></span></div>
-        <p class="small muted" id="b-text" style="margin:6px 0 12px">Own a business, or work for yourself? Add it here. Once we've checked your license, it shows in the <a href="/directory.html">directory</a>.</p>
+        <p class="small muted" id="b-text" style="margin:6px 0 12px">Own a business, or work for yourself? Add it here and it shows in the <a href="/directory.html">directory</a> right away.</p>
         <label class="field">Business name<input id="b-name" maxlength="80" required></label>
         <label class="field">Kind of business
           <select id="b-kind" required><option value="">Choose</option><option>Home and repair</option><option>Food</option><option>Personal care</option><option>Office and media</option><option>Rentals</option><option>Auto</option><option>Pets</option><option>Other</option></select></label>
         <label class="field">Town<input id="b-town" maxlength="60" required placeholder="Santa Rosa"></label>
         <label class="field">What you do<input id="b-services" maxlength="200" required placeholder="Small home repairs, drywall, plumbing fixtures"></label>
-        <label class="field">License type and number <span class="muted">(private)</span><input id="b-license" maxlength="120" required placeholder="City business license #12345, or CSLB C-33 #123456"></label>
-        <p class="small muted" style="margin:-4px 0 12px">Only used to check you're a real business. Changing it sends it back for a check.</p>
+        <label class="field">License or ID number <span class="muted">(private)</span><input id="b-license" maxlength="120" required placeholder="City business license #12345, CSLB #123456, or EIN"></label>
+        <p class="small muted" style="margin:-4px 0 12px">Never shown in the directory.</p>
         <label class="field">Offer for members <span class="muted">(optional)</span><input id="b-offer" maxlength="120" placeholder="10% off your first visit"></label>
         <label class="field">Most points a month you'll take <span class="muted">(private)</span><input id="b-limit" type="number" min="0" max="1000000" step="50" value="0"></label>
         <p class="small muted" style="margin:-4px 0 12px">Points aren't on in any county yet. This is your limit for when they are, and you can change it any time.</p>
+        <label class="check"><input type="checkbox" id="b-attest" required> I confirm this business holds a valid license for the work it does (for example a city business license or a contractor's license).</label>
         <button class="btn small" type="submit" id="b-save">Add my business</button>
       </form>
 
