@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Your profile | Dandelions</title>
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/">Home</a><a href="/directory.html">Directory</a><button class="btn ghost small" type="button" id="signout" hidden>Sign out</button></nav></header>
+  <main id="main">
+    <p class="muted" id="loading">Loading your profile...</p>
+
+    <div id="app" hidden>
+      <div class="page-head"><div class="eyebrow" id="where"></div><h1 id="hello">Your profile</h1><p id="email"></p></div>
+
+      <h2 class="section-title">ID check</h2>
+      <div class="card" id="idcard">
+        <div class="spread"><b id="idtitle"></b><span class="chip" id="idchip"></span></div>
+        <p class="small muted" id="idtext" style="margin-top:6px"></p>
+        <button class="btn" type="button" id="idgo" style="margin-top:12px" hidden></button>
+        <button class="btn ghost small" type="button" id="idrefresh" style="margin-top:12px" hidden>Check again</button>
+        <p class="small muted" style="margin-top:10px">Equitide runs ID checks for Dandelions through Plaid. Dandelions gets back only yes or no and the date, never your ID papers.</p>
+      </div>
+
+      <h2 class="section-title">About you</h2>
+      <form class="card" id="profile">
+        <label class="field">Name others see<input id="p-name" maxlength="60" autocomplete="name"></label>
+        <label class="field">Town<input id="p-town" maxlength="60" placeholder="Santa Rosa"></label>
+        <label class="check"><input type="checkbox" id="p-open"> I'm open to work</label>
+        <label class="field">What I can do <span class="muted">(separate with commas)</span><input id="p-can" placeholder="Drywall repair, interior painting"></label>
+        <label class="field">Certifications <span class="muted">(separate with commas)</span><input id="p-certs" placeholder="OSHA 10-hour construction"></label>
+        <button class="btn small" type="submit">Save</button>
+      </form>
+
+      <h2 class="section-title">Your work, private</h2>
+      <form class="card" id="work">
+        <p class="small muted" style="margin-bottom:12px">Optional. Only you see your answers. Rai only shows county totals, and only once at least 10 people in the county have answered.</p>
+        <label class="field">Jobs you hold now
+          <select id="w-jobs"><option value="">Choose</option><option value="0">None right now</option><option value="1">1</option><option value="2">2</option><option value="3">3 or more</option></select></label>
+        <label class="field">Hours a week, all jobs
+          <select id="w-hours"><option value="">Choose</option><option value="under_20">Under 20</option><option value="20_to_39">20 to 39</option><option value="40_to_50">40 to 50</option><option value="over_50">Over 50</option></select></label>
+        <label class="field">Pay an hour, main job
+          <select id="w-pay"><option value="">Choose</option><option value="under_17">Under $17</option><option value="17_to_25">$17 to $25</option><option value="25_to_35">$25 to $35</option><option value="35_to_50">$35 to $50</option><option value="over_50">Over $50</option><option value="prefer_not">Rather not say</option></select></label>
+        <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small" type="button" id="w-clear" hidden>Remove my answers</button></div>
+      </form>
+
+      <h2 class="section-title">Your business</h2>
+      <form class="card" id="biz">
+        <div class="spread" id="b-head" hidden><b id="b-title"></b><span class="chip" id="b-chip"></span></div>
+        <p class="small muted" id="b-text" style="margin:6px 0 12px">Own a business, or work for yourself? Add it here. Once we've checked your license, it shows in the <a href="/directory.html">directory</a>.</p>
+        <label class="field">Business name<input id="b-name" maxlength="80" required></label>
+        <label class="field">Kind of business
+          <select id="b-kind" required><option value="">Choose</option><option>Home and repair</option><option>Food</option><option>Personal care</option><option>Office and media</option><option>Rentals</option><option>Auto</option><option>Pets</option><option>Other</option></select></label>
+        <label class="field">Town<input id="b-town" maxlength="60" required placeholder="Santa Rosa"></label>
+        <label class="field">What you do<input id="b-services" maxlength="200" required placeholder="Small home repairs, drywall, plumbing fixtures"></label>
+        <label class="field">License type and number <span class="muted">(private)</span><input id="b-license" maxlength="120" required placeholder="City business license #12345, or CSLB C-33 #123456"></label>
+        <p class="small muted" style="margin:-4px 0 12px">Only used to check you're a real business. Changing it sends it back for a check.</p>
+        <label class="field">Offer for members <span class="muted">(optional)</span><input id="b-offer" maxlength="120" placeholder="10% off your first visit"></label>
+        <label class="field">Most points a month you'll take <span class="muted">(private)</span><input id="b-limit" type="number" min="0" max="1000000" step="50" value="0"></label>
+        <p class="small muted" style="margin:-4px 0 12px">Points aren't on in any county yet. This is your limit for when they are, and you can change it any time.</p>
+        <button class="btn small" type="submit" id="b-save">Add my business</button>
+      </form>
+
+      <form class="card" id="busy" hidden style="margin-top:12px">
+        <b>How booked are you this month?</b>
+        <p class="small muted" style="margin:4px 0 12px">Private. Rai only shows the county average, and only once 10 businesses have reported.</p>
+        <label class="field"><span id="busy-month"></span>
+          <select id="busy-val" required><option value="">Choose</option></select></label>
+        <button class="btn small" type="submit">Save</button>
+      </form>
+
+      <h2 class="section-title">Your link</h2>
+      <div class="card"><p class="small">Share it to help your county grow. It only shows who brought who in, and has no cash value.</p><p style="margin-top:8px"><code id="reflink"></code></p></div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/profile.js"></script>
+</body>
+</html>
