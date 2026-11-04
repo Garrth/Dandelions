@@ -26,6 +26,7 @@ body.dir { padding-bottom: 32px; }
 .dir .row:hover b, .dir .row:hover .name { text-decoration: underline; }
 .dir .row .n { font-size: 13px; color: var(--muted); white-space: nowrap; }
 .dir .row .sub { display: block; font-size: 13px; color: var(--muted); }
+.dir .row .sub .lic { color: var(--leaf); font-weight: 700; }
 .dir .row .name { font-weight: 600; }
 .dir .note { background: var(--soft); border-radius: 12px; padding: 12px; font-size: 14px; margin: 8px 0; }
 .dir .countline { font-size: 13px; color: var(--muted); padding: 12px 0 4px; }

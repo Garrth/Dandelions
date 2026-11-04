@@ -12,6 +12,16 @@
     var k = /restaurant|eatery|beverage|food/.test(f) ? "food" : /home_service|construction|vehicle|technical/.test(f) ? "tools" : "shop";
     return '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[k] + "</svg>";
   }
+  var CLASSES = { "A": "General engineering", "B": "General building", "B-2": "Residential remodeling", "C-2": "Insulation", "C-4": "Boilers and steam",
+    "C-5": "Framing and carpentry", "C-6": "Cabinets and millwork", "C-7": "Low voltage systems", "C-8": "Concrete", "C-9": "Drywall", "C-10": "Electrical",
+    "C-11": "Elevators", "C-12": "Earthwork and paving", "C-13": "Fencing", "C-15": "Flooring", "C-16": "Fire protection", "C-17": "Glazing",
+    "C-20": "Heating and air conditioning", "C-21": "Demolition", "C-22": "Asbestos removal", "C-23": "Ornamental metal", "C-27": "Landscaping",
+    "C-28": "Locks and security", "C-29": "Masonry", "C-31": "Traffic control", "C-32": "Parking and highway", "C-33": "Painting", "C-34": "Pipelines",
+    "C-35": "Lathing and plastering", "C-36": "Plumbing", "C-38": "Refrigeration", "C-39": "Roofing", "C-42": "Sewer and septic", "C-43": "Sheet metal",
+    "C-45": "Signs", "C-46": "Solar", "C-47": "Manufactured housing", "C-49": "Tree service", "C-50": "Steel reinforcing", "C-51": "Structural steel",
+    "C-53": "Swimming pools", "C-54": "Tile", "C-55": "Water conditioning", "C-57": "Well drilling", "C-60": "Welding", "C-61": "Limited specialty",
+    "ASB": "Asbestos", "HAZ": "Hazardous waste removal" };
+  function className(c) { var k = c.indexOf("/") > 0 ? "C-61" : c; return (CLASSES[k] || "Specialty") + " (" + c + ")"; }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } }
 
   Promise.all([D.index(), D.family(fam)]).then(function (out) {
@@ -26,7 +36,12 @@
     document.title = name + " | Directory | Dandelions";
     var addr = [b[5], [town, b[7]].filter(Boolean).join(" ")].filter(Boolean).join(", ");
     var tel = phone.replace(/\D/g, "");
-    var maps = "https://www.google.com/maps/dir/?api=1&destination=" + b[3] + "," + b[4];
+    var fromList = String(b[0]).indexOf("cslb-") === 0;
+    var maps = "https://www.google.com/maps/dir/?api=1&destination=" + (fromList ? encodeURIComponent(town + " CA " + b[7]) : b[3] + "," + b[4]);
+    if (fromList) addr = "";
+    var licRow = b[11] ? "<div><b>License</b><span>California contractor #" + esc(b[11]) + ', active. <a href="https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=' +
+      encodeURIComponent(b[11]) + '" target="_blank" rel="noopener">Check it with the state</a><br><span class="muted">' + esc(String(b[12]).split(" ").map(className).join(", ")) +
+      (b[13] === 1 ? ". No employees on file (one-person shop)." : "") + "</span></span></div>" : "";
     var heading = idx.types[b[2]][0];
     var mail = function (subject) { return "mailto:hello@dandelions.lol?subject=" + encodeURIComponent(subject + ": " + name + " (" + id + ")"); };
     document.getElementById("biz").innerHTML =
@@ -38,14 +53,15 @@
         '<a href="' + maps + '" target="_blank" rel="noopener">Directions</a>' +
         '<a href="' + esc(web || "#") + '" target="_blank" rel="noopener nofollow"' + (web ? "" : ' aria-disabled="true"') + ">Website</a></div>" +
       '<div class="facts">' +
-        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">Not listed</span>') + "</span></div>" +
+        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">' + (fromList ? "Works out of " + esc(town || "this county") + ". Call for details." : "Not listed") + "</span>") + "</span></div>" +
+        licRow +
         "<div><b>Phone</b><span>" + (phone ? '<a href="tel:' + tel + '">' + esc(phone) + "</a>" : '<span class="muted">Not listed</span>') + "</span></div>" +
         "<div><b>Online</b><span>" + ([web ? '<a href="' + esc(web) + '" target="_blank" rel="noopener nofollow">' + esc(host(web) || "Website") + "</a>" : "",
           social ? '<a href="' + esc(social) + '" target="_blank" rel="noopener nofollow">' + esc(/facebook/.test(social) ? "Facebook" : /instagram/.test(social) ? "Instagram" : host(social)) + "</a>" : ""]
           .filter(Boolean).join(" · ") || '<span class="muted">Not listed</span>') + "</span></div>" +
         '<div><b>Hours</b><span class="muted">Not listed yet. Call to check.</span></div></div>' +
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
-      '<div class="foot"><span>From public records and Overture Maps open data. Own this business? <a href="' + mail("Claim") + '">Claim it</a> to add photos, hours and an offer.</span>' +
+      '<div class="foot"><span>From public records' + (b[11] ? ", the state contractor license list" : "") + (fromList ? "" : " and Overture Maps open data") + '. Own this business? <a href="' + mail("Claim") + '">Claim it</a> to add photos, hours and an offer.</span>' +
       '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
   }).catch(function () {
     document.getElementById("biz").innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';

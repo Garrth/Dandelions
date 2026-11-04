@@ -13,8 +13,8 @@
       { v: "price", l: "Price ($ to $$$$)", note: "Prices show once " + noun + " claim their listing and add them." },
       { v: "open", l: "Open now", note: "Hours show once " + noun + " claim their listing and add them." });
     if (TRADES.indexOf(family) >= 0) f.push(
-      { v: "lic", l: "Licensed", note: "Coming next: we match each business to the state contractor license list automatically." },
-      { v: "solo", l: "One-person shop", note: "Comes from the state license list and owner claims." },
+      { v: "lic", l: "Licensed", keep: function (b) { return !!b[11]; }, empty: "No licensed contractors found nearby. Try a bigger distance." },
+      { v: "solo", l: "One-person shop", keep: function (b) { return b[13] === 1; }, empty: "None found nearby. Try a bigger distance." },
       { v: "crew", l: "Larger crew", note: "Comes from owner claims and Dandelions reviews." },
       { v: "est", l: "Free estimates", note: "Shows once " + noun + " claim their listing and add it." });
     return f.concat([
@@ -41,16 +41,18 @@
       return '<option value="' + k + '"' + (String(k) === kind ? " selected" : "") + ">" + esc(idx.types[k][1]) + " (" + kc[k] + ")</option>";
     }).join("") : "");
     $("kind").disabled = kinds.length < 2;
-    var list = near.filter(function (x) { return !kind || String(x.b[2]) === kind; });
+    var list = near.filter(function (x) { return (!kind || String(x.b[2]) === kind) && (!f.keep || f.keep(x.b)); });
     if (f.v === "near") list.sort(function (a, b) { return a.d - b.d; });
     $("note").hidden = !f.note && list.length > 0;
     if (f.note) { $("note").textContent = f.note; list = []; }
+    else if (f.empty && near.length && !list.length) $("note").textContent = f.empty;
     else if (!near.length) $("note").textContent = "Nothing within " + r + " miles of " + loc.label + ". Try a bigger distance.";
-    $("count").textContent = f.note ? "" : list.length + " within " + r + " miles of " + loc.label + ", " + (f.v === "near" ? "closest first" : "A to Z");
+    var what = f.v === "lic" ? " licensed" : f.v === "solo" ? " one-person shops" : "";
+    $("count").textContent = f.note ? "" : list.length + what + " within " + r + " miles of " + loc.label + ", " + (f.v === "near" ? "closest first" : "A to Z");
     $("list").innerHTML = list.map(function (x) {
       var b = x.b;
       return '<a class="row" href="/directory/biz.html?f=' + encodeURIComponent(idx.types[t][3]) + "&id=" + encodeURIComponent(b[0]) + '">' +
-        '<span style="min-width:0"><span class="name">' + esc(b[1]) + '</span><span class="sub">' + esc(idx.types[b[2]][1]) + (b[6] ? " · " + esc(b[6]) : "") + "</span></span>" +
+        '<span style="min-width:0"><span class="name">' + esc(b[1]) + '</span><span class="sub">' + esc(idx.types[b[2]][1]) + (b[6] ? " · " + esc(b[6]) : "") + (b[11] ? ' · <span class="lic">Licensed</span>' : "") + "</span></span>" +
         '<span class="n">' + x.d.toFixed(1) + " mi</span></a>";
     }).join("");
   }
