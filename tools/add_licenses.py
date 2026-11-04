@@ -92,10 +92,12 @@ def classes(r):
     return out
 
 # ---- Load the listings, undoing any earlier run ----
-fams = {}
+fams, before = {}, {}
 for path in glob.glob(os.path.join(out, 'fam', '*.json')):
     f = os.path.basename(path)[:-5]
-    fams[f] = [b[:11] for b in json.load(open(path)) if not str(b[0]).startswith('cslb-')]
+    raw = json.load(open(path))
+    before[f] = json.dumps(raw, separators=(',', ':'))
+    fams[f] = [b[:11] for b in raw if not str(b[0]).startswith('cslb-')]
 added_before = index.pop('cslbAdded', 0)
 if added_before:
     index['pts'] = index['pts'][:len(index['pts']) - 3 * added_before]
@@ -150,7 +152,8 @@ index['count'] += len(added)
 index['cslbAdded'] = len(added)
 index['licenses'] = {'source': 'California Contractors State License Board public data portal', 'pulled': today.isoformat()}
 for f, lst in fams.items():
-    lst.sort(key=lambda b: b[1].lower())
-    json.dump(lst, open(os.path.join(out, 'fam', f + '.json'), 'w'), separators=(',', ':'))
+    if any(str(b[0]).startswith('cslb-') for b in lst): lst.sort(key=lambda b: b[1].lower())
+    text = json.dumps(lst, separators=(',', ':'))
+    if text != before.get(f): open(os.path.join(out, 'fam', f + '.json'), 'w').write(text)
 json.dump(index, open(os.path.join(out, 'index.json'), 'w'), separators=(',', ':'))
 print(matched, 'listings matched to a license,', len(added), 'added from the license list', file=sys.stderr)

@@ -61,7 +61,7 @@
           .filter(Boolean).join(" · ") || '<span class="muted">Not listed</span>') + "</span></div>" +
         '<div><b>Hours</b><span class="muted">Not listed yet. Call to check.</span></div></div>' +
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
-      '<div class="foot"><span>From public records' + (b[11] ? ", the state contractor license list" : "") + (fromList ? "" : " and Overture Maps open data") + '. Own this business? <a href="' + mail("Claim") + '">Claim it</a> to add photos, hours and an offer.</span>' +
+      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '. Own this business? <a href="' + mail("Claim") + '">Claim it</a> to add photos, hours and an offer.</span>' +
       '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
   }).catch(function () {
     document.getElementById("biz").innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';
