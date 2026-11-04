@@ -13,13 +13,16 @@
 <div class="wrap">
   <header class="top"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/directory/">Directory</a></nav></header>
   <main>
-    <div class="page-head"><div class="eyebrow">Members</div><h1>Log in</h1><p>We'll email you a link. No password needed.</p></div>
+    <div class="page-head"><div class="eyebrow">Members</div><h1>Log in</h1><p>Use your password, or we'll email you a link.</p></div>
     <form class="card" id="login" novalidate>
       <label class="field">Email<input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-      <button class="btn" type="submit" id="send" style="width:100%">Email me a link</button>
+      <label class="field">Password<input id="pw" type="password" autocomplete="current-password" placeholder="Leave empty to get an email link"></label>
+      <button class="btn" type="submit" id="send" style="width:100%">Log in</button>
+      <button class="btn ghost" type="button" id="link" style="width:100%;margin-top:10px">Email me a link instead</button>
       <p class="small muted" id="msg" style="margin-top:10px" role="status"></p>
     </form>
     <p class="small muted" style="margin-top:12px">Not a member yet? <a href="/#pledge">Pledge first</a>, then come back here.</p>
+    <p class="small muted" style="margin-top:6px">Forgot your password? Use the email link, then set a new one on your profile.</p>
   </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>

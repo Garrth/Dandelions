@@ -269,8 +269,11 @@
     }).then(function (res) {
       go.disabled = false;
       if (res.error) {
-        msg.textContent = res.error.status === 429
-          ? "Too many tries right now. Please wait a few minutes and try again."
+        var wait = (res.error.message || "").match(/after (\d+) seconds/);
+        msg.textContent = wait
+          ? "We just sent you an email. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works. Already a member? Use Sign in at the top of the page."
+          : res.error.status === 429
+          ? "Too many emails sent in the last hour. Please try again later."
           : "Something went wrong on our end. Please try again in a bit.";
         return;
       }

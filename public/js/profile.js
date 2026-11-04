@@ -182,6 +182,20 @@
     });
   });
 
+  $("pwform").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var pw = $("newpw").value;
+    if (pw.length < 8) { toast("Use at least 8 characters."); return; }
+    db.auth.updateUser({ password: pw }).then(function (r) {
+      if (!r.error) { $("newpw").value = ""; toast("Password saved. You can use it next time you log in."); return; }
+      var m = r.error.message || "";
+      toast(/same/i.test(m) ? "That's already your password."
+        : /weak|short|character/i.test(m) ? "Pick a longer or harder password."
+        : /reauth|recent/i.test(m) ? "Log out, log back in with the email link, then try again."
+        : "Couldn't save. Try again.");
+    });
+  });
+
   $("signout").addEventListener("click", function () {
     db.auth.signOut().then(function () { location.href = "/"; });
   });

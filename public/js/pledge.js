@@ -55,8 +55,11 @@
     button.disabled = false;
 
     if (result.error) {
-      if (result.error.status === 429) {
-        show("Too many tries right now. Please wait a few minutes and try again.", "error");
+      var wait = (result.error.message || "").match(/after (\d+) seconds/);
+      if (wait) {
+        show("We just sent you an email. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works.", "error");
+      } else if (result.error.status === 429) {
+        show("Too many emails sent in the last hour. Please try again later.", "error");
       } else {
         show("Something went wrong on our end. Please try again in a bit.", "error");
       }
