@@ -26,3 +26,19 @@ When building those inputs, read only the parts of the Overture files whose boun
 The script:
 
 - drops closed places, low-confidence places, places outside the county line, parks and other non-businesses, and duplicates (same name within about 100 meters).
+
+## Contractor licenses (California)
+
+`tools/add_licenses.py` adds the state contractor license list (CSLB public data portal, "List by Classification and County") to a county's files. Run it after `build_directory.py`:
+
+```
+python3 tools/add_licenses.py cslb_downloads/ 06097 public/data/dir
+```
+
+- Download one `.xlsx` per classification for the county. The state site turns away requests that come too fast, so wait between downloads and retry the ones that come back as an error page (the script skips files that aren't spreadsheets).
+- Only active (CLEAR, not expired) licenses are used.
+- Each license is matched to a listing by phone, or by the same name in the same ZIP or town. A matched listing gets three more fields: license number, classifications, and 1 if the contractor told the state it has no employees (workers comp exempt), else 0.
+- A license with no matching listing becomes a new listing (id `cslb-<number>`) under the closest business type. These never show a street address, because many are home addresses. They sit at the ZIP center for distance.
+- Running it again removes what the last run added first.
+
+Sonoma, Nov 4 2026: 5,350 active licenses, 788 listings matched, 4,439 contractors added.
