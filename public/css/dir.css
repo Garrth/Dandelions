@@ -1,0 +1,51 @@
+/* The directory. Uses the color tokens from app.css. */
+body.dir { padding-bottom: 32px; }
+.dir .hero { background: #15210f; color: #fdfdf8; }
+.dir .hero .wrap { padding-bottom: 16px; display: flex; flex-direction: column; gap: 10px; }
+.dir .hero .brand, .dir .hero .navlinks a:not(.btn) { color: #fdfdf8; }
+.dir .hero h1 { font-size: 32px; }
+.dir .searchbox { display: flex; gap: 8px; align-items: center; background: #fdfdf8; border-radius: 14px; padding: 0 14px; }
+.dir .searchbox input { flex: 1; min-width: 0; border: 0; background: transparent; color: #15210f; height: 50px; font-size: 17px; outline: none; }
+.dir .searchbox:focus-within { outline: 3px solid var(--sun); }
+.dir .locrow { display: flex; gap: 8px; align-items: center; }
+.dir .locbtn { flex: 1; min-width: 0; min-height: 44px; text-align: left; background: transparent; border: 1px solid #56624f; border-radius: 10px; color: #fdfdf8; font-weight: 700; padding: 0 10px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dir .locbtn span { font-weight: 400; color: #c9d1bf; }
+.dir .radius { min-height: 44px; border-radius: 10px; border: 0; background: var(--sun); color: #15210f; font-weight: 700; padding: 0 8px; }
+.dir .locpanel { background: #fdfdf8; color: #15210f; border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.dir .locpanel input { height: 44px; border-radius: 10px; border: 1px solid #c4cab6; padding: 0 10px; background: #fff; color: #15210f; }
+.dir .locpanel .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dir .locpanel button { min-height: 44px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.dir .locpanel .go { background: #15210f; color: #fdfdf8; border: 0; }
+.dir .locpanel .alt { background: #fff; color: #15210f; border: 1px solid #c4cab6; }
+.dir .locpanel .err { color: #b5541c; font-size: 14px; }
+.dir .letters { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 2px; padding: 6px 0; position: sticky; top: 0; background: var(--soft); z-index: 2; border-bottom: 1px solid var(--line); }
+.dir .letters a, .dir .letters span { height: 34px; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; color: var(--ink); }
+.dir .letters span { color: var(--muted); font-weight: 400; opacity: .6; }
+.dir .letterhead { font-family: var(--display); font-weight: 800; font-size: 24px; background: var(--sun); color: #15210f; border-radius: 8px; padding: 2px 10px; margin: 16px 0 4px; scroll-margin-top: 50px; }
+.dir .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; min-height: 44px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.dir .row:hover b, .dir .row:hover .name { text-decoration: underline; }
+.dir .row .n { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.dir .row .sub { display: block; font-size: 13px; color: var(--muted); }
+.dir .row .name { font-weight: 600; }
+.dir .note { background: var(--soft); border-radius: 12px; padding: 12px; font-size: 14px; margin: 8px 0; }
+.dir .countline { font-size: 13px; color: var(--muted); padding: 12px 0 4px; }
+.dir .boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dir .boxes label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; }
+.dir .boxes select { height: 44px; min-width: 0; border-radius: 10px; border: 1px solid var(--line); background: var(--card); padding: 0 8px; font-weight: 400; font-size: 15px; }
+.dir .crumb { font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; display: inline-flex; min-height: 44px; align-items: center; }
+.dir .bizhead { display: flex; gap: 14px; align-items: center; }
+.dir .bizicon { width: 72px; height: 72px; flex-shrink: 0; border-radius: 18px; background: var(--sun); display: flex; align-items: center; justify-content: center; color: #15210f; }
+.dir .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dir .actions a { min-height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.dir .actions a.main { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.dir .actions a[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+.dir .facts { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.dir .facts div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+.dir .facts div:last-child { border-bottom: 0; }
+.dir .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--leaf); }
+.dir .foot { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 20px; font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+.dir .stack16 { display: flex; flex-direction: column; gap: 16px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dir .hero { background: #0b1009; }
+}
+:root[data-theme="dark"] .dir .hero { background: #0b1009; }
