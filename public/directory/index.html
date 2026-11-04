@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Directory | Dandelions</title>
+  <meta name="description" content="Every business near you, A to Z. Sonoma County first.">
+  <meta name="theme-color" content="#15210f">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/dir.css">
+</head>
+<body class="dir">
+<div class="hero">
+  <div class="wrap">
+  <header class="top"><a class="brand" href="/" id="homebrand"><img src="/favicon.svg" alt="" width="26" height="26"> Directory</a><nav class="navlinks"><a href="/" id="homelink">Home</a></nav></header>
+    <label for="q"><h1>What do you need?</h1></label>
+    <div class="searchbox">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#56624f" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" autocomplete="off" placeholder="Type a word: plumber, tacos, dentist">
+    </div>
+      <div class="locrow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffd21a" stroke-width="2" aria-hidden="true"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg>
+        <button type="button" class="locbtn" id="locbtn" aria-label="Change where to search from">Loading...</button>
+        <select class="radius" id="radius" aria-label="How far to look">
+          <option value="5">5 mi</option><option value="10">10 mi</option><option value="25">25 mi</option><option value="me">Near me</option>
+        </select>
+      </div>
+      <p class="small" id="locnote" style="color:#c9d1bf" hidden></p>
+      <form class="locpanel" id="locform" hidden>
+        <label for="where" style="font-weight:700;font-size:14px">ZIP code or town</label>
+        <input id="where" list="towns" autocomplete="off" placeholder="95404 or Petaluma">
+        <datalist id="towns"></datalist>
+        <p class="err" id="locerr" role="alert"></p>
+        <div class="row"><button type="button" class="alt" id="loccancel">Cancel</button><button class="go">Done</button></div>
+        <p class="small" style="color:#56624f">Starts at the ZIP on your profile. Pick Near me in the distance box to use your phone's location.</p>
+      </form>
+  </div>
+</div>
+<div class="wrap">
+  <main>
+    <div id="matches" hidden></div>
+    <div id="browse">
+      <nav class="letters" id="letters" aria-label="Jump to a letter"></nav>
+      <p class="countline" id="total">Loading the directory...</p>
+      <div id="az"></div>
+    </div>
+    <div class="foot">
+      <span>Listings start from Overture Maps open data. Owners and members keep them up to date.</span>
+      <span><a href="/directory/members.html">Dandelions member businesses</a> · <a href="/under-the-hood.html">Under the hood</a></span>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/dir-common.js"></script>
+<script src="/js/dir-home.js"></script>
+</body>
+</html>
