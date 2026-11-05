@@ -27,9 +27,9 @@
   Promise.all([D.index(), D.family(fam)]).then(function (out) {
     var idx = out[0], b = out[1].filter(function (x) { return x[0] === id; })[0];
     if (!b) throw new Error("missing");
-    return D.location(idx).then(function (loc) { return [idx, b, loc]; });
+    return Promise.all([D.location(idx), D.claimed()]).then(function (x) { return [idx, b, x[0], x[1]]; });
   }).then(function (o) {
-    var idx = o[0], b = o[1], loc = o[2];
+    var idx = o[0], b = o[1], loc = o[2], claimed = o[3].indexOf(id) >= 0;
     var safe = function (u) { return /^https?:\/\//i.test(u || "") ? u : ""; };
     var name = b[1], type = idx.types[b[2]][1], town = b[6], phone = b[8], web = safe(b[9]), social = safe(b[10]);
     var dist = D.miles(loc.lat, loc.lon, b[3], b[4]);
@@ -47,7 +47,7 @@
     document.getElementById("biz").innerHTML =
       '<a class="crumb" href="/directory/list.html?t=' + encodeURIComponent(heading) + '">‹ ' + esc(type) + "</a>" +
       '<div class="bizhead"><div class="bizicon">' + icon(fam) + '</div><div style="min-width:0"><h1 style="font-size:26px">' + esc(name) + "</h1>" +
-      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + " · " + dist.toFixed(1) + " mi</p></div></div>" +
+      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + " · " + dist.toFixed(1) + " mi" + (claimed ? ' · <span class="lic">Claimed by owner</span>' : "") + "</p></div></div>" +
       '<div class="actions">' +
         '<a class="main" href="' + (tel ? "tel:" + tel : "#") + '"' + (tel ? "" : ' aria-disabled="true"') + ">Call</a>" +
         '<a href="' + maps + '" target="_blank" rel="noopener">Directions</a>' +
@@ -61,7 +61,7 @@
           .filter(Boolean).join(" · ") || '<span class="muted">Not listed</span>') + "</span></div>" +
         '<div><b>Hours</b><span class="muted">Not listed yet. Call to check.</span></div></div>' +
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
-      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '. Own this business? <a href="' + mail("Claim") + '">Claim it</a> to add photos, hours and an offer.</span>' +
+      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '.' + (claimed ? " The owner has claimed this listing." : ' Own this business? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
       '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
   }).catch(function () {
     document.getElementById("biz").innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';

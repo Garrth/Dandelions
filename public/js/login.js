@@ -7,8 +7,15 @@
   if (!window.supabase) { msg.textContent = "Something didn't load. Please refresh the page."; return; }
   var db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
 
+  function backTo() {
+    // Someone who started claiming a listing before logging in goes back to it.
+    var r = null;
+    try { r = localStorage.getItem("dandelions_return"); localStorage.removeItem("dandelions_return"); } catch (e) {}
+    return r && /^\/directory\/[a-z]+\.html\?[\w=&%.-]*$/.test(r) ? r : null;
+  }
+
   // Already logged in? Go straight to the member home page.
-  db.auth.getSession().then(function (res) { if (res.data && res.data.session) location.replace("/app/"); });
+  db.auth.getSession().then(function (res) { if (res.data && res.data.session) location.replace(backTo() || "/app/"); });
 
   function email() {
     var v = document.getElementById("email").value.trim();
@@ -41,7 +48,7 @@
     busy(true); msg.textContent = "Logging in...";
     db.auth.signInWithPassword({ email: e, password: pw }).then(function (res) {
       busy(false);
-      if (!res.error) { location.replace("/app/"); return; }
+      if (!res.error) { location.replace(backTo() || "/app/"); return; }
       msg.textContent = res.error.status === 429 ? "Too many tries. Wait a few minutes, or use the email link."
         : "Email or password doesn't match. No password yet? Use the email link, then set one on your profile.";
     });
