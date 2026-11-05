@@ -59,12 +59,21 @@
     .rec div { flex: 1; background: var(--soft); border-radius: 12px; padding: 8px; text-align: center; }
     .rec b { display: block; font-family: var(--display); font-size: 22px; }
     .rec span { font-size: 12px; color: var(--muted); }
+    .seg.big button { padding: 14px 6px; font-family: var(--display); font-size: 18px; }
+    .seg.big button[aria-pressed="true"] { background: var(--sun); color: var(--sun-ink); border-color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+    .cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .cat { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; min-height: 120px; }
+    .cat:hover { border-color: var(--ink); }
+    .cat b { font-family: var(--display); font-size: 17px; line-height: 1.15; }
+    .cat small { color: var(--muted); font-size: 13px; }
+    .cat .nums { margin-top: auto; padding-top: 6px; font-size: 13px; font-weight: 800; color: var(--leaf); }
+    .cat.role { background: var(--soft); }
     .back { display: inline-block; margin-bottom: 8px; font-weight: 700; }
   </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top"><a class="brand" href="/preview/work.html"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="#list">Work</a><a href="#record">Your record</a><a href="#check">Check</a></nav></header>
+  <header class="top"><a class="brand" href="/preview/work.html"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="#list">Work</a><a href="#record">Mine</a><a href="#check">Check</a></nav></header>
   <div class="pv">Preview with sample data. View as
     <select id="who"><option value="owner">Rio's Bike Repair, verified</option><option value="new">New business, first project</option><option value="none">Not verified yet</option></select>
   </div>
