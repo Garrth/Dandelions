@@ -13,6 +13,17 @@ Rai reads `public/rai/knowledge.md` before every chat, plus this week's numbers 
 3. **SQL.** Run `supabase/migrations/20261105040000_rai_chat.sql` in the SQL Editor. Safe to run again.
 4. **Function.** Edge Functions > Deploy a new function > Via Editor. Name it `rai`, paste all of `supabase/functions/rai/index.ts`, and deploy. Then open the function's settings and turn **off** "Verify JWT", so visitors who aren't signed in can ask.
 
+## Daily list of questions Rai couldn't answer
+
+When Rai can't answer, it adds a hidden marker. The function strips it, saves just that question (emails and phone numbers removed) and the page, and shows the visitor a note that it was saved. The first chat each day (California time) emails the list from the days before. Saved questions are deleted after 30 days.
+
+1. Run `supabase/migrations/20261106010000_rai_gaps.sql` in the SQL Editor.
+2. At resend.com, create an API key with "Sending access" for dandelions.lol.
+3. Add Supabase secrets `RESEND_API_KEY` (that key) and `RAI_SUMMARY_TO` (who gets the email; separate several with commas).
+4. Redeploy `rai`: Edge Functions > rai > Code, paste the new `index.ts`, Deploy.
+
+Without those two secrets, questions are still saved but no email is sent.
+
 ## Optional secrets
 
 | Name | What it changes | Default |

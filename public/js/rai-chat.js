@@ -38,7 +38,9 @@
     ".rai-form textarea{flex:1;resize:none;min-height:42px;max-height:120px;border:1px solid var(--line,#dfe3d2);border-radius:12px;padding:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:16px}",
     ".rai-form button{background:var(--sun,#ffd21a);color:var(--sun-ink,#15210f);border:0;border-radius:12px;padding:0 16px;font-weight:800;cursor:pointer;box-shadow:0 2px 0 var(--ink,#15210f)}",
     ".rai-form button:disabled{opacity:.5;cursor:default}",
-    ".rai-note{font-size:12px;color:var(--muted,#56624f);padding:0 14px 10px}"
+    ".rai-gapnote{margin-top:6px;font-size:13px;color:var(--muted,#56624f)}",
+    ".rai-note{font-size:12px;color:var(--muted,#56624f);padding:0 14px 10px}",
+    ".rai-note a{color:inherit}"
   ].join("\n");
   var face = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="6" y="7" width="20" height="16" rx="6" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="12.5" cy="15" r="2" fill="currentColor"/><circle cx="19.5" cy="15" r="2" fill="currentColor"/><path d="M16 7V3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="3" r="1.6" fill="currentColor"/><circle cx="16" cy="28" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
 
@@ -74,14 +76,14 @@
     '<button type="button" data-new>New chat</button><button type="button" data-close aria-label="Close">Close</button></div>' +
     '<div class="rai-log" role="log" aria-live="polite"></div>' +
     '<form class="rai-form"><textarea rows="1" maxlength="1500" placeholder="Ask Rai anything" aria-label="Your question"></textarea><button type="submit">Send</button></form>' +
-    '<p class="rai-note">Don\'t share private details like ID or bank numbers. Chats aren\'t saved to your account.</p>';
+    '<p class="rai-note">Don\'t share private details like ID or account numbers. Chats aren\'t saved. Questions Rai can\'t answer are kept without your name. <a href="/privacy.html">Privacy</a></p>';
   document.body.appendChild(fab); document.body.appendChild(panel);
   var log = panel.querySelector(".rai-log"), form = panel.querySelector("form"), box = form.querySelector("textarea"), send = form.querySelector("button");
   var busy = false;
 
   function draw() {
     var h = '<div class="rai-msg rai">' + md(HELLO) + "</div>";
-    state.msgs.forEach(function (m) { h += '<div class="rai-msg ' + (m.role === "user" ? "you" : "rai") + '">' + (m.role === "user" ? "<p>" + esc(m.content).replace(/\n/g, "<br>") + "</p>" : md(m.content)) + "</div>"; });
+    state.msgs.forEach(function (m) { h += '<div class="rai-msg ' + (m.role === "user" ? "you" : "rai") + '">' + (m.role === "user" ? "<p>" + esc(m.content).replace(/\n/g, "<br>") + "</p>" : md(m.content) + (m.gap ? '<p class="rai-gapnote">I saved this question, without your name, so the team can teach me the answer.</p>' : "")) + "</div>"; });
     if (busy) h += '<div class="rai-msg rai wait">Rai is thinking...</div>';
     if (!state.msgs.length && !busy) h += '<div class="rai-starts">' + STARTERS.map(function (s) { return '<button type="button">' + esc(s) + "</button>"; }).join("") + "</div>";
     log.innerHTML = h;
@@ -113,7 +115,7 @@
           : "Sorry, I couldn't answer just now. Please try again in a minute.";
         state.msgs.push({ role: "assistant", content: t, failed: true });
       } else {
-        state.msgs.push({ role: "assistant", content: t });
+        state.msgs.push(out.gap ? { role: "assistant", content: t, gap: true } : { role: "assistant", content: t });
       }
     }).catch(function () {
       state.msgs.push({ role: "assistant", content: "I can't reach the internet right now. Check your connection and try again.", failed: true });
