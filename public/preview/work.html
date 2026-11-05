@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Work (preview)</title>
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .pv { background: var(--ink); color: var(--bg); font-size: 13px; padding: 8px 12px; border-radius: 12px; margin-bottom: 14px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+    .pv select { background: var(--bg); color: var(--ink); border-radius: 8px; border: 0; padding: 4px 6px; }
+    .seg { display: flex; gap: 6px; margin: 14px 0 10px; }
+    .seg button { flex: 1; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 9px 6px; font-weight: 800; cursor: pointer; }
+    .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .budget .bar { height: 14px; margin: 8px 0 6px; display: flex; }
+    .budget .bar span.res { background: var(--leaf); }
+    .budget .bar span.paid { background: var(--sun); }
+    .keyrow { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+    .keyrow i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+    .wcard { display: block; color: inherit; text-decoration: none; }
+    .wcard:hover { border-color: var(--ink); }
+    .wcard .type { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--leaf); }
+    .wcard h3 { margin: 4px 0; font-size: 19px; }
+    .wcard .meta { display: flex; gap: 4px 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); margin-top: 8px; }
+    .wcard .meta b { color: var(--ink); }
+    .wcard .bar { margin-top: 10px; }
+    .st { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 2px 9px; border: 1px solid var(--line); white-space: nowrap; }
+    .st.open { background: var(--leaf); border-color: var(--leaf); color: var(--bg); }
+    .st.review { background: var(--sun); border-color: var(--sun); color: var(--sun-ink); }
+    .st.stall { color: var(--warn); border-color: var(--warn); }
+    .st.done { background: var(--soft); }
+    .pay { display: grid; grid-template-columns: 28px 1fr auto; gap: 2px 10px; padding: 12px 0; border-top: 1px solid var(--line); }
+    .pay:first-child { border-top: 0; }
+    .pay .dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; font-weight: 800; }
+    .pay.paid .dot { background: var(--leaf); border-color: var(--leaf); color: var(--bg); }
+    .pay.checking .dot { background: var(--sun); border-color: var(--ink); }
+    .pay.late .dot { border-color: var(--warn); color: var(--warn); }
+    .pay .amt { font-family: var(--display); font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+    .pay .sub { grid-column: 2 / -1; font-size: 13px; color: var(--muted); }
+    .steps { display: flex; gap: 4px; margin: 6px 0 16px; }
+    .steps span { flex: 1; height: 6px; border-radius: 3px; background: var(--soft); border: 1px solid var(--line); }
+    .steps span.on { background: var(--sun); border-color: var(--ink); }
+    .pick { display: block; width: 100%; text-align: left; border: 2px solid var(--line); background: var(--card); border-radius: 14px; padding: 12px 14px; cursor: pointer; margin-top: 8px; }
+    .pick[aria-pressed="true"] { border-color: var(--ink); background: var(--soft); }
+    .pick small { display: block; color: var(--muted); font-size: 13px; }
+    .tick { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; font-size: 15px; }
+    .tick input { margin-top: 4px; }
+    .row-ed { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-top: 10px; background: var(--card); }
+    .row-ed .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .row-ed .field { margin-top: 8px; }
+    .chk { display: grid; grid-template-columns: 22px 1fr; gap: 2px 8px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 15px; }
+    .chk:first-child { border-top: 0; }
+    .chk b.ok { color: var(--leaf); }
+    .chk b.no { color: var(--warn); }
+    .chk .sub { grid-column: 2; font-size: 13px; color: var(--muted); }
+    .rec { display: flex; gap: 8px; }
+    .rec div { flex: 1; background: var(--soft); border-radius: 12px; padding: 8px; text-align: center; }
+    .rec b { display: block; font-family: var(--display); font-size: 22px; }
+    .rec span { font-size: 12px; color: var(--muted); }
+    .back { display: inline-block; margin-bottom: 8px; font-weight: 700; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/preview/work.html"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="#list">Work</a><a href="#record">Your record</a><a href="#check">Check</a></nav></header>
+  <div class="pv">Preview with sample data. View as
+    <select id="who"><option value="owner">Rio's Bike Repair, verified</option><option value="new">New business, first project</option><option value="none">Not verified yet</option></select>
+  </div>
+  <main id="main"></main>
+</div>
+<script src="/preview/work.js"></script>
+</body>
+</html>
