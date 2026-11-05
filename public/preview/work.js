@@ -88,7 +88,11 @@
     { id: "checker", name: "Checker", what: "Reviews proposals and checks finished work.", pay: CHECK_PRICES.review + " a review, " + CHECK_PRICES.remote + " online, " + CHECK_PRICES.onsite + " on site", get: "Tutorial and test" },
     { id: "help", name: "Member help", what: "Answers questions by email and in Talk.", pay: "Paid per shift", get: "Tutorial and test" },
     { id: "reports", name: "Reports", what: "Sorts out wrong phone numbers and listing reports.", pay: "Paid per report", get: "Tutorial and test" },
-    { id: "keeper", name: "Keeper", what: "Signs off on rule changes.", pay: "Set by the members", get: "Interview and approval" }
+    { id: "keeper", name: "Keeper", what: "Signs off on rule changes.", pay: "Set by the members", get: "Interview and approval" },
+    { id: "node", name: "Node operator", what: "Runs a copy of the ledger, a distribution account, and keeps the shared files safe, current and spread out.", pay: "Monthly, set by the members", get: "Interview and approval" },
+    { id: "reviewer", name: "Code reviewer", what: "Reads every change to the site's code before it goes live.", pay: "Paid per review", get: "Test and approval" },
+    { id: "security", name: "Site security", what: "Watches for attacks, checks log-ins and data, fixes weak spots.", pay: "Paid per shift and per fix", get: "Interview and approval" },
+    { id: "maintainer", name: "Site maintainer", what: "Approved members who can put changes live on the site, after a code review.", pay: "Paid per change", get: "Interview and approval" }
   ];
   var mode = "start";
   function stats(tid) {
@@ -112,7 +116,7 @@
       return '<a class="cat" href="#' + mode + "/" + t.id + '"><b>' + esc(t.name) + "</b><small>" + esc(t.note) + '</small><span class="nums">' +
         (mode === "start" ? st.n + " under way · " + fmt(st.pts) + " points" : st.help + " looking for help") + "</span></a>";
     }).join("") +
-      (mode === "start" ? '<a class="cat role" href="#roles"><b>Run Dandelions</b><small>Organizer, moderator, checker, member help, keeper</small><span class="nums">' + ROLES.length + " roles</span></a>" : "") + "</div>";
+      (mode === "start" ? '<a class="cat role" href="#roles"><b>Run Dandelions</b><small>Organizer, checker, moderator, node operator and more</small><span class="nums">' + ROLES.length + " roles</span></a>" : "") + "</div>";
     if (!ok) h += gate(m);
     h += '<div class="row" style="margin-top:16px;justify-content:center"><a class="btn ghost small" href="#underway">See every project under way</a></div>';
     main.innerHTML = h;
@@ -150,7 +154,7 @@
     var h = '<a class="back" href="#list">← Work</a><div class="page-head"><div class="eyebrow">Start a project</div><h1 style="font-size:32px">Run Dandelions.</h1><p>Ongoing roles that keep things running. Getting a role is a project too.</p></div><div class="stack">' +
       ROLES.map(function (r) {
         return '<div class="card"><b>' + esc(r.name) + '</b><p class="small">' + esc(r.what) + '</p><div class="keyrow" style="margin-top:6px"><span>' + esc(r.pay) + "</span><span>To get it: " + esc(r.get) + "</span></div>" +
-          (m.person && m.biz ? '<button class="btn small" type="button" style="margin-top:8px" data-role="' + r.id + '">' + (r.id === "keeper" ? "Ask for an interview" : "Start the tutorial") + "</button>" : "") + "</div>";
+          (m.person && m.biz ? '<button class="btn small" type="button" style="margin-top:8px" data-role="' + r.id + '">' + (/Interview/.test(r.get) ? "Ask for an interview" : "Start the tutorial") + "</button>" : "") + "</div>";
       }).join("") + "</div>" + (m.person && m.biz ? "" : gate(m));
     main.innerHTML = h;
     main.querySelectorAll("[data-role]").forEach(function (b) {
@@ -158,9 +162,9 @@
         var r = ROLES.filter(function (x) { return x.id === b.getAttribute("data-role"); })[0];
         var back = document.createElement("div"); back.className = "sheet-back";
         back.innerHTML = '<div class="sheet"><div class="spread"><h2 style="font-size:22px">' + esc(r.name) + '</h2><button class="btn ghost small" data-close>Close</button></div>' +
-          (r.id === "keeper" ? '<p style="margin-top:8px">Keepers are picked by interview and approved by the members. Tell us why you want it and what you\'ve done.</p><textarea style="margin-top:10px"></textarea>'
+          (/Interview/.test(r.get) ? '<p style="margin-top:8px">This role is picked by interview and approved by the members. Tell us why you want it and what you\'ve done.</p><textarea style="margin-top:10px"></textarea>'
             : '<div class="stack" style="margin-top:10px"><div class="chk"><b class="ok">1</b><span>Watch the tutorial, about 15 minutes</span></div><div class="chk"><b class="ok">2</b><span>Take the test, 10 questions</span></div><div class="chk"><b class="ok">3</b><span>Pass, and the role shows on your record</span></div></div>') +
-          '<button class="btn" style="width:100%;margin-top:12px" data-close data-sent>' + (r.id === "keeper" ? "Send" : "Start") + "</button></div>";
+          '<button class="btn" style="width:100%;margin-top:12px" data-close data-sent>' + (/Interview/.test(r.get) ? "Send" : "Start") + "</button></div>";
         back.onclick = function (e) { if (e.target === back || e.target.closest("[data-close]")) { if (e.target.closest("[data-sent]")) toast("Preview only"); back.remove(); } };
         document.body.appendChild(back);
       };
