@@ -11,7 +11,7 @@
     // Someone who started claiming a listing before logging in goes back to it.
     var r = null;
     try { r = localStorage.getItem("dandelions_return"); localStorage.removeItem("dandelions_return"); } catch (e) {}
-    return r && /^\/directory\/[a-z]+\.html\?[\w=&%.-]*$/.test(r) ? r : null;
+    return r && /^\/(directory\/[a-z]+|app\/talk)\.html(\?[\w=&%.-]*)?$/.test(r) ? r : null;
   }
 
   // Already logged in? Go straight to the member home page.
