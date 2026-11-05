@@ -1,0 +1,23 @@
+/* Rai's numbers */
+.rai-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.rai-tile { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; min-width: 0; }
+.rai-tile .lbl { font-size: 13px; font-weight: 700; color: var(--muted); }
+.rai-tile .big { font-family: var(--display); font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; margin: 2px 0; overflow-wrap: anywhere; }
+.rai-tile .big small { font-size: 14px; font-weight: 700; }
+.rai-tile p { font-size: 13px; color: var(--muted); }
+.rai-tile.wide { grid-column: 1 / -1; }
+.trend { white-space: nowrap; font-size: 14px; font-weight: 800; }
+.trend.good { color: var(--leaf); }
+.trend.bad { color: var(--warn); }
+.trend.flat { color: var(--muted); }
+.rai-rows { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 4px 14px; }
+.rai-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: baseline; }
+.rai-row:first-child { border-top: 0; }
+.rai-row b { font-variant-numeric: tabular-nums; }
+.rai-row .sub { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+.rai-when { font-size: 13px; color: var(--muted); margin-top: 6px; }
+.rai-search { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; margin-bottom: 8px; }
+.rai-cat summary { cursor: pointer; list-style: none; }
+.rai-cat summary::-webkit-details-marker { display: none; }
+.rai-cat .more { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; font-size: 14px; }
+.rai-cat .more p + p { margin-top: 4px; }
