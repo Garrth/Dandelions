@@ -5,10 +5,9 @@
 // {"action": "check", claimId, code}.
 // One file on purpose, so it can be pasted into the Supabase dashboard editor.
 
-export const MAX_STARTS_PER_DAY = 5; // code requests per member per day
+export const MAX_STARTS_PER_DAY = 10; // code requests per member per day
 export const MAX_TRIES = 5; // wrong codes per claim
 export const CODE_MINUTES = 10; // Twilio codes last 10 minutes
-export const FREE_CLAIMS = 3; // claims per member before a person looks at the next one
 
 // "(707) 555-1234" -> "+17075551234", or "" if it isn't a US number.
 export function e164(phone) {
@@ -21,7 +20,7 @@ export function e164(phone) {
 const ok = (s, re) => typeof s === "string" && re.test(s);
 
 // deps: { isMember(id), listing(fips, family, id), ownerOf(fips, id), startsToday(memberId),
-//   saveClaim(fields) -> id, getClaim(id), updateClaim(id, fields), verifiedCount(memberId),
+//   saveClaim(fields) -> id, getClaim(id), updateClaim(id, fields),
 //   sendCode(to, channel) -> bool, checkCode(to, code) -> bool, testPhone, testPhoneBad }
 export async function startClaim(deps, user, body) {
   const { fips, family, id, channel } = body || {};
@@ -62,9 +61,9 @@ export async function checkClaim(deps, user, body) {
   }
   const owner = await deps.ownerOf(claim.county_fips, claim.listing_id);
   if (owner && owner !== user.id) return { error: "already_claimed" };
-  const status = (await deps.verifiedCount(user.id)) >= FREE_CLAIMS ? "review" : "verified";
-  await deps.updateClaim(claimId, { status, verified_at: new Date().toISOString() });
-  return { status };
+  // No one approves claims by hand: the code from the listing's own phone is the check.
+  await deps.updateClaim(claimId, { status: "verified", verified_at: new Date().toISOString() });
+  return { status: "verified" };
 }
 
 export const cors = {
@@ -128,11 +127,6 @@ export async function setup(req) {
         const since = new Date(Date.now() - 86400000).toISOString();
         const { count } = await admin.from("listing_claims").select("id", { count: "exact", head: true })
           .eq("member_id", memberId).gte("created_at", since);
-        return count || 0;
-      },
-      async verifiedCount(memberId) {
-        const { count } = await admin.from("listing_claims").select("id", { count: "exact", head: true })
-          .eq("member_id", memberId).in("status", ["verified", "review"]);
         return count || 0;
       },
       async saveClaim(fields) {

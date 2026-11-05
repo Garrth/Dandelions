@@ -52,13 +52,41 @@ See claims and help requests in the SQL Editor:
 -- Newest claims, including codes that never got typed in
 select created_at, listing_name, channel, status, tries from public.listing_claims order by created_at desc limit 50;
 
--- Claims waiting for a person (a member's 4th claim and up)
-select * from public.listing_claims where status = 'review';
-
 -- "This isn't our number" requests to call back
 select created_at, listing_name, contact, note from public.claim_help where status = 'open' order by created_at;
 ```
 
-To approve a claim waiting for review: `update public.listing_claims set status = 'verified' where id = '...';`
 To close a help request: `update public.claim_help set status = 'done' where id = '...';`
 To take a listing away from someone: `update public.listing_claims set status = 'expired' where id = '...';`
+
+Nobody approves claims or edits by hand. The code from the listing's own phone is the check, and
+everything is logged so a bad change can be put back.
+
+## Owner details (Verified listings)
+
+Run `supabase/migrations/20261105010000_listing_details.sql` once in the SQL Editor. It adds:
+
+- `listing_details`: what an owner adds after claiming (name, phone, address, website, description,
+  hours, menu link, one offer, price, free estimates, crew size, up to 5 photos). Only the owner of
+  record can write it. A listing with a row here, and an owner of record, shows as **Verified**.
+- `listing_details_log`: every change, old and new.
+- The `listing-photos` storage bucket (public, JPEG only, 2 MB each). The page shrinks photos and
+  strips location data before upload.
+
+Owners get to the edit page from **Add your details** on their listing, or right after claiming.
+
+```sql
+-- Latest owner changes
+select at, county_fips, listing_id, new->>'name' as name, new->>'offer' as offer from public.listing_details_log order by at desc limit 50;
+
+-- Put a listing back the way it was before its last change (use the log row's id)
+update public.listing_details d set (name, phone, address, town, zip, website, description, hours, menu_url, offer, price, free_estimates, crew, photos)
+  = (select l.old->>'name', l.old->>'phone', l.old->>'address', l.old->>'town', l.old->>'zip', l.old->>'website', l.old->>'description',
+            l.old->'hours', l.old->>'menu_url', l.old->>'offer', (l.old->>'price')::smallint, (l.old->>'free_estimates')::boolean,
+            l.old->>'crew', array(select jsonb_array_elements_text(l.old->'photos')))
+     from public.listing_details_log l where l.id = 123 and l.old is not null)
+  where (d.county_fips, d.listing_id) = (select county_fips, listing_id from public.listing_details_log where id = 123);
+
+-- Take a listing's details down completely
+delete from public.listing_details where county_fips = '06097' and listing_id = '...';
+```

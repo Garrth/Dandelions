@@ -46,6 +46,29 @@ body.dir { padding-bottom: 32px; }
 .dir .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: var(--leaf); }
 .dir .foot { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 20px; font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 .dir .stack16 { display: flex; flex-direction: column; gap: 16px; }
+.dir .two { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px; }
+.dir textarea { margin-top: 4px; font-weight: 400; }
+.dir .hrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; font-weight: 700; }
+.dir .hrow:last-child { border-bottom: 0; }
+.dir .hrow input[type="time"] { min-width: 0; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 0 6px; font-weight: 400; }
+.dir .hrow input[type="time"]:disabled { opacity: .4; }
+.dir .photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dir .ph { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--soft); }
+.dir .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dir .ph button { position: absolute; top: 4px; right: 4px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: rgba(0,0,0,.65); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+.dir label.btn { cursor: pointer; }
+.dir .savebar { position: sticky; bottom: 0; background: var(--bg); padding: 10px 0 12px; border-top: 1px solid var(--line); }
+.dir .gallery { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 0 16px; }
+.dir .gallery img { height: 200px; width: auto; max-width: 85%; border-radius: 12px; object-fit: cover; scroll-snap-align: start; flex-shrink: 0; background: var(--soft); }
+.dir .offer { background: var(--sun); color: #15210f; border-radius: 12px; padding: 12px 14px; font-weight: 700; }
+.dir .offer span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; margin-bottom: 2px; }
+.dir .about { white-space: pre-line; }
+.dir .hours-t { width: 100%; border-collapse: collapse; }
+.dir .hours-t td { padding: 1px 0; }
+.dir .hours-t td + td { text-align: right; }
+.dir .hours-t tr.today { font-weight: 700; }
+.dir .open { color: var(--leaf); font-weight: 700; }
+.dir .closed { color: var(--warn); font-weight: 700; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .dir .hero { background: #0b1009; }
 }
