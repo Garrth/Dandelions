@@ -107,6 +107,17 @@
     COUNTY: COUNTY, BASE: BASE, esc: esc, miles: miles, json: json, location: location, radius: radius,
     locationBar: locationBar, index: function () { return json(BASE + "index.json"); },
     family: function (f) { return json(BASE + "fam/" + encodeURIComponent(f) + ".json"); },
+    // Ids of listings an owner has claimed. Empty if the database can't be reached.
+    claimed: function () {
+      if (!cache.claimed) {
+        var cfg = window.DANDELIONS_CONFIG;
+        cache.claimed = !window.supabase || !cfg ? Promise.resolve([]) :
+          window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey).rpc("claimed_listings", { fips: COUNTY })
+            .then(function (r) { return r.error || !r.data ? [] : r.data.map(function (x) { return typeof x === "string" ? x : x.claimed_listings; }); })
+            .catch(function () { return []; });
+      }
+      return cache.claimed;
+    },
     homeLink: function () { return signedIn() ? "/app/" : "/"; }
   };
 })();

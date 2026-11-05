@@ -71,6 +71,9 @@
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
     if (!session) { location.replace("/app/login.html"); return; }
+    var ret = null;
+    try { ret = localStorage.getItem("dandelions_return"); localStorage.removeItem("dandelions_return"); } catch (e) {}
+    if (ret && /^\/directory\/[a-z]+\.html\?[\w=&%.-]*$/.test(ret)) { location.replace(ret); return; }
     var user = session.user;
     Promise.all([
       db.from("members").select("zip,county_fips,referral_code").eq("id", user.id).maybeSingle(),
