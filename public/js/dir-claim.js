@@ -6,7 +6,7 @@
   var fam = params.get("f") || "", id = params.get("id") || "";
   var box = document.getElementById("claim");
   var cfg = window.DANDELIONS_CONFIG || {};
-  var db = window.supabase && window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+  var db = D.db();
   var biz, claimId, channel;
   var back = "/directory/biz.html?f=" + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id);
 
@@ -48,7 +48,7 @@
       '<div class="stack" style="margin-top:12px"><button class="btn" type="button" id="sms" style="width:100%">Text me the code</button>' +
       '<button class="btn ghost" type="button" id="voice" style="width:100%">Call with the code instead</button></div>' +
       '<p class="small muted" id="msg" role="status" style="margin-top:10px"></p></div>' +
-      '<p class="small muted">Claiming is free. Once it\'s yours, you\'ll be able to fix the details and add photos, hours and an offer (coming soon).</p>');
+      '<p class="small muted">Claiming is free. Once it\'s yours, you can fix the details and add photos, hours and an offer.</p>');
     function go(ch) {
       channel = ch;
       var msg = document.getElementById("msg");
@@ -85,11 +85,11 @@
     });
   }
 
-  function done(status) {
-    page(status === "review"
-      ? '<div class="card"><h2>Code matched</h2><p style="margin-top:6px">You\'ve claimed a few listings already, so a person will look at this one before it\'s yours. We\'ll email you.</p></div>'
-      : '<div class="card"><h2>It\'s yours</h2><p style="margin-top:6px">You\'re now the owner of record for this listing. Next you\'ll be able to fix the details and add photos, hours and an offer. We\'ll email you when that\'s ready.</p>' +
-        '<p style="margin-top:12px"><a class="btn small" href="' + back + '">See the listing</a></p></div>');
+  function done() {
+    var edit = "/directory/edit.html?f=" + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id);
+    page('<div class="card"><h2>It\'s yours</h2><p style="margin-top:6px">You\'re now the owner of record for this listing. Add your hours, photos and an offer, and fix anything that\'s wrong. It shows right away.</p>' +
+      '<div class="stack" style="margin-top:12px"><a class="btn" href="' + edit + '" style="width:100%;text-align:center">Add your details</a>' +
+      '<a class="btn ghost" href="' + back + '" style="width:100%;text-align:center">See the listing</a></div></div>');
   }
 
   function help() {

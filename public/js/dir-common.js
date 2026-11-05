@@ -25,14 +25,44 @@
     try { for (var i = 0; i < localStorage.length; i++) if (/^sb-.*-auth-token$/.test(localStorage.key(i))) return true; } catch (e) {}
     return false;
   }
+  // One database client for the page (several clients fight over the log-in).
+  var client;
+  function db() {
+    var cfg = window.DANDELIONS_CONFIG;
+    if (!client && window.supabase && cfg) client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+    return client || null;
+  }
+
+  // Hours are {"mon": ["09:00", "17:00"], ...}. A missing or empty day is closed.
+  // A close time at or before the open time means it runs past midnight.
+  var DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  function cleanHours(h) {
+    if (!h || typeof h !== "object") return null;
+    var out = {}, any = false;
+    DAYS.forEach(function (d) {
+      var x = h[d];
+      if (Array.isArray(x) && x.length === 2 && /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(x[0]) && /^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(x[1])) { out[d] = [x[0], x[1]]; any = true; }
+    });
+    return any ? out : null;
+  }
+  // Open right now, in the county's own time. true, false, or null when there are no hours.
+  function openNow(hours, when) {
+    if (!hours) return null;
+    var parts = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "short", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(when || new Date()).forEach(function (p) { parts[p.type] = p.value; });
+    var day = DAYS.indexOf(parts.weekday.slice(0, 3).toLowerCase()), now = parts.hour + ":" + parts.minute;
+    var today = hours[DAYS[day]], yest = hours[DAYS[(day + 6) % 7]];
+    if (today && (today[1] > today[0] ? now >= today[0] && now < today[1] : now >= today[0])) return true;
+    if (yest && yest[1] <= yest[0] && now < yest[1]) return true;
+    return false;
+  }
   function memberZip() {
     if (!signedIn() || !window.supabase || !window.DANDELIONS_CONFIG) return Promise.resolve(null);
-    var cfg = window.DANDELIONS_CONFIG;
-    var db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
-    return db.auth.getSession().then(function (s) {
+    return db().auth.getSession().then(function (s) {
       var u = s.data && s.data.session && s.data.session.user;
       if (!u) return null;
-      return db.from("members").select("zip").eq("id", u.id).maybeSingle().then(function (r) { return r.data ? r.data.zip : null; });
+      return db().from("members").select("zip").eq("id", u.id).maybeSingle().then(function (r) { return r.data ? r.data.zip : null; });
     }).catch(function () { return null; });
   }
   function fromZip(idx, zip) {
@@ -107,16 +137,35 @@
     COUNTY: COUNTY, BASE: BASE, esc: esc, miles: miles, json: json, location: location, radius: radius,
     locationBar: locationBar, index: function () { return json(BASE + "index.json"); },
     family: function (f) { return json(BASE + "fam/" + encodeURIComponent(f) + ".json"); },
+    db: db, signedIn: signedIn, openNow: openNow, DAYS: DAYS, cleanHours: cleanHours,
     // Ids of listings an owner has claimed. Empty if the database can't be reached.
     claimed: function () {
       if (!cache.claimed) {
-        var cfg = window.DANDELIONS_CONFIG;
-        cache.claimed = !window.supabase || !cfg ? Promise.resolve([]) :
-          window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey).rpc("claimed_listings", { fips: COUNTY })
+        cache.claimed = !db() ? Promise.resolve([]) :
+          db().rpc("claimed_listings", { fips: COUNTY })
             .then(function (r) { return r.error || !r.data ? [] : r.data.map(function (x) { return typeof x === "string" ? x : x.claimed_listings; }); })
             .catch(function () { return []; });
       }
       return cache.claimed;
+    },
+    // What owners added, by listing id. Only listings with an owner of record count, so a
+    // listing whose claim was taken back stops showing what that owner wrote.
+    details: function () {
+      if (!cache.details) {
+        cache.details = !db() ? Promise.resolve({}) : Promise.all([
+          db().from("listing_details").select("*").eq("county_fips", COUNTY).then(function (r) { return r.error ? [] : r.data || []; }),
+          window.DIR.claimed()
+        ]).then(function (o) {
+          var out = {};
+          o[0].forEach(function (d) { if (o[1].indexOf(d.listing_id) >= 0) { d.hours = cleanHours(d.hours); out[d.listing_id] = d; } });
+          return out;
+        }).catch(function () { return {}; });
+      }
+      return cache.details;
+    },
+    photoUrl: function (path) {
+      var cfg = window.DANDELIONS_CONFIG;
+      return /^[0-9]{5}\/[A-Za-z0-9-]+\/[a-z0-9]+\.jpg$/.test(path || "") && cfg ? cfg.supabaseUrl + "/storage/v1/object/public/listing-photos/" + path : "";
     },
     homeLink: function () { return signedIn() ? "/app/" : "/"; }
   };
