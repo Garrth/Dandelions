@@ -16,6 +16,7 @@
     already_claimed: "Someone already claimed this listing. If that wasn't you, use \"This isn't our number\" below and a person will look into it.",
     too_many: "That's a lot of codes for one day. Try again tomorrow, or ask for help below.",
     send_failed: "We couldn't send the code just now. Try again in a minute.",
+    test_phone_bad: "Test mode is on but the test phone number isn't set right, so no code was sent.",
     wrong_code: "That code doesn't match.",
     too_many_tries: "Too many wrong codes. Ask for a new one.",
     expired: "That code ran out. Ask for a new one.",

@@ -22,7 +22,7 @@ const ok = (s, re) => typeof s === "string" && re.test(s);
 
 // deps: { isMember(id), listing(fips, family, id), ownerOf(fips, id), startsToday(memberId),
 //   saveClaim(fields) -> id, getClaim(id), updateClaim(id, fields), verifiedCount(memberId),
-//   sendCode(to, channel) -> bool, checkCode(to, code) -> bool, testPhone }
+//   sendCode(to, channel) -> bool, checkCode(to, code) -> bool, testPhone, testPhoneBad }
 export async function startClaim(deps, user, body) {
   const { fips, family, id, channel } = body || {};
   if (!ok(fips, /^[0-9]{5}$/) || !ok(family, /^[a-z0-9_]{1,60}$/) || !ok(id, /^[A-Za-z0-9-]{1,80}$/) || !["sms", "call"].includes(channel))
@@ -35,6 +35,8 @@ export async function startClaim(deps, user, body) {
   const owner = await deps.ownerOf(fips, id);
   if (owner) return owner === user.id ? { status: "verified" } : { error: "already_claimed" };
   if ((await deps.startsToday(user.id)) >= MAX_STARTS_PER_DAY) return { error: "too_many" };
+  // A test phone that's set but not a real number would quietly text the business. Stop instead.
+  if (deps.testPhoneBad) return { error: "test_phone_bad" };
   // While testing (Twilio trial accounts only reach numbers you've verified), codes go to the test phone.
   if (!(await deps.sendCode(deps.testPhone || phone, channel))) return { error: "send_failed" };
   const claimId = await deps.saveClaim({ member_id: user.id, county_fips: fips, family, listing_id: id, listing_name: listing.name, phone, channel });
@@ -105,6 +107,7 @@ export async function setup(req) {
     user: { id: data.user.id },
     deps: {
       testPhone: e164(env("CLAIM_TEST_PHONE") || ""),
+      testPhoneBad: !!(env("CLAIM_TEST_PHONE") || "").trim() && !e164(env("CLAIM_TEST_PHONE")),
       async isMember(id) {
         const { data } = await admin.from("members").select("id").eq("id", id).maybeSingle();
         return !!data;
