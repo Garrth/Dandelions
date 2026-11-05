@@ -121,7 +121,7 @@
       }).join("") + "</div>";
       h += '<p class="rai-when">' + esc(L.note) + "</p>" + when(L);
     } else {
-      h += '<p class="note">Coming with the next weekly update: layoffs of 50 or more that companies must report ahead of time.</p>';
+      h += '<p class="note">Coming with the next weekly update: notices that bigger companies must file before a large layoff or closing.</p>';
     }
 
     // Yearly numbers.

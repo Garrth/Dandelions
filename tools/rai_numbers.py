@@ -220,7 +220,7 @@ def pull_warn(counties):
             'last30': {'notices': len(month), 'workers': sum(x['workers'] for x in month)},
             'last365': {'notices': len(year), 'workers': sum(x['workers'] for x in year)},
             'recent': [{'company': x['company'], 'workers': x['workers'], 'date': x['date'].isoformat()} for x in year[:8]],
-            'source': 'California EDD WARN notices', 'note': 'Layoffs of 50 or more that companies must report ahead of time. They don\'t say why.'
+            'source': 'California EDD WARN notices', 'note': 'Notices that bigger companies must file before a large layoff or closing. One layoff can be split across several sites, so some numbers are small. Notices don\'t say why.'
         }
     return out
 
