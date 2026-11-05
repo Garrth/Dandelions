@@ -1,0 +1,41 @@
+# Rai's numbers: once a week, pull the public numbers for each county and save any that changed.
+# Run it by hand from the Actions tab: Rai's numbers > Run workflow.
+name: Rai's numbers
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'  # Mondays, about 7am in California
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rai-numbers
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install openpyxl==3.1.5
+      - name: Pull the numbers
+        env:
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        run: python3 tools/rai_numbers.py
+      - name: Save what changed
+        run: |
+          git add public/data/rai
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name "rai-numbers"
+          git config user.email "rai-numbers@users.noreply.github.com"
+          git commit -m "Rai's numbers for $(date -u +%Y-%m-%d)"
+          git push
