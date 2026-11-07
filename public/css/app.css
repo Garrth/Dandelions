@@ -209,3 +209,23 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .tile.off { background: var(--soft); color: var(--muted); cursor: default; }
 .foot { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; }
 .foot a, .foot button { color: var(--ink); background: none; border: 0; padding: 0; font: inherit; text-decoration: underline; cursor: pointer; }
+
+/* Profile: view mode with Edit buttons */
+.section-title + .edit, .spread > .section-title + .edit { margin-top: 18px; }
+.me-head { display: grid; grid-template-columns: 72px 1fr auto; gap: 14px; align-items: center; }
+.me-form .me-head { grid-template-columns: 72px 1fr; }
+.me-photo { width: 72px; height: 72px; border-radius: 50%; background: var(--sun) center / cover no-repeat; border: 3px solid var(--ink); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 30px; color: var(--sun-ink); }
+#me h2 { overflow-wrap: anywhere; }
+.perm { display: grid; grid-template-columns: 40px 1fr; gap: 2px 12px; align-items: center; padding-block: 10px; border-top: 1px solid var(--line); }
+.perm:first-child { border-top: 0; padding-top: 0; }
+.perm .disc { grid-row: span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; background: var(--sun); border: 2px solid var(--ink); }
+.perm.locked .disc { background: var(--soft); border: 2px dashed var(--line); filter: grayscale(1); opacity: .6; }
+.perm b { font-size: 15px; }
+.perm span { font-size: 13px; color: var(--muted); }
+.sk-row { display: grid; grid-template-columns: 1fr 96px auto; gap: 8px; margin-bottom: 8px; }
+.sk-row input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+.sk-row button { border: 0; background: none; font-size: 22px; color: var(--muted); cursor: pointer; padding: 0 6px; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin-top: 12px; font-size: 14px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.yes-no { list-style: none; padding: 0; margin: 12px 0 0; font-size: 14px; display: grid; gap: 4px; }
