@@ -16,7 +16,34 @@
     <p class="muted" id="loading">Loading your profile...</p>
 
     <div id="app" hidden>
-      <div class="page-head"><div class="eyebrow" id="where"></div><h1 id="hello">Your profile</h1><p id="email"></p></div>
+      <div class="page-head"><div class="eyebrow" id="where"></div><h1 id="hello">Your profile</h1><p id="email"></p><p class="small muted" style="margin-top:6px">Your permissions, skills and availability. Other members see only what you choose to show.</p></div>
+
+      <div class="card" id="me">
+        <div class="me-view">
+          <div class="me-head">
+            <div class="me-photo" id="m-photo" aria-hidden="true"></div>
+            <div style="min-width:0"><h2 id="m-name">Your name</h2><p class="small muted" id="m-town"></p><span class="chip" id="m-vis" style="margin-top:6px"></span></div>
+            <button class="btn ghost small edit" type="button" data-edit="me">Edit</button>
+          </div>
+        </div>
+        <form class="me-form" hidden>
+          <div class="me-head" style="margin-bottom:12px">
+            <div class="me-photo" id="p-photo-preview" aria-hidden="true"></div>
+            <div class="row"><label class="btn ghost small" for="p-photo">Choose photo</label><input id="p-photo" type="file" accept="image/*" hidden><button class="btn ghost small" type="button" id="p-photo-remove" hidden>Remove</button></div>
+          </div>
+          <p class="small muted" style="margin:-4px 0 12px">Optional. Only ID-checked members can see it, and only if your profile is visible.</p>
+          <label class="field">Name others see<input id="p-name" maxlength="60" autocomplete="name"></label>
+          <label class="field">Town<input id="p-town" maxlength="60" placeholder="Santa Rosa"></label>
+          <fieldset class="field" style="border:0;padding:0;margin:0 0 12px">Who can see your profile
+            <label class="check" style="margin:8px 0 6px;font-weight:400"><input type="radio" name="vis" value="1" id="p-vis-on"> ID-checked members</label>
+            <label class="check" style="margin:0;font-weight:400"><input type="radio" name="vis" value="0" id="p-vis-off"> Only me (private)</label>
+          </fieldset>
+          <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small cancel" type="button">Cancel</button></div>
+        </form>
+      </div>
+
+      <h2 class="section-title">Your permissions</h2>
+      <div class="card" id="perms"><p class="small muted">Loading...</p></div>
 
       <h2 class="section-title">ID check</h2>
       <div class="card" id="idcard">
@@ -27,32 +54,45 @@
         <p class="small muted" style="margin-top:10px">Equitide runs ID checks for Dandelions through Plaid. Dandelions gets back only yes or no and the date, never your ID papers.</p>
       </div>
 
-      <h2 class="section-title">About you</h2>
-      <form class="card" id="profile">
-        <label class="field">Name others see<input id="p-name" maxlength="60" autocomplete="name"></label>
-        <label class="field">Town<input id="p-town" maxlength="60" placeholder="Santa Rosa"></label>
-        <label class="check"><input type="checkbox" id="p-open"> I'm open to work</label>
-        <label class="field">What I can do <span class="muted">(separate with commas)</span><input id="p-can" placeholder="Drywall repair, interior painting"></label>
-        <label class="field">Certifications <span class="muted">(separate with commas)</span><input id="p-certs" placeholder="OSHA 10-hour construction"></label>
-        <button class="btn small" type="submit">Save</button>
-      </form>
+      <div class="spread"><h2 class="section-title">Skills and availability</h2><button class="btn ghost small edit" type="button" data-edit="skills">Edit</button></div>
+      <div class="card" id="skills">
+        <div class="sk-view"></div>
+        <form class="sk-form" hidden>
+          <p class="small muted" style="margin-bottom:10px">What you can do, and what you'd want an hour for it in dollars. The rate is optional.</p>
+          <div id="sk-rows"></div>
+          <button class="btn ghost small" type="button" id="sk-add" style="margin-bottom:14px">Add a skill</button>
+          <label class="field">Certifications <span class="muted">(separate with commas)</span><input id="p-certs" placeholder="OSHA 10-hour construction"></label>
+          <label class="check"><input type="checkbox" id="p-open"> I'm looking for work</label>
+          <label class="check"><input type="checkbox" id="p-haswork"> I have work that needs doing</label>
+          <label class="check"><input type="checkbox" id="p-reach"> Project owners can reach out to me</label>
+          <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small cancel" type="button">Cancel</button></div>
+        </form>
+      </div>
 
-      <h2 class="section-title">Your work, private</h2>
-      <form class="card" id="work">
-        <p class="small muted" style="margin-bottom:12px">Optional. Only you see your answers. Rai only shows county totals, and only once at least 10 people in the county have answered.</p>
-        <label class="field">Jobs you hold now
-          <select id="w-jobs"><option value="">Choose</option><option value="0">None right now</option><option value="1">1</option><option value="2">2</option><option value="3">3 or more</option></select></label>
-        <label class="field">Hours a week, all jobs
-          <select id="w-hours"><option value="">Choose</option><option value="under_20">Under 20</option><option value="20_to_39">20 to 39</option><option value="40_to_50">40 to 50</option><option value="over_50">Over 50</option></select></label>
-        <label class="field">Pay an hour, main job
-          <select id="w-pay"><option value="">Choose</option><option value="under_17">Under $17</option><option value="17_to_25">$17 to $25</option><option value="25_to_35">$25 to $35</option><option value="35_to_50">$35 to $50</option><option value="over_50">Over $50</option><option value="prefer_not">Rather not say</option></select></label>
-        <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small" type="button" id="w-clear" hidden>Remove my answers</button></div>
-      </form>
+      <div class="spread"><h2 class="section-title">Your work, private</h2><button class="btn ghost small edit" type="button" data-edit="work">Edit</button></div>
+      <div class="card" id="work">
+        <p class="small muted" style="margin-bottom:10px">Optional. Only you see your answers. Rai only shows county totals, and only once at least 10 people in the county have answered.</p>
+        <div class="w-view"></div>
+        <form class="w-form" hidden>
+          <label class="field">Jobs you hold now
+            <select id="w-jobs"><option value="">Choose</option><option value="0">None right now</option><option value="1">1</option><option value="2">2</option><option value="3">3 or more</option></select></label>
+          <label class="field">Hours a week, all jobs
+            <select id="w-hours"><option value="">Choose</option><option value="under_20">Under 20</option><option value="20_to_39">20 to 39</option><option value="40_to_50">40 to 50</option><option value="over_50">Over 50</option></select></label>
+          <label class="field">Pay an hour, main job
+            <select id="w-pay"><option value="">Choose</option><option value="under_17">Under $17</option><option value="17_to_25">$17 to $25</option><option value="25_to_35">$25 to $35</option><option value="35_to_50">$35 to $50</option><option value="over_50">Over $50</option><option value="prefer_not">Rather not say</option></select></label>
+          <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small cancel" type="button">Cancel</button><button class="btn ghost small" type="button" id="w-clear" hidden>Remove my answers</button></div>
+        </form>
+      </div>
 
-      <h2 class="section-title">Your business</h2>
-      <form class="card" id="biz">
-        <div class="spread" id="b-head" hidden><b id="b-title"></b><span class="chip" id="b-chip"></span></div>
-        <p class="small muted" id="b-text" style="margin:6px 0 12px">Own a business, or work for yourself? Add it here and it shows in the <a href="/directory/members.html">directory</a> right away.</p>
+      <div class="spread"><h2 class="section-title">Your business</h2><button class="btn ghost small edit" type="button" data-edit="biz" id="b-edit" hidden>Edit</button></div>
+      <div class="card" id="bizcard">
+        <div class="b-view">
+          <div class="spread" id="b-head" hidden><b id="b-title"></b><span class="chip" id="b-chip"></span></div>
+          <p class="small muted" id="b-text" style="margin:6px 0 0">Own a business, or work for yourself? Add it here and it shows in the <a href="/directory/members.html">directory</a> right away.</p>
+          <dl class="facts" id="b-facts" hidden></dl>
+          <button class="btn small" type="button" id="b-add" style="margin-top:12px">Add my business</button>
+        </div>
+      <form class="b-form" id="biz" hidden>
         <label class="field">Business name<input id="b-name" maxlength="80" required></label>
         <label class="field">Kind of business
           <select id="b-kind" required><option value="">Choose</option><option>Home and repair</option><option>Food</option><option>Personal care</option><option>Office and media</option><option>Rentals</option><option>Auto</option><option>Pets</option><option>Other</option></select></label>
@@ -64,8 +104,9 @@
         <label class="field">Most points a month you'll take <span class="muted">(private)</span><input id="b-limit" type="number" min="0" max="1000000" step="50" value="0"></label>
         <p class="small muted" style="margin:-4px 0 12px">Points aren't on in any county yet. This is your limit for when they are, and you can change it any time.</p>
         <label class="check"><input type="checkbox" id="b-attest" required> I confirm this business holds a valid license for the work it does (for example a city business license or a contractor's license).</label>
-        <button class="btn small" type="submit" id="b-save">Add my business</button>
+        <div class="row"><button class="btn small" type="submit" id="b-save">Add my business</button><button class="btn ghost small cancel" type="button">Cancel</button></div>
       </form>
+      </div>
 
       <form class="card" id="busy" hidden style="margin-top:12px">
         <b>How booked are you this month?</b>
