@@ -183,6 +183,7 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .field { display: block; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
 .field input, .field select { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
 .check { display: flex; gap: 8px; align-items: center; font-size: 14px; margin-bottom: 12px; }
+.field .check input { display: inline-block; width: auto; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
 
 /* Dashboard */
