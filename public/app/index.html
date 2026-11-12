@@ -8,7 +8,6 @@
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/app.css">
-  <link rel="stylesheet" href="/css/deals.css">
 </head>
 <body>
 <div class="wrap">
@@ -17,9 +16,6 @@
     <p class="muted" id="loading">Loading...</p>
     <div id="app" hidden>
       <div class="page-head"><div class="eyebrow" id="where"></div><h1><span class="pre">Be not afraid.</span> There's plenty to do.</h1></div>
-
-      <h2 class="section-title">Today's deals</h2>
-      <div id="deals-box" style="margin-bottom:20px"><p class="small muted">Loading today's deals...</p></div>
 
       <div class="mapcard">
         <svg id="map" viewBox="-10 0 985 620" role="img" aria-label="Map of US counties colored by growth stage"><text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">Loading map...</text></svg>
@@ -43,6 +39,7 @@
         <a class="tile" href="/preview/work.html">Work<small>Opens at 1%. See the preview</small></a>
         <a class="tile" href="/app/talk.html">Talk<small>Ideas start here</small></a>
         <a class="tile" href="/app/baselines.html">Baselines<small>What we measure against</small></a>
+        <a class="tile" href="/deals.html">Deals of the day<small>From local businesses</small></a>
       </div>
 
       <nav class="foot"><a href="/?intro">About Dandelions</a><a href="/charter.html">Charter</a><a href="/under-the-hood.html">Under the hood</a><button type="button" id="signout">Sign out</button></nav>
@@ -52,7 +49,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/js/vendor/topojson-client.min.js"></script>
 <script src="/js/config.js"></script>
-<script src="/js/deals.js"></script>
 <script src="/js/dashboard.js"></script>
 <script src="/js/rai-chat.js"></script>
 </body>

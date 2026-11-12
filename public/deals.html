@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deals of the day | Dandelions</title>
+  <meta name="description" content="Today's deals from businesses in Dandelions.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/deals.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/?intro">
+      <img src="/favicon.svg" alt="" width="30" height="30">
+      Dandelions
+    </a>
+    <a class="pill" href="/#pledge">Join</a>
+  </header>
+
+  <main class="page">
+    <div class="eyebrow">Deals of the day</div>
+    <h1 style="font-size:clamp(36px,8vw,52px)">Today's deals</h1>
+    <p class="sec-lead">Up to three a day, from businesses in Dandelions. New ones every day.</p>
+    <div id="deals-box" style="margin-top:20px"><p class="dl-note">Loading today's deals...</p></div>
+    <p class="note" style="margin-top:28px">Deals come from the businesses. Run a business? <a href="/business.html">Here's how to post one</a>.</p>
+    <p class="note"><a href="/?intro">Home</a> · <a href="/directory/">Directory</a> · <a href="/terms.html">Terms</a></p>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/deals.js"></script>
+<script src="/js/home-deals.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>

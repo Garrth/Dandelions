@@ -1,4 +1,4 @@
-// The deals of the day on the front page. Deals for everyone always show. With a ZIP code, local deals show too.
+// The deals of the day page. Deals for everyone always show. With a ZIP code, local deals show too.
 (function () {
   var cfg = window.DANDELIONS_CONFIG || {}, box = document.getElementById("deals-box");
   if (!box || !window.supabase || !window.Deals) return;
