@@ -237,3 +237,8 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .navlinks .btn { white-space: nowrap; }
 .navlinks .narrow { display: none; }
 @media (max-width: 420px) { .navlinks { gap: 8px; } .navlinks .wide { display: none; } .navlinks .narrow { display: inline; } }
+
+/* Tabs under the header: the charter and how it works. */
+.tabs { display: flex; gap: 6px; margin: -4px 0 8px; }
+.tabs a { font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 2px solid var(--line); }
+.tabs a:hover { border-color: var(--ink); }
