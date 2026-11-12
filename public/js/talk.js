@@ -107,6 +107,7 @@
     var s = new URLSearchParams();
     if (q.p) s.set("p", q.p);
     else if (q.u) s.set("u", q.u);
+    else if (q.following) s.set("following", "1");
     else { s.set("r", q.r || place); if (q.t) s.set("t", q.t); if (q.all) s.set("all", "1"); }
     return "/app/talk.html?" + s.toString();
   }
@@ -164,7 +165,8 @@
       starred.map(function (t) { return row(t, "★"); }).join("") +
       '<div class="tk-rule"></div>' +
       '<a data-nav class="tk-topic quiet' + (view.kind === "all" ? " on" : "") + '" href="' + esc(href({ r: place, all: 1 })) + '"><span>All topics (' + open.length + ")</span></a>" +
-      (user ? "" : '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>');
+      (user ? '<a data-nav class="tk-topic quiet' + (view.kind === "following" ? " on" : "") + '" href="' + esc(href({ following: 1 })) + '"><span>People you follow (' + Object.keys(follows).length + ")</span></a>" :
+        '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>');
     each($("tlist"), "a", function (a) { a.addEventListener("click", closeSide); });
   }
   function topicsButton() { return '<button class="btn ghost small tk-open" type="button" data-openside>☰ Topics</button>'; }
@@ -246,6 +248,7 @@
           if (r.error && !/duplicate/.test(r.error.message || "")) { toast("Couldn't save that. Try again."); return; }
           if (on) delete follows[id]; else follows[id] = true;
           each(box, '[data-follow="' + id + '"]', function (x) { x.textContent = on ? "Follow" : "Following"; });
+          sideList();
           toast(on ? "Unfollowed " + b.getAttribute("data-name") : "Following " + b.getAttribute("data-name") + ". The bell will tell you when they post.");
         });
       });
@@ -490,6 +493,29 @@
     });
   }
 
+  // ---- People you follow. Only you see this list. ----
+  function showFollowing() {
+    var main = $("main"), ids = Object.keys(follows);
+    document.title = "People you follow · Talk | Dandelions";
+    function draw(names) {
+      main.innerHTML = '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">Talk</div><h1>People you follow</h1></div></div>' +
+          '<p class="muted tk-about">Only you see this list. Nobody sees who follows them or how many followers they have.</p></div>' +
+        (!user ? joinPrompt("follow people") : ids.length ? '<div class="tk-tlist">' + ids.map(function (id) {
+          var nm = names[id] || "A member";
+          return '<div class="tk-trow" style="padding-left:14px">' + badge(nm, id) + '<a data-nav href="' + esc(href({ u: id })) + '"><b>' + esc(nm) + '</b><span class="meta">See their posts</span></a>' +
+            '<button class="btn ghost small" type="button" data-follow="' + esc(id) + '" data-name="' + esc(nm) + '">Following</button></div>';
+        }).join("") + "</div>" : '<p class="note">You aren\'t following anyone yet. Tap Follow next to a name on any post.</p>');
+      wireOpen(main);
+      wire(main, function () {});
+    }
+    if (!user || !ids.length) return draw({});
+    db.from("talk_posts").select("author_id,author_name,created_at").in("author_id", ids).order("created_at", { ascending: false }).limit(500).then(function (r) {
+      var names = {};
+      (r.data || []).forEach(function (x) { if (!names[x.author_id]) names[x.author_id] = x.author_name; });
+      draw(names);
+    });
+  }
+
   // ---- The bell: people you follow posting, and comments on your posts ----
   function bell() {
     if (!user) return;
@@ -544,12 +570,12 @@
   function route() {
     var q = new URLSearchParams(location.search);
     var p = q.get("p"), u = q.get("u"), r = q.get("r"), t = q.get("t");
-    view = p && ID_RE.test(p) ? { kind: "post", p: p } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
+    view = p && ID_RE.test(p) ? { kind: "post", p: p } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
     var change = r && PLACE_RE.test(r) && r !== place;
     if (change && places.indexOf(r) < 0) places.push(r);
     (change ? (place = r, $("place").innerHTML = places.map(function (x) { return '<option value="' + esc(x) + '"' + (x === place ? " selected" : "") + ">" + esc(placeName(x)) + "</option>"; }).join(""), loadTopics()) : Promise.resolve()).then(function () {
       sideList();
-      if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else showFeed();
+      if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else showFeed();
       scrollTo(0, 0);
     });
   }
