@@ -1,55 +1,108 @@
 /* Talk. Uses the color tokens from app.css. */
-.talk-bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: end; }
-.talk-bar label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; }
-.talk-bar select { height: 44px; min-width: 0; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 0 8px; font: inherit; font-weight: 400; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; height: 44px; }
-.seg button { border: 0; background: var(--card); color: var(--ink); padding: 0 10px; font-weight: 700; font-size: 14px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .composer input, .composer textarea { width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
-
-/* The list of ideas in a room */
-.ideas { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
-.idea { display: flex; gap: 10px; align-items: center; padding: 12px 12px 12px 14px; border-bottom: 1px solid var(--line); }
-.idea:last-child { border-bottom: 0; }
-.idea a { flex: 1; min-width: 0; color: var(--ink); text-decoration: none; }
-.idea a b { display: block; overflow-wrap: anywhere; line-height: 1.3; }
-.idea a:hover b { text-decoration: underline; }
 .meta { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
-.backer { flex-shrink: 0; width: 52px; min-height: 52px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; font: inherit; font-weight: 800; cursor: pointer; line-height: 1.1; }
-.backer .up { font-size: 12px; }
-.backer.on { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
-.backer:disabled { cursor: default; opacity: .75; }
 .rulesbox { margin-top: 18px; font-size: 14px; }
 .rulesbox summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
 .rules { padding-left: 20px; margin: 6px 0 8px; font-size: 14px; }
 .rules li { margin-bottom: 6px; }
-
-/* One idea and its chat */
 .crumb { display: inline-flex; min-height: 44px; align-items: center; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; }
-.ideahead .ideatop { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
-.ideatitle { font-size: 22px; line-height: 1.25; overflow-wrap: anywhere; }
-.ideahead .meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-.ideahead .text { white-space: pre-line; overflow-wrap: anywhere; margin-top: 10px; }
-.ideahead .tools { font-size: 13px; color: var(--muted); margin-top: 6px; }
 .badge { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: #15210f; }
-.ideahead .badge { width: 24px; height: 24px; font-size: 12px; }
 .badge.ghost { background: transparent; }
-.chat { display: flex; flex-direction: column; gap: 10px; padding: 16px 0 8px; }
-.msg { display: flex; gap: 8px; align-items: flex-end; max-width: 88%; }
-.msg.same { margin-top: -6px; }
-.msg.mine { align-self: flex-end; }
-.bubble { background: var(--card); border: 1px solid var(--line); border-radius: 18px 18px 18px 6px; padding: 8px 12px; min-width: 0; }
-.msg.mine .bubble { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); border-radius: 18px 18px 6px 18px; }
-.bubble.hid { opacity: .6; border-style: dashed; }
-.bubble .who { font-size: 13px; font-weight: 800; margin-bottom: 2px; }
-.bubble .text { white-space: pre-line; overflow-wrap: anywhere; }
-.bubble .when { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.msg.mine .bubble .when, .msg.mine .bubble .linkbtn { color: var(--sun-ink); opacity: .8; }
 .linkbtn { background: none; border: 0; padding: 0 3px; min-height: 32px; color: var(--muted); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline; }
 .flagbox { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .flagbox button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; min-height: 36px; }
 .sendbar { position: sticky; bottom: 0; display: flex; gap: 8px; align-items: flex-end; background: var(--bg); padding: 10px 0 12px; border-top: 1px solid var(--line); }
 .sendbar textarea { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; resize: none; border-radius: 22px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 11px 14px; font: inherit; line-height: 1.35; }
 .sendbar .btn { border-radius: 22px; min-height: 44px; }
-.idea .lastc { display: block; font-size: 14px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.idea .lastc b { display: inline; font-weight: 700; }
+
+/* The frame: topics column on the left, posts on the right */
+.wrap.wide { max-width: 1080px; }
+.tk { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 24px; align-items: start; }
+.tk.side-off { grid-template-columns: minmax(0, 1fr); }
+.tk.side-off .tk-side { display: none; }
+.tk-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; border-right: 1px solid var(--line); padding-right: 16px; }
+.tk-place { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
+.tk-place select { height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 0 8px; font-weight: 400; font-size: 15px; }
+.tk-sidehead { margin-bottom: 6px; }
+.tk-topic { display: flex; gap: 8px; align-items: center; min-height: 40px; padding: 6px 10px; border-radius: 10px; color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; line-height: 1.25; }
+.tk-topic:hover { background: var(--soft); }
+.tk-topic.on { background: var(--sun); color: var(--sun-ink); }
+.tk-topic.quiet { color: var(--muted); font-weight: 500; }
+.tk-topic.quiet.on { color: var(--sun-ink); }
+.tk-mark { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+.tk-rule { border-top: 1px solid var(--line); margin: 8px 0; }
+.tk-hint { padding: 6px 10px; }
+.tk-open { display: none; flex-shrink: 0; }
+.tk.side-off .tk-open { display: inline-block; }
+.tk-shade { display: none; }
+
+/* Heading of a topic, a person, or all topics */
+.tk-head { margin-bottom: 14px; }
+.tk-headrow { display: flex; gap: 12px; align-items: center; }
+.tk-htext { flex: 1; min-width: 0; }
+.tk-htext h1 { font-size: 30px; overflow-wrap: anywhere; }
+.tk-htext .eyebrow { margin-bottom: 2px; }
+.tk-about { margin-top: 6px; font-size: 15px; }
+.tk-compose { margin-bottom: 14px; }
+.tk-compose input, .tk-compose textarea, .tk-compose select { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
+.tk-compose h3 { margin-bottom: 10px; }
+.tk-compose .check { font-weight: 400; }
+
+/* Posts and comments */
+.tk-post { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px 8px; margin-bottom: 12px; }
+.tk-post.hid, .tk-comment.hid { opacity: .65; border-style: dashed; }
+.tk-by { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 14px; }
+.tk-by .badge { width: 26px; height: 26px; font-size: 13px; }
+.tk-name { color: var(--ink); font-weight: 800; text-decoration: none; }
+.tk-name:hover { text-decoration: underline; }
+.tk-follow { margin-left: auto; }
+.tk-title { font-family: var(--body); font-size: 18px; font-weight: 800; letter-spacing: 0; line-height: 1.3; margin-top: 8px; overflow-wrap: anywhere; }
+.tk-title a { color: var(--ink); text-decoration: none; }
+.tk-title a:hover { text-decoration: underline; }
+.tk-body { white-space: pre-line; overflow-wrap: anywhere; margin-top: 6px; }
+.tk-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; font-size: 14px; }
+.tk-plus { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; min-height: 34px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+.tk-plus.on { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+.tk-plus:disabled { cursor: default; opacity: .75; }
+.tk-comments { color: var(--ink); font-weight: 700; min-height: 34px; display: inline-flex; align-items: center; }
+.tk-tools { margin-left: auto; }
+.tk-move select { margin-left: 4px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.tk-thread { margin: 0 0 8px 18px; border-left: 2px solid var(--line); padding-left: 14px; }
+.tk-comment { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.tk-comment:last-child { border-bottom: 0; }
+.tk-comment .badge { width: 28px; height: 28px; font-size: 13px; }
+.tk-cbody { flex: 1; min-width: 0; }
+.tk-cbody .tk-body { margin-top: 2px; }
+.tk-none { padding: 12px 0; }
+.tk-newbar { display: block; width: 100%; margin-bottom: 12px; min-height: 40px; border: 0; border-radius: 999px; background: var(--ink); color: var(--bg); font: inherit; font-weight: 700; cursor: pointer; }
+
+/* All topics */
+.tk-search { display: block; width: 100%; height: 44px; margin-bottom: 12px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.tk-tlist { background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.tk-trow { display: flex; gap: 8px; align-items: center; padding: 10px 14px 10px 6px; border-bottom: 1px solid var(--line); }
+.tk-trow:last-child { border-bottom: 0; }
+.tk-trow a { flex: 1; min-width: 0; color: var(--ink); text-decoration: none; }
+.tk-trow a:hover b { text-decoration: underline; }
+.tk-star { width: 44px; height: 44px; flex-shrink: 0; border: 0; background: none; color: var(--muted); font-size: 22px; cursor: pointer; border-radius: 10px; }
+.tk-star.on { color: #d9a400; }
+.tk-star:disabled { cursor: default; opacity: .5; }
+
+/* The bell */
+.tk-bell { position: relative; width: 44px; height: 44px; border: 0; background: none; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; }
+.tk-bell:hover { background: var(--soft); }
+.tk-dot { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--warn); color: #fff; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; padding: 0 4px; }
+.tk-panel { position: fixed; top: 60px; right: max(16px, calc(50% - 524px)); width: min(340px, calc(100% - 32px)); max-height: 70vh; overflow: auto; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.18); padding: 12px; z-index: 15; }
+.tk-note { display: block; padding: 8px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 14px; }
+.tk-note:hover { background: var(--soft); }
+.tk-note.new { font-weight: 800; }
+
+/* Phones and narrow windows: the topics column slides in */
+@media (max-width: 860px) {
+  .tk, .tk.side-off { grid-template-columns: minmax(0, 1fr); }
+  .tk-side, .tk.side-off .tk-side { display: block; position: fixed; top: 0; left: 0; bottom: 0; width: min(290px, 85vw); max-height: none; background: var(--bg); z-index: 12; padding: 16px; border-right: 1px solid var(--line); transform: translateX(-102%); transition: transform .2s; }
+  .tk.side-open .tk-side { transform: none; }
+  .tk.side-open .tk-shade { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 11; }
+  .tk-open, .tk.side-off .tk-open { display: inline-block; }
+  .tk-htext h1 { font-size: 26px; }
+  .tk-thread { margin-left: 4px; padding-left: 10px; }
+}
