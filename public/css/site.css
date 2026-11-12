@@ -56,6 +56,7 @@ button, input { font: inherit; }
 /* Hero */
 .hero { position: relative; padding-block: 40px 56px; overflow: hidden; }
 .hero h1 { font-size: clamp(56px, 15vw, 120px); font-weight: 800; }
+.hero h1 .pre { display: block; font-size: .42em; letter-spacing: -0.01em; margin-bottom: .12em; }
 .hero h1 .hl { background: linear-gradient(transparent 58%, var(--sun) 58%, var(--sun) 92%, transparent 92%); padding-inline: 4px; }
 .hero .sub { font-size: 20px; color: var(--muted); max-width: 32em; margin-top: 22px; }
 .hero .sub strong { color: var(--ink); }
