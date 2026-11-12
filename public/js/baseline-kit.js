@@ -89,7 +89,7 @@ window.BaselineKit = (function () {
   function howItWorks(s) {
     return '<details class="card bl-how"><summary><b>How a baseline changes</b></summary>' +
       '<p class="small muted" style="margin:8px 0">Nobody approves a change by hand. Every member can follow each step in Talk.</p><ol>' +
-      "<li><b>Propose.</b> In the baseline's topic in Talk, any member writes new wording. It shows next to the current wording.</li>" +
+      "<li><b>Propose.</b> On the Baselines page, any member writes new wording. It becomes a post in that baseline's topic in Talk, shown next to the current wording.</li>" +
       "<li><b>Gather support.</b> When the proposal gets " + s.support_needed + " +1s from other members, the discussion starts. One change per baseline at a time; the next waits its turn.</li>" +
       "<li><b>Discuss for " + s.discuss_days + " days</b> in the comments on the proposal.</li>" +
       "<li><b>Vote for " + s.vote_days + " days.</b> One person, one vote: yes, no or pass. Only ID-checked members vote. Votes are private, and results show when the vote closes.</li>" +

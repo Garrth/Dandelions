@@ -52,3 +52,6 @@ a.bl-prop:hover { border-color: var(--leaf); }
 .tk-propfull { margin: 12px 0; display: grid; gap: 12px; }
 .tk-propfull .bl-compare { margin-top: 0; }
 .tk-group { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 10px 10px 2px; }
+.bl-form { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.bl-form h3 { font-size: 18px; margin-bottom: 4px; }
+.bl-form .field input { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
