@@ -68,6 +68,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tabs a.soon { opacity: .45; }
 
 /* Page heading */
+.page-head h1 .pre { display: block; font-size: .55em; margin-bottom: .1em; }
 .page-head { padding-block: 12px 18px; }
 .page-head h1 { font-size: clamp(32px, 9vw, 48px); font-weight: 800; }
 .page-head p { color: var(--muted); margin-top: 6px; }
