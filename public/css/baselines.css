@@ -1,0 +1,46 @@
+/* Baselines page */
+.bl-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 12px; }
+.bl-tabs a { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 14px; }
+.bl-tabs a[aria-selected="true"] { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+.bl-base h2 { margin-bottom: 4px; }
+.bl-md { margin-top: 12px; overflow-wrap: anywhere; }
+.bl-md > * + * { margin-top: 10px; }
+.bl-md ul, .bl-md ol { padding-left: 22px; margin-block: 0; }
+.bl-md li + li { margin-top: 4px; }
+.bl-md h3 { font-size: 17px; }
+.bl-table { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bl-table table { border-collapse: collapse; font-size: 14px; min-width: 520px; width: 100%; }
+.bl-table th, .bl-table td { border-bottom: 1px solid var(--line); padding: 8px 6px; text-align: left; vertical-align: top; }
+.bl-table th { background: var(--soft); font-weight: 800; }
+.bl-hist { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; }
+.bl-hist summary, .bl-how summary { cursor: pointer; }
+.bl-old { margin-top: 12px; padding: 12px; background: var(--soft); border-radius: 12px; }
+.bl-how ol { padding-left: 22px; margin: 0 0 8px; }
+.bl-how li + li { margin-top: 6px; }
+a.bl-prop { display: grid; gap: 6px; color: var(--ink); text-decoration: none; }
+a.bl-prop:hover { border-color: var(--leaf); }
+.bl-sum { font-weight: 700; font-size: 17px; }
+.bl-h1 { font-size: 26px; }
+.bl-steps { list-style: none; display: flex; gap: 4px; padding: 0; margin: 4px 0 8px; flex-wrap: wrap; }
+.bl-steps li { font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--soft); color: var(--muted); }
+.bl-steps li.done { background: var(--s2); color: var(--sun-ink); }
+.bl-steps li.now { background: var(--sun); color: var(--sun-ink); }
+.bl-vote { width: 100%; }
+.bl-compare { display: grid; gap: 12px; margin-top: 12px; }
+.bl-compare section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; min-width: 0; }
+.bl-compare h3 { font-size: 16px; }
+.bl-pv { margin-top: 8px; padding: 12px; background: var(--soft); border-radius: 12px; }
+@media (min-width: 760px) {
+  .bl-compare { grid-template-columns: 1fr 1fr; }
+}
+.field textarea { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace; font-weight: 400; resize: vertical; }
+/* On phones, each table row becomes a small card so nothing scrolls sideways. */
+@media (max-width: 600px) {
+  .bl-table table, .bl-table tbody, .bl-table tr, .bl-table td { display: block; min-width: 0; }
+  .bl-table thead { display: none; }
+  .bl-table tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
+  .bl-table td { border: 0; padding: 2px 0; }
+  .bl-table td:first-child { font-weight: 800; }
+  .bl-table td:nth-child(3) { color: var(--muted); font-size: 13px; }
+  .bl-table td:nth-child(3)::before { content: "Source: "; }
+}
