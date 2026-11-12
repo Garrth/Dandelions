@@ -8,6 +8,8 @@
   var box = document.getElementById("talk");
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  // Post text is plain, except links to a proposed baseline change, which become a link.
+  function bodyHtml(s) { return esc(s).replace(/(^|\s)(\/app\/baselines\.html\?p=[0-9a-f-]{36})/g, '$1<a href="$2">See it on the Baselines page</a>'); }
   function each(root, sel, fn) { Array.prototype.forEach.call(root.querySelectorAll(sel), fn); }
   function toast(text) {
     var t = document.createElement("div");
@@ -190,7 +192,7 @@
         (opt.where ? ' <span class="muted small">in ' + esc(t ? t.name : "General") + (p.room !== place ? ", " + esc(placeName(p.room)) : "") + "</span>" : "") + follow + "</div>" +
       (p.deleted ? '<p class="muted">Removed by its author</p>' :
         (p.title ? "<h3 class=\"tk-title\">" + (opt.link ? '<a data-nav href="' + esc(href({ p: p.id })) + '">' + esc(p.title) + "</a>" : esc(p.title)) + "</h3>" : "") +
-        (p.body ? '<p class="tk-body">' + esc(opt.link && p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" : "")) +
+        (p.body ? '<p class="tk-body">' + bodyHtml(opt.link && p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" : "")) +
       '<div class="tk-foot">' + plusBtn(p) +
         (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + p.replies + (p.replies === 1 ? " comment" : " comments") + "</a>" : "") +
         (p.deleted ? "" : tools(p)) + "</div>" +
@@ -200,7 +202,7 @@
     return '<div class="tk-comment' + (c.hidden ? " hid" : "") + '">' + badge(c.author_name, c.author_id) + '<div class="tk-cbody">' +
       '<div class="tk-by"><a data-nav class="tk-name" href="' + esc(href({ u: c.author_id })) + '">' + esc(c.author_name) + '</a><span class="muted">· ' + ago(c.created_at) + "</span>" +
         (c.hidden ? ' <span class="chip warn">Hidden</span>' : "") + "</div>" +
-      (c.deleted ? '<p class="muted">Removed by its author</p>' : '<p class="tk-body">' + esc(c.body) + "</p>") +
+      (c.deleted ? '<p class="muted">Removed by its author</p>' : '<p class="tk-body">' + bodyHtml(c.body) + "</p>") +
       '<div class="tk-foot">' + plusBtn(c) + (c.deleted ? "" : tools(c)) + "</div></div></div>";
   }
   function plusBtn(p) {
