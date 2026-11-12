@@ -231,3 +231,9 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; overflow-wrap: anywhere; }
 .yes-no { list-style: none; padding: 0; margin: 12px 0 0; font-size: 14px; display: grid; gap: 4px; }
+
+.btn.peach { background: #f0a57c; color: #15210f; box-shadow: inset 0 0 0 2px #15210f; }
+.btn.peach:hover { background: #ec9467; }
+.navlinks .btn { white-space: nowrap; }
+.navlinks .narrow { display: none; }
+@media (max-width: 420px) { .navlinks { gap: 8px; } .navlinks .wide { display: none; } .navlinks .narrow { display: inline; } }
