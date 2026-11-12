@@ -73,3 +73,4 @@ body.dir { padding-bottom: 32px; }
   :root:not([data-theme="light"]) .dir .hero { background: #0b1009; }
 }
 :root[data-theme="dark"] .dir .hero { background: #0b1009; }
+.dl-cancel { background: none; border: 0; padding: 0; color: var(--warn, #b5541c); text-decoration: underline; cursor: pointer; font: inherit; }

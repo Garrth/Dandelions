@@ -154,10 +154,70 @@
       $("save").disabled = false;
       msg.innerHTML = 'Saved. It\'s live. <a href="' + back + '">See your listing</a>';
       drawPhotos();
+      if ($("deal") && !$("df")) { $("deal").remove(); dealCard(true); }
     }).catch(function () {
       $("save").disabled = false;
       msg.textContent = "Couldn't save just now. Check your connection and try again.";
     });
+  }
+
+  // Deal of the day: the owner picks an open day and writes the deal. No approval step.
+  var DEAL_ERR = {
+    deal_full: "That day is full. Pick another day.",
+    deal_week: "You already have a deal within a week of that day. One a week.",
+    deal_day: "Pick a day from today to 30 days out.",
+    deal_title: "Say what the deal is (at least 3 characters).",
+    deal_no_details: "Save your listing first, then book a deal.",
+    deal_not_owner: "Only the owner of this listing can book a deal.",
+    check_violation: "Check the link starts with https:// and the prices are short."
+  };
+  function dealErr(e) { var m = (e && e.message) || ""; for (var k in DEAL_ERR) if (m.indexOf(k) >= 0) return DEAL_ERR[k]; return "Couldn't book just now. Try again."; }
+  function nice(day) { return new Date(day + "T12:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }); }
+  function dealCard(saved) {
+    var host = document.createElement("div");
+    host.className = "card"; host.id = "deal";
+    box.insertBefore(host, box.querySelector(".foot"));
+    if (!saved) { host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Save your listing above first. Then you can book a day for a deal on the Dandelions front page.</p>'; return; }
+    Promise.all([
+      db.rpc("deal_calendar", { p_fips: D.COUNTY }),
+      db.from("daily_deals").select("id,deal_day,title,price_was,price_now,status").eq("county_fips", D.COUNTY).eq("listing_id", id).eq("status", "live").order("deal_day")
+    ]).then(function (o) {
+      var cal = o[0].data || [], mine = (o[1].data || []).filter(function (x) { return x.deal_day >= (cal[0] ? cal[0].day : ""); });
+      host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Your deal shows on the Dandelions front page for one day, as one of 3 deals in the county. One day a week per business. Free while we get started.</p>' +
+        (mine.length ? '<ul class="small" style="margin:10px 0 0;padding-left:1.2em">' + mine.map(function (x) {
+          return "<li><b>" + nice(x.deal_day) + ":</b> " + esc(x.title) + (x.price_now ? " (" + esc(x.price_now) + ")" : "") + ' <button type="button" class="dl-cancel" data-cancel="' + x.id + '">Cancel</button></li>';
+        }).join("") + "</ul>" : "") +
+        '<form id="df" style="margin-top:10px" novalidate>' +
+        '<label class="field">Day<select id="dday">' + cal.map(function (c) {
+          var full = c.taken >= 3;
+          return '<option value="' + c.day + '"' + (full ? " disabled" : "") + ">" + nice(c.day) + (full ? " (full)" : c.taken ? " (" + (3 - c.taken) + " left)" : "") + "</option>";
+        }).join("") + "</select></label>" +
+        field("dtitle", "The deal", "", 'maxlength="80" placeholder="Free coffee with any pastry"') +
+        '<div class="two">' + field("dwas", "Regular price", "", 'maxlength="20" placeholder="$6"') + field("dnow", "Deal price", "", 'maxlength="20" placeholder="$3"') + "</div>" +
+        field("ddetails", "Anything to know (optional)", "", 'maxlength="200" placeholder="Mornings only, while they last"') +
+        field("dlink", "Link to the deal (optional)", "", 'type="url" maxlength="300" placeholder="https://"') +
+        '<p class="small muted">Honor the deal as written. People see it on the front page and on your listing.</p>' +
+        '<button class="btn small" type="submit" id="dbook" style="margin-top:8px">Book this day</button><p class="small" id="dmsg" role="status" style="margin-top:8px"></p></form>';
+      $("df").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var link = url(val("dlink"));
+        $("dbook").disabled = true; $("dmsg").textContent = "Booking...";
+        db.rpc("deal_book", { p_fips: D.COUNTY, p_lid: id, p_day: $("dday").value, p_title: val("dtitle"), p_details: val("ddetails"),
+          p_was: val("dwas"), p_now: val("dnow"), p_link: link.replace(/^http:\/\//i, "https://") }).then(function (r) {
+          if (r.error) throw r.error;
+          host.remove(); dealCard(true);
+        }).catch(function (err) { $("dbook").disabled = false; $("dmsg").textContent = dealErr(err); });
+      });
+      Array.prototype.forEach.call(host.querySelectorAll("[data-cancel]"), function (b) {
+        b.addEventListener("click", function () {
+          if (!confirm("Cancel this deal?")) return;
+          db.rpc("deal_cancel", { p_id: Number(b.getAttribute("data-cancel")) }).then(function (r) {
+            if (r.error) throw r.error;
+            host.remove(); dealCard(true);
+          }).catch(function () { b.textContent = "Couldn't cancel. Try again."; });
+        });
+      });
+    }).catch(function () { host.innerHTML = '<h3>Deal of the day</h3><p class="small muted">Couldn\'t load the calendar. Try refreshing.</p>'; });
   }
 
   function signedOut() {
@@ -188,6 +248,7 @@
       var d = o[1].data;
       if (d) d.hours = D.cleanHours(d.hours);
       form(d);
+      dealCard(!!d);
     });
   }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';

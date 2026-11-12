@@ -99,6 +99,18 @@
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
       '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '.' + (det ? " Details from the owner." : claimed ? " The owner has claimed this listing." : ' Own this business? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
       '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
+    // Today's deal of the day for this business, if it booked one. "Today" is Pacific time, like the front page.
+    var today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+    if (D.db()) D.db().from("daily_deals").select("title,details,price_was,price_now,link").eq("county_fips", D.COUNTY).eq("listing_id", id)
+      .eq("deal_day", today).eq("status", "live").limit(1).then(function (r) {
+        var x = r.data && r.data[0], acts = document.querySelector("#biz .actions");
+        if (!x || !acts) return;
+        var el = document.createElement("div");
+        el.className = "offer";
+        el.innerHTML = "<span>Deal of the day</span>" + esc(x.title) + (x.price_now ? " · " + (x.price_was ? "<s>" + esc(x.price_was) + "</s> " : "") + "<b>" + esc(x.price_now) + "</b>" : "") +
+          (x.details ? '<br><small class="muted">' + esc(x.details) + "</small>" : "") + (/^https:\/\//.test(x.link) ? ' <a href="' + esc(x.link) + '" target="_blank" rel="noopener">Get it</a>' : "");
+        acts.parentNode.insertBefore(el, acts.nextSibling);
+      });
   }).catch(function () {
     document.getElementById("biz").innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';
   });

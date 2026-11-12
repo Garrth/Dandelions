@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>For businesses | Dandelions</title>
+  <meta name="description" content="Claim your free listing in the Dandelions directory, add an offer, and book a deal of the day for your business.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/site.css">
+  <style>
+    .prose .bz-steps { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 12px; counter-reset: s; }
+    .bz-steps li { counter-increment: s; background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 58px; position: relative; }
+    .bz-steps li::before { content: counter(s); position: absolute; left: 14px; top: 12px; width: 32px; height: 32px; border-radius: 50%; background: var(--sun); color: var(--sun-ink); font-weight: 800; display: grid; place-items: center; font-family: var(--display); }
+    .bz-steps b { display: block; font-size: 18px; }
+    .bz-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    .bz-cta .alt { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/?intro">
+      <img src="/favicon.svg" alt="" width="30" height="30">
+      Dandelions
+    </a>
+    <a class="pill" href="/#pledge">Join</a>
+  </header>
+
+  <main class="page prose">
+    <div class="eyebrow">For businesses</div>
+    <h1>Get found by people who want to buy local.</h1>
+    <p class="lead">Dandelions members look for businesses in the Dandelions directory. Your business may already be there. Claim it, make it yours, and post deals. It's all free while we get started.</p>
+
+    <h2>How it works</h2>
+    <ol class="bz-steps">
+      <li><b>Find your business.</b> Search the directory. Listings start from public data, so most businesses are already there.</li>
+      <li><b>Claim it.</b> We send a code to the business phone. Enter it and the listing is yours. It takes about a minute.</li>
+      <li><b>Make it yours.</b> Add your hours, photos, a short description and an offer. Changes go live right away, with a Verified mark.</li>
+      <li><b>Book a deal of the day.</b> Pick a day and post a special offer. It shows on the Dandelions front page that day, one of three deals for your county. Each business can book one day a week.</li>
+    </ol>
+    <div class="bz-cta">
+      <a class="btn" href="/directory/">Find my business</a>
+      <a class="btn alt" href="/#pledge">Pledge as a business</a>
+    </div>
+
+    <h2>What makes a good deal of the day</h2>
+    <ul>
+      <li>Something people would come in for just to try you out, like a free coffee with a pastry or half off a first visit.</li>
+      <li>Clear and simple. Say what it is, the regular price and the deal price.</li>
+      <li>Honor it as written. The deal is between you and your customer.</li>
+    </ul>
+
+    <h2>Where the directory is open</h2>
+    <p>The directory is open in Sonoma County now, and more Bay Area counties are being added. If your county isn't open yet, pledge as a business and we'll let you know when it is.</p>
+
+    <h2>Later</h2>
+    <p>When points are turned on, you'll be able to accept them from customers. Nothing has cash value today, and listing your business is free.</p>
+
+    <p class="note"><a href="/?intro">Home</a> · <a href="/directory/">Directory</a> · <a href="/charter.html">Charter</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></p>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>
