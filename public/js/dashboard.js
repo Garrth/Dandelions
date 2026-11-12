@@ -94,7 +94,6 @@
       if (!out[2].data || out[2].data.status !== "passed") $("profile-hint").textContent = "Next: check your ID";
       link = location.origin + "/?ref=" + (m.referral_code || "");
       $("loading").hidden = true; $("app").hidden = false;
-      if (window.Deals) window.Deals.show($("deals-box"), db, mine, '<p class="small muted" style="margin-top:8px">Run a business? <a href="/business.html">Book a deal of the day</a>.</p>');
       getJSON("/data/us-counties.json").then(drawMap).catch(function () {
         $("map").innerHTML = '<text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">The map couldn\'t load. Try refreshing.</text>';
       });

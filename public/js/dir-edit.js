@@ -177,13 +177,13 @@
     var host = document.createElement("div");
     host.className = "card"; host.id = "deal";
     box.insertBefore(host, box.querySelector(".foot"));
-    if (!saved) { host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Save your listing above first. Then you can book a day for a deal on the Dandelions front page.</p>'; return; }
+    if (!saved) { host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Save your listing above first. Then you can book a deal of the day.</p>'; return; }
     Promise.all([
       db.rpc("deal_calendar", { p_fips: D.COUNTY }),
       db.from("daily_deals").select("id,deal_day,title,price_was,price_now,status").eq("county_fips", D.COUNTY).eq("listing_id", id).eq("status", "live").order("deal_day")
     ]).then(function (o) {
       var cal = o[0].data || [], mine = (o[1].data || []).filter(function (x) { return x.deal_day >= (cal[0] ? cal[0].day : ""); });
-      host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Your deal shows on the Dandelions front page for one day, as one of 3 deals in the county. One day a week per business. Free while we get started.</p>' +
+      host.innerHTML = '<h3>Deal of the day</h3><p class="small muted" style="margin-top:4px">Your deal shows on the Deals of the day page for one day, as one of 3 in the county. One day a week per business. Free while we get started.</p>' +
         (mine.length ? '<ul class="small" style="margin:10px 0 0;padding-left:1.2em">' + mine.map(function (x) {
           return "<li><b>" + nice(x.deal_day) + ":</b> " + esc(x.title) + (x.price_now ? " (" + esc(x.price_now) + ")" : "") + ' <button type="button" class="dl-cancel" data-cancel="' + x.id + '">Cancel</button></li>';
         }).join("") + "</ul>" : "") +
@@ -196,7 +196,7 @@
         '<div class="two">' + field("dwas", "Regular price", "", 'maxlength="20" placeholder="$6"') + field("dnow", "Deal price", "", 'maxlength="20" placeholder="$3"') + "</div>" +
         field("ddetails", "Anything to know (optional)", "", 'maxlength="200" placeholder="Mornings only, while they last"') +
         field("dlink", "Link to the deal (optional)", "", 'type="url" maxlength="300" placeholder="https://"') +
-        '<p class="small muted">Honor the deal as written. People see it on the front page and on your listing.</p>' +
+        '<p class="small muted">Honor the deal as written. People see it on the Deals of the day page and on your listing.</p>' +
         '<button class="btn small" type="submit" id="dbook" style="margin-top:8px">Book this day</button><p class="small" id="dmsg" role="status" style="margin-top:8px"></p></form>';
       $("df").addEventListener("submit", function (e) {
         e.preventDefault();

@@ -227,3 +227,13 @@ footer .honest { font-family: var(--display); font-weight: 700; font-size: 20px;
 .callout p { margin: 0; background: var(--card); border: 2px solid var(--ink); border-radius: 18px; padding: 12px 16px; font-size: 17px; position: relative; }
 .callout p::before { content: ""; position: absolute; left: -9px; top: 50%; width: 14px; height: 14px; margin-top: -7px; background: var(--card); border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); }
 .prose .cta { margin-top: 32px; }
+
+.mini-link { font-size: 15px; font-weight: 700; color: var(--ink); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px; text-decoration: none; }
+.mini-link:hover { border-color: var(--ink); }
+
+/* The two doors on the front page. */
+.doors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; max-width: 34em; }
+.doors .btn { text-align: center; padding: 16px 12px; }
+.doors .btn small { display: block; font-family: var(--body); font-weight: 600; font-size: 14px; margin-top: 4px; opacity: .8; }
+.doors .btn.alt { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+@media (max-width: 420px) { .doors { grid-template-columns: 1fr; } }
