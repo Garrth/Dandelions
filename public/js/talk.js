@@ -8,8 +8,7 @@
   var box = document.getElementById("talk");
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  // Post text is plain, except links to a proposed baseline change, which become a link.
-  function bodyHtml(s) { return esc(s).replace(/(^|\s)(\/app\/baselines\.html\?p=[0-9a-f-]{36})/g, '$1<a href="$2">See it on the Baselines page</a>'); }
+  function bodyHtml(s) { return esc(s); }
   function each(root, sel, fn) { Array.prototype.forEach.call(root.querySelectorAll(sel), fn); }
   function toast(text) {
     var t = document.createElement("div");
@@ -65,6 +64,16 @@
   var user = null, agreed = false, mod = false, pausedUntil = null, counties = {};
   var places = [], place = "", topics = [], stars = {}, follows = {}, backed = {}, flagged = {};
   var view = {}, topPost = null, notices = [];
+  // Baselines: each one has its own topic. Proposed changes are posts in that topic, with a vote attached.
+  var BK = window.BaselineKit, bboard = null, bByTopic = {}, propByPost = {};
+  function loadBaselines() {
+    if (!BK) return Promise.resolve();
+    return BK.load(db, function () { loadBaselines().then(route); }).then(function (b) {
+      bboard = b; bByTopic = {}; propByPost = {};
+      b.baselines.forEach(function (x) { if (x.topic_id) bByTopic[x.topic_id] = x; });
+      b.proposals.forEach(function (x) { if (x.talk_post_id) propByPost[x.talk_post_id] = x; });
+    }).catch(function () {});
+  }
 
   function placeName(id) {
     var c = counties[(id || "").slice(3)];
@@ -159,10 +168,18 @@
         (mark ? '<span class="tk-mark" aria-hidden="true">' + mark + "</span>" : "") + "<span>" + esc(t.name) + "</span></a>";
     }
     var open = topics.filter(function (t) { return !t.archived; });
-    var pinned = open.filter(function (t) { return t.pinned; });
-    var starred = open.filter(function (t) { return !t.pinned && stars[t.id]; });
+    var grouped = open.filter(function (t) { return t.section; });
+    var pinned = open.filter(function (t) { return t.pinned && !t.section; });
+    var starred = open.filter(function (t) { return !t.pinned && !t.section && stars[t.id]; });
+    var sections = [];
+    grouped.forEach(function (t) { if (sections.indexOf(t.section) < 0) sections.push(t.section); });
     $("tlist").innerHTML =
       '<a data-nav class="tk-topic' + (cur === "" ? " on" : "") + '" href="' + esc(href({ r: place })) + '"><span>General</span></a>' +
+      sections.map(function (sec) {
+        return '<div class="tk-group">' + esc(sec) + "</div>" + grouped.filter(function (t) { return t.section === sec; })
+          .sort(function (a, b) { return blOrder(a) - blOrder(b) || a.name.localeCompare(b.name); })
+          .map(function (t) { return row(t); }).join("");
+      }).join("") +
       pinned.map(function (t) { return row(t, "📌"); }).join("") +
       starred.map(function (t) { return row(t, "★"); }).join("") +
       '<div class="tk-rule"></div>' +
@@ -171,11 +188,12 @@
         '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>');
     each($("tlist"), "a", function (a) { a.addEventListener("click", closeSide); });
   }
+  function blOrder(t) { var b = bByTopic[t.id]; return b && bboard ? bboard.baselines.indexOf(b) : 99; }
   function topicsButton() { return '<button class="btn ghost small tk-open" type="button" data-openside>☰ Topics</button>'; }
   function wireOpen(root) { each(root, "[data-openside]", function (b) { b.addEventListener("click", openSide); }); }
 
   function loadTopics() {
-    return db.from("talk_topics").select("id,room,name,about,pinned,archived,posts,last_post_at,made_by").in("room", ["any", place]).order("last_post_at", { ascending: false }).limit(300)
+    return db.from("talk_topics").select("id,room,name,about,pinned,archived,posts,last_post_at,made_by,section").in("room", ["any", place]).order("last_post_at", { ascending: false }).limit(300)
       .then(function (r) {
         topics = (r.data || []).sort(function (a, b) { return (b.pinned - a.pinned) || (new Date(b.last_post_at) - new Date(a.last_post_at)); });
       });
@@ -192,7 +210,9 @@
         (opt.where ? ' <span class="muted small">in ' + esc(t ? t.name : "General") + (p.room !== place ? ", " + esc(placeName(p.room)) : "") + "</span>" : "") + follow + "</div>" +
       (p.deleted ? '<p class="muted">Removed by its author</p>' :
         (p.title ? "<h3 class=\"tk-title\">" + (opt.link ? '<a data-nav href="' + esc(href({ p: p.id })) + '">' + esc(p.title) + "</a>" : esc(p.title)) + "</h3>" : "") +
-        (p.body ? '<p class="tk-body">' + bodyHtml(opt.link && p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" : "")) +
+        (p.body ? '<p class="tk-body">' + bodyHtml(opt.link && p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" : "") +
+        (propByPost[p.id] && bboard ? '<div class="tk-prop">' + BK.steps(propByPost[p.id]) + "<p>" + BK.stateLine(propByPost[p.id], bboard.settings) + "</p>" +
+          (opt.link ? '<p><a data-nav href="' + esc(href({ p: p.id })) + '">See the wording' + (propByPost[p.id].status === "vote" || propByPost[p.id].status === "final" ? " and vote" : "") + "</a></p>" : "") + "</div>" : "")) +
       '<div class="tk-foot">' + plusBtn(p) +
         (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + p.replies + (p.replies === 1 ? " comment" : " comments") + "</a>" : "") +
         (p.deleted ? "" : tools(p)) + "</div>" +
@@ -326,15 +346,16 @@
     document.title = name + " · Talk | Dandelions";
     var main = $("main");
     main.innerHTML =
-      '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">' + esc(placeName(place)) + "</div><h1>" + esc(name) + "</h1></div>" +
+      '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">' + esc(t && bByTopic[t.id] ? "Baselines · everyone" : placeName(place)) + "</div><h1>" + esc(name) + "</h1></div>" +
         (user && !paused() ? '<button class="btn small" type="button" id="newpost">New post</button>' : "") + "</div>" +
         '<p class="muted tk-about">' + (t ? esc(t.about || "") : "Anything goes here. Ideas that catch on get their own topic.") + "</p>" +
         (t && mod ? '<button class="linkbtn" type="button" id="edittopic">Edit topic</button>' : "") + "</div>" +
+      (t && bByTopic[t.id] ? baselineBox(bByTopic[t.id]) : "") +
       '<div id="topicform"></div>' +
       (!user ? joinPrompt() : paused() ? pauseNote() :
         '<form class="card tk-compose" id="compose" hidden><label class="field">Title (optional)<input id="ctitle" maxlength="120" placeholder="Sum it up in a few words"></label>' +
         '<label class="field">Your post<textarea id="cbody" maxlength="2000" rows="3" placeholder="Say what you think, or what you\'d do about it"></textarea></label>' +
-        '<div class="spread"><span class="small muted">In ' + esc(name) + ", " + esc(placeName(place)) + '</span><div class="row"><button class="btn ghost small" type="button" id="cancelpost">Cancel</button><button class="btn small" type="submit">Post</button></div></div>' +
+        '<div class="spread"><span class="small muted">In ' + esc(name) + ", " + esc(t && bByTopic[t.id] ? "for everyone" : placeName(place)) + '</span><div class="row"><button class="btn ghost small" type="button" id="cancelpost">Cancel</button><button class="btn small" type="submit">Post</button></div></div>' +
         '<p class="small muted" id="cmsg" role="status"></p></form>') +
       '<div id="newbar"></div><div id="posts"><p class="muted">Loading...</p></div>' +
       '<details class="rulesbox"><summary>Talk rules</summary>' + rulesList() + "</details>";
@@ -342,13 +363,14 @@
     if ($("newpost")) $("newpost").addEventListener("click", function () { $("compose").hidden = false; $("cbody").focus(); });
     if ($("cancelpost")) $("cancelpost").addEventListener("click", function () { $("compose").hidden = true; });
     if ($("edittopic")) $("edittopic").addEventListener("click", function () { topicForm(t); });
+    if ($("propose")) $("propose").addEventListener("click", function () { proposeForm(bByTopic[t.id]); });
     if ($("compose")) $("compose").addEventListener("submit", function (e) {
       e.preventDefault();
       var title = $("ctitle").value.trim(), body = $("cbody").value.trim();
       if (!title && !body) { $("cmsg").textContent = ERR.talk_empty; $("cbody").focus(); return; }
       needRules(function () {
         $("cmsg").textContent = "Posting...";
-        db.from("talk_posts").insert({ room: place, topic_id: t ? t.id : null, kind: "post", title: title, body: body }).then(function (r) {
+        db.from("talk_posts").insert({ room: t && bByTopic[t.id] ? "us" : place, topic_id: t ? t.id : null, kind: "post", title: title, body: body }).then(function (r) {
           if (r.error) { $("cmsg").textContent = errText(r.error); return; }
           toast("Posted"); showFeed();
         });
@@ -364,9 +386,58 @@
     });
   }
   function feedQuery() {
-    var q = db.from("talk_posts").select(COLS).eq("room", place).is("parent_id", null).eq("deleted", false);
+    // Baseline topics are for everyone, so they show posts from every place.
+    var q = db.from("talk_posts").select(COLS).is("parent_id", null).eq("deleted", false);
+    if (!(view.t && bByTopic[view.t])) q = q.eq("room", place);
     q = view.t ? q.eq("topic_id", view.t) : q.is("topic_id", null);
     return q.order("created_at", { ascending: false }).limit(50);
+  }
+
+  // ---- Baselines in Talk ----
+  function baselineBox(b) {
+    var open = bboard.proposals.filter(function (p) { return p.baseline_key === b.key && BK.isOpen(p); });
+    return '<div class="card tk-bl"><p>This topic is for the <b>' + esc(b.title) + "</b> baseline, version " + b.version + '. <a href="/app/baselines.html?b=' + b.key + '">Read the current wording</a>.</p>' +
+      (open.length ? '<p class="small">In progress: ' + open.map(function (p) { return '<a data-nav href="' + esc(href({ p: p.talk_post_id })) + '">' + esc(p.summary) + "</a> (" + esc(p.status === "support" ? "gathering +1s" : p.status === "discuss" ? "discussion" : p.status === "vote" ? "voting" : p.status === "final" ? "final check" : "final wording") + ")"; }).join(", ") + "</p>" : "") +
+      (!user ? "" : paused() ? "" : '<button class="btn small" type="button" id="propose">Propose a change</button>') + "</div>";
+  }
+  function proposeForm(b) {
+    var f = $("topicform");
+    f.innerHTML = '<form class="card tk-compose" id="pform"><h3>Propose a change to ' + esc(b.title) + "</h3>" +
+      '<p class="small muted">Write the whole new wording. It becomes a post here, shown next to the current wording. ' + bboard.settings.support_needed + " +1s from other members start the discussion, then a vote.</p>" +
+      '<label class="field">In one or two sentences, what changes and why?<input id="psum" maxlength="300" required placeholder="Add a question about having people you can count on."></label>' +
+      '<label class="field">The new wording<textarea id="pbody" rows="14" maxlength="8000">' + esc(b.body) + "</textarea></label>" +
+      '<p class="small muted">Use **two stars** for bold, a dash and a space for a list, and 1. for numbered steps.</p>' +
+      '<details><summary class="small">Preview</summary><div id="pprev" class="bl-pv">' + BK.md(b.body) + "</div></details>" +
+      '<div class="row" style="margin-top:12px"><button class="btn small" type="submit" id="psend">Propose it</button><button class="btn ghost small" type="button" id="pcancel">Cancel</button></div>' +
+      '<p class="small muted" id="pmsg" role="status"></p></form>';
+    $("pcancel").addEventListener("click", function () { f.innerHTML = ""; });
+    $("pbody").addEventListener("input", function () { $("pprev").innerHTML = BK.md($("pbody").value); });
+    $("pform").addEventListener("submit", function (e) {
+      e.preventDefault();
+      needRules(function () {
+        $("psend").disabled = true; $("pmsg").textContent = "Sending...";
+        db.rpc("baseline_propose", { p_key: b.key, p_summary: $("psum").value, p_body: $("pbody").value }).then(function (r) {
+          if (r.error) { $("psend").disabled = false; $("pmsg").textContent = BK.errText(r.error); return; }
+          toast("Proposed. It needs +1s from other members now.");
+          loadBaselines().then(function () { go({ p: r.data }); });
+        });
+      });
+    });
+  }
+  function proposalFull(p) {
+    var b = bboard.baselines.filter(function (x) { return x.key === p.baseline_key; })[0] || {};
+    var act = "", q = p.status === "vote" ? "Should this change go ahead?" : p.status === "final" ? "Does Rai's final wording match what we agreed?" : "";
+    if (q) {
+      act = !user ? joinPrompt("vote") : !bboard.me.verified ?
+        '<p class="note">Only ID-checked members vote, so every vote is one real person. <a href="/app/profile.html">Check your ID on your profile</a>.</p>' :
+        '<div><p><b>' + esc(q) + '</b></p><div class="row" style="margin-top:6px">' + ["yes", "no", "pass"].map(function (c) {
+          var label = c === "yes" ? (p.status === "final" ? "Yes, it matches" : "Yes") : c === "no" ? "No" : "Pass";
+          return '<button type="button" class="btn small' + (p.my_vote === c ? "" : " ghost") + '" data-bvote="' + c + '" aria-pressed="' + (p.my_vote === c) + '">' + label + "</button>";
+        }).join("") + '</div><p class="small muted" style="margin-top:6px">' + (p.my_vote ? "You voted " + esc(p.my_vote) + ". You can change it until the vote closes." : "Your vote is private.") + "</p></div>";
+    } else if (p.status === "support") {
+      act = '<p class="small muted">' + (user && p.mine ? "It needs +1s from other members. Share this post to get the word out." : "Think it should go to a vote? Give this post a +1.") + "</p>";
+    }
+    return '<div class="tk-propfull">' + (act ? '<div class="card">' + act + "</div>" : "") + BK.texts(p, b) + BK.howItWorks(bboard.settings) + "</div>";
   }
 
   // Moderators make and edit topics by hand, so we can shape Talk while it rolls out.
@@ -452,12 +523,21 @@
         var t = p.topic_id && topicById(p.topic_id);
         document.title = (p.title || "Post") + " · Talk | Dandelions";
         main.innerHTML = '<a data-nav class="crumb" href="' + esc(href({ r: place, t: p.topic_id })) + '">‹ ' + esc(t ? t.name : "General") + "</a>" +
-          postCard(p) +
+          postCard(p) + (propByPost[p.id] && bboard ? proposalFull(propByPost[p.id]) : "") +
           '<div class="tk-thread" id="thread">' + (reps.length ? reps.map(commentRow).join("") : '<p class="small muted tk-none">No comments yet. Start the conversation.</p>') + "</div>" +
           (p.deleted || p.hidden ? "" : !user ? '<div style="margin-top:14px">' + joinPrompt("comment") + "</div>" : paused() ? pauseNote() :
             '<form class="sendbar" id="replyf"><textarea id="rbody" maxlength="2000" rows="1" placeholder="Add a comment" aria-label="Add a comment"></textarea>' +
             '<button class="btn small" type="submit">Send</button></form><p class="small muted" id="rmsg" role="status" style="text-align:center"></p>');
         wire(main, showPost);
+        each(main, "[data-bvote]", function (btn) {
+          btn.addEventListener("click", function () {
+            each(main, "[data-bvote]", function (x) { x.disabled = true; });
+            db.rpc("baseline_vote", { p_proposal: propByPost[p.id].id, p_choice: btn.getAttribute("data-bvote") }).then(function (r) {
+              toast(r.error ? BK.errText(r.error) : "Vote saved.");
+              loadBaselines().then(showPost);
+            });
+          });
+        });
         var ta = $("rbody");
         if (ta) {
           ta.addEventListener("input", function () { ta.style.height = "auto"; ta.style.height = Math.min(ta.scrollHeight, 140) + "px"; });
@@ -613,7 +693,7 @@
       if (PLACE_RE.test(asked) && places.indexOf(asked) < 0) places.push(asked);
       place = PLACE_RE.test(asked) ? asked : places[0];
       frame();
-      return loadTopics().then(function () { route(); bell(); });
+      return Promise.all([loadTopics(), loadBaselines()]).then(function () { route(); bell(); });
     });
   }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t load Talk. Try refreshing.</p>';
