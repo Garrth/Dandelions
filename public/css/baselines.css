@@ -44,3 +44,11 @@ a.bl-prop:hover { border-color: var(--leaf); }
   .bl-table td:nth-child(3) { color: var(--muted); font-size: 13px; }
   .bl-table td:nth-child(3)::before { content: "Source: "; }
 }
+.bl-talk { margin-top: 16px; padding: 14px; background: var(--soft); border-radius: 12px; display: grid; gap: 8px; justify-items: start; }
+/* Baselines inside Talk */
+.tk-bl { margin: 10px 0 14px; display: grid; gap: 8px; justify-items: start; }
+.tk-prop { margin-top: 8px; padding: 10px 12px; background: var(--soft); border-radius: 12px; font-size: 14px; }
+.tk-prop .bl-steps { margin-top: 0; }
+.tk-propfull { margin: 12px 0; display: grid; gap: 12px; }
+.tk-propfull .bl-compare { margin-top: 0; }
+.tk-group { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 10px 10px 2px; }
