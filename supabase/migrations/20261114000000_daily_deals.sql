@@ -149,7 +149,7 @@ grant execute on function public.deal_mod_remove(bigint, text) to authenticated;
 -- Running this again doesn't add copies. To change the words later, update the rows where sponsor = '10spot.shop'.
 insert into public.daily_deals (area, deal_day, sponsor, owner_id, title, details, link)
 select 'all', d::date, '10spot.shop', null, 'Merch item of the day: 50% off',
-       'Half off one piece of Dandelions merch each day. 10spot.shop is run by Dandelions'' founder.',
+       'Half off one piece of Dandelions merch each day.',
        'https://10spot.shop/'
 from generate_series(public.deal_today(), public.deal_today() + 365, interval '1 day') d
 where not exists (select 1 from public.daily_deals x where x.sponsor = '10spot.shop' and x.area = 'all' and x.deal_day = d::date);
