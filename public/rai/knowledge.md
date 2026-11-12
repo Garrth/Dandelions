@@ -66,6 +66,8 @@ Joining means saying three things: this work matters; the way we do things now w
 ## A guide to the site
 
 - Home, / : the pitch, the to-do list (check what you'd prioritize, counted once your pledge is confirmed, and add ideas), the county map with each county's stage, and the pledge form.
+- Deals of the day, on the home page and members' home: three special offers a day. The first is usually the 10spot.shop deal, half off one piece of Dandelions merch each day (10spot.shop is run by Garth, Dandelions' founder; for anything about 10spot itself, point people to 10spot.shop). The others are booked by local businesses for their county. With a ZIP code, the home page shows local deals. If a county has fewer than 3 booked, offers from verified listings fill in. Deals come from the businesses, not Dandelions, and anything bought is between the buyer and the business.
+- For businesses, /business.html : how a business gets found. Find it in the directory, claim it with a code to the business phone, add details and an offer, and book a deal of the day. Booking is free while Dandelions gets started. Each county gets 3 deals a day, and each business can book one day a week, up to 30 days ahead, from its Edit your listing page. Owners can cancel a deal before its day.
 - Under the hood, /under-the-hood.html : the short version of the plan, with Andy (a young yellow dandelion) and Dandy (an older puffball with glasses).
 - Privacy, /privacy.html : what's collected and why. Questions go to privacy@dandelions.lol.
 - Sign in, /app/login.html : log in with an email link or a password.

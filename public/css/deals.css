@@ -1,0 +1,21 @@
+/* Deals of the day, on the home page and the members' home. */
+.dl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.dl-card { background: var(--card); border: 2px solid var(--ink); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 0 var(--ink); }
+.dl-card:first-child { background: var(--sun); color: var(--sun-ink, #15210f); }
+.dl-card:first-child .dl-from, .dl-card:first-child .dl-details { color: inherit; opacity: .8; }
+.dl-card.empty { background: var(--card); color: var(--ink); border-style: dashed; box-shadow: none; }
+.dl-from { margin: 0; font-size: 14px; color: var(--muted); font-weight: 700; }
+.dl-title { margin: 0; font-family: var(--display); font-size: 22px; line-height: 1.15; font-weight: 800; }
+.dl-price { margin: 0; font-size: 20px; }
+.dl-price s { opacity: .6; font-weight: 400; }
+.dl-details { margin: 0; font-size: 15px; color: var(--muted); }
+.dl-go { margin-top: auto; padding-top: 8px; font-weight: 800; color: inherit; }
+.dl-note { color: var(--muted); font-size: 15px; margin: 10px 0 0; }
+.dl-zip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; font-size: 15px; color: var(--muted); }
+.dl-zip input { width: 7em; padding: 8px 10px; border: 2px solid var(--line); border-radius: 10px; font: inherit; background: var(--card); color: var(--ink); }
+.dl-zip button { padding: 8px 14px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); font-weight: 700; cursor: pointer; }
+.doors { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; max-width: 34em; }
+.doors .btn { text-align: center; padding: 16px 12px; }
+.doors .btn small { display: block; font-family: var(--body); font-weight: 600; font-size: 14px; margin-top: 4px; opacity: .8; }
+.doors .btn.alt { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+@media (max-width: 420px) { .doors { grid-template-columns: 1fr; } }

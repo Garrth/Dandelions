@@ -22,6 +22,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/deals.css">
 </head>
 <body>
 <div class="wrap wide">
@@ -40,8 +41,11 @@
     <h1><span class="pre">Be not afraid.</span> There's <span class="hl">plenty</span> to do.</h1>
     <p class="goal">The goal: <span class="hl">useful work for anyone who wants it.</span></p>
     <p class="sub">AI is going to change a lot of jobs. So who has a plan for what comes next? The market isn't paid to solve it. Government doesn't have the tools. <strong>Dandelions has a plan, and it runs on one thing: people taking part.</strong></p>
-    <div class="cta-row">
-      <a class="btn" href="#pledge">Become a Dandelion</a>
+    <div class="doors">
+      <a class="btn" href="#list">I'm here for me<small>See what there is to do</small></a>
+      <a class="btn alt" href="/business.html">I run a business<small>Get found, post a deal</small></a>
+    </div>
+    <div class="cta-row" style="margin-top:14px">
       <span class="count" id="hero-count-wrap" hidden><b id="hero-count"></b> Dandelions so far</span>
     </div>
     </div>
@@ -54,6 +58,13 @@
 </div>
 
 <div class="wrap wide">
+  <section id="deals">
+    <div class="eyebrow">Deals of the day</div>
+    <h2 class="sec-title">Today's deals</h2>
+    <p class="sec-lead">Three special offers a day from businesses in Dandelions. New ones every day.</p>
+    <div id="deals-box" style="margin-top:20px"><p class="dl-note">Loading today's deals...</p></div>
+  </section>
+
   <section id="list">
     <div class="eyebrow">The to-do list</div>
     <h2 class="sec-title">What would you prioritize?</h2>
@@ -175,6 +186,8 @@
 <script src="/js/vendor/topojson-client.min.js"></script>
 <script src="/js/config.js"></script>
 <script src="/js/site.js"></script>
+<script src="/js/deals.js"></script>
+<script src="/js/home-deals.js"></script>
 <script src="/js/rai-chat.js"></script>
 </body>
 </html>
