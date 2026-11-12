@@ -206,7 +206,7 @@
   function plusBtn(p) {
     var mine = user && p.author_id === user.id, on = !!backed[p.id], can = user && !mine && !p.deleted;
     return '<button class="tk-plus' + (on ? " on" : "") + '" type="button"' + (can ? ' data-plus="' + p.id + '"' : " disabled") + ' data-n="' + p.backers + '" aria-pressed="' + on +
-      '" aria-label="' + (can ? (on ? "You gave this +1. Tap to take it back" : "Give this +1") : "+1 count") + '">+1 <span class="n">' + p.backers + "</span></button>";
+      '" aria-label="' + (can ? (on ? "You gave this +1. Tap to take it back" : "Give this +1") : "+1 count") + '">+1<span class="n">' + (p.backers ? " · " + p.backers : "") + "</span></button>";
   }
   // What a person can do to one post: delete their own, flag someone else's, and for moderators hide, put back, pause or move.
   function tools(p) {
@@ -233,7 +233,7 @@
           if (r.error) { toast("Couldn't save that. Try again."); return; }
           if (on) delete backed[id]; else backed[id] = true;
           n += on ? -1 : 1;
-          b.setAttribute("data-n", n); b.querySelector(".n").textContent = n;
+          b.setAttribute("data-n", n); b.querySelector(".n").textContent = n ? " · " + n : "";
           b.classList.toggle("on", !on); b.setAttribute("aria-pressed", String(!on));
         });
       });
