@@ -363,7 +363,6 @@
     if ($("newpost")) $("newpost").addEventListener("click", function () { $("compose").hidden = false; $("cbody").focus(); });
     if ($("cancelpost")) $("cancelpost").addEventListener("click", function () { $("compose").hidden = true; });
     if ($("edittopic")) $("edittopic").addEventListener("click", function () { topicForm(t); });
-    if ($("propose")) $("propose").addEventListener("click", function () { proposeForm(bByTopic[t.id]); });
     if ($("compose")) $("compose").addEventListener("submit", function (e) {
       e.preventDefault();
       var title = $("ctitle").value.trim(), body = $("cbody").value.trim();
@@ -396,33 +395,9 @@
   // ---- Baselines in Talk ----
   function baselineBox(b) {
     var open = bboard.proposals.filter(function (p) { return p.baseline_key === b.key && BK.isOpen(p); });
-    return '<div class="card tk-bl"><p>This topic is for the <b>' + esc(b.title) + "</b> baseline, version " + b.version + '. <a href="/app/baselines.html?b=' + b.key + '">Read the current wording</a>.</p>' +
+    return '<div class="card tk-bl"><p>Chat about the <b>' + esc(b.title) + '</b> baseline here. <a href="/app/baselines.html?b=' + b.key + '">Read the current wording</a>.</p>' +
       (open.length ? '<p class="small">In progress: ' + open.map(function (p) { return '<a data-nav href="' + esc(href({ p: p.talk_post_id })) + '">' + esc(p.summary) + "</a> (" + esc(p.status === "support" ? "gathering +1s" : p.status === "discuss" ? "discussion" : p.status === "vote" ? "voting" : p.status === "final" ? "final check" : "final wording") + ")"; }).join(", ") + "</p>" : "") +
-      (!user ? "" : paused() ? "" : '<button class="btn small" type="button" id="propose">Propose a change</button>') + "</div>";
-  }
-  function proposeForm(b) {
-    var f = $("topicform");
-    f.innerHTML = '<form class="card tk-compose" id="pform"><h3>Propose a change to ' + esc(b.title) + "</h3>" +
-      '<p class="small muted">Write the whole new wording. It becomes a post here, shown next to the current wording. ' + bboard.settings.support_needed + " +1s from other members start the discussion, then a vote.</p>" +
-      '<label class="field">In one or two sentences, what changes and why?<input id="psum" maxlength="300" required placeholder="Add a question about having people you can count on."></label>' +
-      '<label class="field">The new wording<textarea id="pbody" rows="14" maxlength="8000">' + esc(b.body) + "</textarea></label>" +
-      '<p class="small muted">Use **two stars** for bold, a dash and a space for a list, and 1. for numbered steps.</p>' +
-      '<details><summary class="small">Preview</summary><div id="pprev" class="bl-pv">' + BK.md(b.body) + "</div></details>" +
-      '<div class="row" style="margin-top:12px"><button class="btn small" type="submit" id="psend">Propose it</button><button class="btn ghost small" type="button" id="pcancel">Cancel</button></div>' +
-      '<p class="small muted" id="pmsg" role="status"></p></form>';
-    $("pcancel").addEventListener("click", function () { f.innerHTML = ""; });
-    $("pbody").addEventListener("input", function () { $("pprev").innerHTML = BK.md($("pbody").value); });
-    $("pform").addEventListener("submit", function (e) {
-      e.preventDefault();
-      needRules(function () {
-        $("psend").disabled = true; $("pmsg").textContent = "Sending...";
-        db.rpc("baseline_propose", { p_key: b.key, p_summary: $("psum").value, p_body: $("pbody").value }).then(function (r) {
-          if (r.error) { $("psend").disabled = false; $("pmsg").textContent = BK.errText(r.error); return; }
-          toast("Proposed. It needs +1s from other members now.");
-          loadBaselines().then(function () { go({ p: r.data }); });
-        });
-      });
-    });
+      "</div>";
   }
   function proposalFull(p) {
     var b = bboard.baselines.filter(function (x) { return x.key === p.baseline_key; })[0] || {};
