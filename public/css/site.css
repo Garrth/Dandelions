@@ -237,3 +237,8 @@ footer .honest { font-family: var(--display); font-weight: 700; font-size: 20px;
 .doors .btn small { display: block; font-family: var(--body); font-weight: 600; font-size: 14px; margin-top: 4px; opacity: .8; }
 .doors .btn.alt { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
 @media (max-width: 420px) { .doors { grid-template-columns: 1fr; } }
+
+/* Tabs under the header: the charter and how it works. */
+.tabs { display: flex; gap: 6px; margin: -4px 0 8px; }
+.tabs a { font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 2px solid var(--line); }
+.tabs a:hover { border-color: var(--ink); }
