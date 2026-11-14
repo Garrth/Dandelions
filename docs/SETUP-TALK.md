@@ -45,3 +45,32 @@ select at, action, note, post_id, member_id from public.talk_mod_log order by at
 -- End a pause early
 delete from public.talk_pauses where member_id = (select id from auth.users where email = 'name@example.com');
 ```
+
+## Part 4: Rai reads Talk (summaries and Catching on)
+
+1. Run `supabase/migrations/20261115000000_talk_rai.sql` once in the SQL Editor (project dandelions).
+2. Update the `rai` function: in Supabase, Edge Functions > rai > Code, replace everything with
+   `supabase/functions/rai/index.ts` and Deploy. Keep Verify JWT off.
+
+How it works:
+
+- **Summary**: each topic has a ✦ Summary button. Rai writes the first summary at 3 posts or comments, then again after
+  10 new ones, or once a day if anything is new. It happens when someone opens the Summary, so there's no timer.
+  Points link to the posts behind them. Summaries never name people.
+- **This summary is off**: members can flag a summary with a note. Rai reads the notes next time. 3 flags shows a warning.
+- **Ask Rai about this topic** opens the Rai chat with the topic's summary and newest 80 messages loaded.
+  It counts toward the usual 30 questions a day.
+- **Catching on**: when someone opens General, Rai groups the last 14 days of General posts into ideas (at most every
+  15 minutes, only when something is new). An idea gets its own topic when enough different people took part
+  (posted, commented or gave a +1) on enough different days: county 5 people over 2 days, state 10 over 2, whole US 25 over 3.
+  Nobody approves it. Its posts move to the new topic, and the person who started it can rename it for a day.
+- **Not about this**: an author can take their post out of an idea, and Rai leaves it alone after that.
+- Topics for every place (like Automation and work) show posts from every place.
+- Background Rai work is capped at 200 a day for the whole site (secret `RAI_BG_CAP` changes it).
+
+```sql
+-- Topics that opened on their own
+select at, note, topic_id from public.talk_mod_log where action = 'traction_topic' order by at desc;
+
+-- Change the bars: edit public.talk_idea_bar in the SQL file and run that function again.
+```

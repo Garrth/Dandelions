@@ -64,6 +64,15 @@
   var user = null, agreed = false, mod = false, pausedUntil = null, counties = {};
   var places = [], place = "", topics = [], stars = {}, follows = {}, backed = {}, flagged = {};
   var view = {}, topPost = null, notices = [];
+  // Rai: the Catching on list for General, and which idea each General post is in.
+  var ideas = [], ideaByPost = {};
+  var raiUrl = (cfg.supabaseUrl || "") + "/functions/v1/rai";
+  function raiCall(body) {
+    return fetch(raiUrl, { method: "POST", headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + (cfg.supabaseKey || "") }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); }).catch(function () { return {}; });
+  }
+  // Topics for every place ('any') show posts from every place.
+  function everyone(t) { return !!(t && t.room === "any"); }
   // Baselines: each one has its own topic. Proposed changes are posts in that topic, with a vote attached.
   var BK = window.BaselineKit, bboard = null, bByTopic = {}, propByPost = {};
   function loadBaselines() {
@@ -117,6 +126,7 @@
   function href(q) {
     var s = new URLSearchParams();
     if (q.p) s.set("p", q.p);
+    else if (q.s) { s.set("r", q.r || place); s.set("s", q.s); }
     else if (q.u) s.set("u", q.u);
     else if (q.following) s.set("following", "1");
     else { s.set("r", q.r || place); if (q.t) s.set("t", q.t); if (q.all) s.set("all", "1"); }
@@ -193,7 +203,7 @@
   function wireOpen(root) { each(root, "[data-openside]", function (b) { b.addEventListener("click", openSide); }); }
 
   function loadTopics() {
-    return db.from("talk_topics").select("id,room,name,about,pinned,archived,posts,last_post_at,made_by,section").in("room", ["any", place]).order("last_post_at", { ascending: false }).limit(300)
+    return db.from("talk_topics").select("id,room,name,about,pinned,archived,posts,last_post_at,made_by,section,created_by,created_at").in("room", ["any", place]).order("last_post_at", { ascending: false }).limit(300)
       .then(function (r) {
         topics = (r.data || []).sort(function (a, b) { return (b.pinned - a.pinned) || (new Date(b.last_post_at) - new Date(a.last_post_at)); });
       });
@@ -235,6 +245,7 @@
     if (!user) return "";
     var mine = p.author_id === user.id, out = [];
     if (mine) out.push('<button class="linkbtn" type="button" data-del="' + p.id + '">Delete</button>');
+    if (mine && ideaByPost[p.id]) out.push('<button class="linkbtn" type="button" data-noidea="' + p.id + '" title="Rai put this under ' + esc(ideaByPost[p.id].name) + '">Not about ' + esc(ideaByPost[p.id].name) + "</button>");
     else if (flagged[p.id]) out.push('<span class="muted small">Flagged</span>');
     else out.push('<button class="linkbtn" type="button" data-flag="' + p.id + '">Flag</button>');
     if (mod) {
@@ -281,6 +292,14 @@
         db.from("talk_posts").update({ deleted: true }).eq("id", b.getAttribute("data-del")).then(function (r) {
           if (r.error) { toast("Couldn't delete. Try again."); return; }
           toast("Deleted"); again();
+        });
+      });
+    });
+    each(root, "[data-noidea]", function (b) {
+      b.addEventListener("click", function () {
+        db.rpc("talk_idea_skip", { p_post: b.getAttribute("data-noidea") }).then(function (r) {
+          if (r.error) { toast("Couldn't save that. Try again."); return; }
+          toast("Done. Rai won't group that post again."); again();
         });
       });
     });
@@ -346,16 +365,20 @@
     document.title = name + " · Talk | Dandelions";
     var main = $("main");
     main.innerHTML =
-      '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">' + esc(t && bByTopic[t.id] ? "Baselines · everyone" : placeName(place)) + "</div><h1>" + esc(name) + "</h1></div>" +
+      '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">' + esc(t && bByTopic[t.id] ? "Baselines · everyone" : everyone(t) ? "Everyone" : placeName(place)) + "</div><h1>" + esc(name) + "</h1></div>" +
         (user && !paused() ? '<button class="btn small" type="button" id="newpost">New post</button>' : "") + "</div>" +
         '<p class="muted tk-about">' + (t ? esc(t.about || "") : "Anything goes here. Ideas that catch on get their own topic.") + "</p>" +
+        (t ? '<div class="row tk-actions"><a data-nav class="btn ghost small" href="' + esc(href({ r: place, s: t.id })) + '">✦ Summary</a>' +
+          '<button class="btn ghost small" type="button" data-askrai>Ask Rai about this topic</button></div>' : "") +
+        (t && canRename(t) ? '<p class="small"><button class="linkbtn" type="button" id="renametopic">Rename this topic</button> <span class="muted">(you started it, so you can rename it today)</span></p>' : "") +
         (t && mod ? '<button class="linkbtn" type="button" id="edittopic">Edit topic</button>' : "") + "</div>" +
+      (t ? "" : '<div id="catching"></div>') +
       (t && bByTopic[t.id] ? baselineBox(bByTopic[t.id]) : "") +
       '<div id="topicform"></div>' +
       (!user ? joinPrompt() : paused() ? pauseNote() :
         '<form class="card tk-compose" id="compose" hidden><label class="field">Title (optional)<input id="ctitle" maxlength="120" placeholder="Sum it up in a few words"></label>' +
         '<label class="field">Your post<textarea id="cbody" maxlength="2000" rows="3" placeholder="Say what you think, or what you\'d do about it"></textarea></label>' +
-        '<div class="spread"><span class="small muted">In ' + esc(name) + ", " + esc(t && bByTopic[t.id] ? "for everyone" : placeName(place)) + '</span><div class="row"><button class="btn ghost small" type="button" id="cancelpost">Cancel</button><button class="btn small" type="submit">Post</button></div></div>' +
+        '<div class="spread"><span class="small muted">In ' + esc(name) + ", " + esc(everyone(t) ? "for everyone" : placeName(place)) + '</span><div class="row"><button class="btn ghost small" type="button" id="cancelpost">Cancel</button><button class="btn small" type="submit">Post</button></div></div>' +
         '<p class="small muted" id="cmsg" role="status"></p></form>') +
       '<div id="newbar"></div><div id="posts"><p class="muted">Loading...</p></div>' +
       '<details class="rulesbox"><summary>Talk rules</summary>' + rulesList() + "</details>";
@@ -363,6 +386,10 @@
     if ($("newpost")) $("newpost").addEventListener("click", function () { $("compose").hidden = false; $("cbody").focus(); });
     if ($("cancelpost")) $("cancelpost").addEventListener("click", function () { $("compose").hidden = true; });
     if ($("edittopic")) $("edittopic").addEventListener("click", function () { topicForm(t); });
+    if ($("renametopic")) $("renametopic").addEventListener("click", function () { renameForm(t); });
+    wireAsk(main, t);
+    // General shows Catching on first, so post cards know which idea they're in.
+    var ideasReady = t ? Promise.resolve() : catchingOn(true);
     if ($("compose")) $("compose").addEventListener("submit", function (e) {
       e.preventDefault();
       var title = $("ctitle").value.trim(), body = $("cbody").value.trim();
@@ -375,8 +402,8 @@
         });
       });
     });
-    feedQuery().then(function (r) {
-      var list = r.data || [];
+    Promise.all([feedQuery(), ideasReady]).then(function (o) {
+      var r = o[0], list = r.data || [];
       topPost = list[0] ? list[0].id : null;
       $("posts").innerHTML = r.error ? '<p class="note">Couldn\'t load posts. Try refreshing.</p>' : list.length ?
         list.map(function (p) { return postCard(p, { link: true }); }).join("") :
@@ -387,9 +414,151 @@
   function feedQuery() {
     // Baseline topics are for everyone, so they show posts from every place.
     var q = db.from("talk_posts").select(COLS).is("parent_id", null).eq("deleted", false);
-    if (!(view.t && bByTopic[view.t])) q = q.eq("room", place);
+    if (!(view.t && everyone(topicById(view.t)))) q = q.eq("room", place);
     q = view.t ? q.eq("topic_id", view.t) : q.is("topic_id", null);
     return q.order("created_at", { ascending: false }).limit(50);
+  }
+
+  // ---- Rai in Talk ----
+  function canRename(t) {
+    return user && t.made_by === "traction" && t.created_by === user.id && Date.now() - new Date(t.created_at).getTime() < 86400000;
+  }
+  function renameForm(t) {
+    var f = $("topicform");
+    f.innerHTML = '<form class="card tk-compose" id="rform"><label class="field">New name<input id="rname" maxlength="60" required value="' + esc(t.name) + '"></label>' +
+      '<div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small" type="button" id="rcancel">Cancel</button></div></form>';
+    $("rcancel").addEventListener("click", function () { f.innerHTML = ""; });
+    $("rform").addEventListener("submit", function (e) {
+      e.preventDefault();
+      db.rpc("talk_topic_rename", { p_topic: t.id, p_name: $("rname").value.trim() }).then(function (r) {
+        if (r.error) { toast(/duplicate|unique/.test(r.error.message || "") ? "There's already a topic with that name here." : "Couldn't rename it. Try again."); return; }
+        toast("Renamed"); loadTopics().then(route);
+      });
+    });
+  }
+  // "Ask Rai about this topic" opens the Rai panel, which also reads the topic.
+  function wireAsk(root, t) {
+    each(root, "[data-askrai]", function (b) {
+      b.addEventListener("click", function () {
+        window.RaiTopic = t ? t.id : "";
+        if (window.RaiChat) window.RaiChat.open(b.getAttribute("data-q") || "");
+      });
+    });
+  }
+  function snippet(p) { var x = (p.title || p.body || "").replace(/\s+/g, " "); return x.length > 90 ? x.slice(0, 90) + "..." : x; }
+  // Under a point or an idea: the posts behind it, loaded when someone opens the list.
+  function wireSources(root) {
+    each(root, "details[data-posts]", function (d) {
+      d.addEventListener("toggle", function () {
+        if (!d.open || d.getAttribute("data-done")) return;
+        d.setAttribute("data-done", "1");
+        var ids = d.getAttribute("data-posts").split(",").filter(function (x) { return ID_RE.test(x); });
+        db.from("talk_posts").select("id,title,body,author_name,created_at,parent_id").in("id", ids).then(function (r) {
+          var list = (r.data || []).sort(function (a, b) { return ids.indexOf(a.id) - ids.indexOf(b.id); });
+          d.querySelector(".tk-src").innerHTML = list.length ? list.map(function (p) {
+            return '<a data-nav href="' + esc(href({ p: p.parent_id || p.id })) + '">' + esc(snippet(p)) + '<span class="muted small"> · ' + esc(p.author_name) + ", " + ago(p.created_at) + "</span></a>";
+          }).join("") : '<p class="small muted">Those posts aren\'t here anymore.</p>';
+        });
+      });
+    });
+  }
+  function sources(ids) {
+    if (!ids || !ids.length) return "";
+    return '<details class="tk-srcbox" data-posts="' + esc(ids.join(",")) + '"><summary>' + (ids.length === 1 ? "Read the post" : "Read the " + ids.length + " posts") +
+      '</summary><div class="tk-src"><p class="small muted">Loading...</p></div></details>';
+  }
+
+  // ---- Catching on: ideas in General that keep coming up ----
+  function catchingOn(ask) {
+    var at = place;
+    return db.rpc("talk_catching_on", { p_room: at }).then(function (r) {
+      if (at !== place) return;
+      ideas = (r && r.data) || []; ideaByPost = {};
+      ideas.forEach(function (x) { if (!x.topic_id) (x.posts || []).forEach(function (id) { ideaByPost[id] = x; }); });
+      var box = $("catching");
+      if (box) {
+        var open = ideas.filter(function (x) { return !x.topic_id; });
+        box.innerHTML = !ideas.length ? "" :
+          '<div class="card tk-catch"><div class="spread"><b>Catching on</b><span class="small muted">Rai groups posts about the same idea</span></div>' +
+          ideas.map(function (x) {
+            var t = x.topic_id && topicById(x.topic_id);
+            if (x.topic_id) return '<div class="tk-idea done"><p>✓ <b>' + esc(x.name) + "</b> got its own topic" + (t ? ': <a data-nav href="' + esc(href({ r: at, t: x.topic_id })) + '">' + esc(t.name) + " ›</a>" : "") + "</p></div>";
+            var pct = Math.min(100, Math.round(100 * x.people / x.need_people));
+            return '<div class="tk-idea"><div class="spread"><b>' + esc(x.name) + '</b><span class="small">' + x.people + " of " + x.need_people + " people</span></div>" +
+              '<div class="tk-bar" role="img" aria-label="' + x.people + " of " + x.need_people + ' people"><i style="width:' + pct + '%"></i></div>' +
+              (x.about ? '<p class="small muted">' + esc(x.about) + "</p>" : "") + sources(x.posts) + "</div>";
+          }).join("") +
+          (open.length ? '<p class="small muted tk-catchnote">When ' + open[0].need_people + " different people take part over at least " + open[0].need_days +
+            " days (posting, commenting or giving a +1), an idea gets its own topic. Nobody has to approve it.</p>" : "") + "</div>";
+        wireSources(box);
+      }
+      // Rai catches up in the background. If it changed anything, show the new list.
+      if (ask) raiCall({ action: "talk_ideas", place: at }).then(function (o) {
+        if (at !== place || view.kind !== "feed" || view.t) return;
+        if (o && o.made) { toast("An idea caught on and got its own topic."); loadTopics().then(function () { sideList(); catchingOn(false); }); }
+        else if (o && "made" in o) catchingOn(false);
+      });
+    });
+  }
+
+  // ---- A topic's Summary ----
+  function showSummary() {
+    var t = topicById(view.t), main = $("main");
+    if (!t) { go({ r: place }); return; }
+    document.title = "Summary: " + t.name + " · Talk | Dandelions";
+    main.innerHTML = '<a data-nav class="crumb" href="' + esc(href({ r: place, t: t.id })) + '">‹ ' + esc(t.name) + "</a>" +
+      '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">Rai\'s summary</div><h1>' + esc(t.name) + "</h1></div></div></div>" +
+      '<div id="sum"><p class="muted">Loading...</p></div>';
+    wireOpen(main);
+    var asked = false;
+    function draw() {
+      db.from("talk_summaries").select("topic_id,body,messages,people,made_at,flags").eq("topic_id", t.id).maybeSingle().then(function (r) {
+        var s = r.data, b = s && s.body, box = $("sum");
+        if (!box || view.kind !== "summary" || view.t !== t.id) return;
+        var ask = '<div class="card tk-askrai"><p><b>Talk it over with Rai.</b> Rai has read this topic and can answer questions about it.</p><div class="row" style="margin-top:8px">' +
+          ["What's the strongest case against?", "What do people agree on?"].map(function (q) {
+            return '<button class="btn ghost small" type="button" data-askrai data-q="' + esc(q) + '">' + esc(q) + "</button>";
+          }).join("") + '<button class="btn small" type="button" data-askrai>Ask Rai</button></div></div>';
+        var waiting = asked ? "" : '<p class="small muted tk-reading" id="reading">Rai is checking for new posts...</p>';
+        if (!b) {
+          box.innerHTML = waiting + '<p class="note">No summary yet. Rai writes one once a topic has 3 posts or comments, then keeps it up to date.</p>' +
+            '<p style="margin:12px 0"><a data-nav href="' + esc(href({ r: place, t: t.id })) + '">Go to the posts</a></p>' + ask;
+        } else {
+          var when = ago(s.made_at);
+          box.innerHTML = waiting +
+            (s.flags >= 3 ? '<p class="note warn">Members say this summary may be off. Rai will look again at the next update.</p>' : "") +
+            '<div class="card tk-sum"><h2>How people lean</h2><p>' + esc(b.lean) + "</p></div>" +
+            (b.points && b.points.length ? '<div class="card tk-sum"><h2>Main points</h2><ol class="tk-points">' + b.points.map(function (pt) {
+              return "<li><p>" + esc(pt.text) + "</p>" + sources(pt.posts) + "</li>";
+            }).join("") + "</ol></div>" : "") +
+            (b.questions && b.questions.length ? '<div class="card tk-sum"><h2>Open questions</h2><ul>' + b.questions.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
+            (b.missing && b.missing.length ? '<div class="card tk-sum"><h2>What\'s missing</h2><ul>' + b.missing.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" : "") +
+            '<p class="small muted tk-summeta">Written by Rai from ' + s.messages + " posts and comments by " + s.people + (s.people === 1 ? " person" : " people") + ", " + when + (when === "just now" ? "" : " ago") +
+              ". Rai can be wrong, so read the posts behind each point. Rai doesn't take sides or decide anything.</p>" +
+            (user ? '<p class="tk-off"><button class="linkbtn" type="button" id="sumoff">This summary is off</button></p><div id="offbox"></div>' : "") + ask;
+          wireSources(box);
+          if ($("sumoff")) $("sumoff").addEventListener("click", function () {
+            $("offbox").innerHTML = '<form class="card tk-compose" id="offf"><label class="field">What\'s off about it?<textarea id="offnote" maxlength="300" rows="2" placeholder="For example: it missed the worries about cost"></textarea></label>' +
+              '<div class="row"><button class="btn small" type="submit">Send</button><button class="btn ghost small" type="button" id="offcancel">Cancel</button></div></form>';
+            $("offcancel").addEventListener("click", function () { $("offbox").innerHTML = ""; });
+            $("offf").addEventListener("submit", function (e) {
+              e.preventDefault();
+              db.rpc("talk_summary_flag", { p_topic: t.id, p_note: $("offnote").value.trim() }).then(function (x) {
+                if (x.error) { toast("Couldn't send that. Try again."); return; }
+                $("offbox").innerHTML = '<p class="small muted">Thanks. Rai reads these notes at the next update.</p>';
+              });
+            });
+          });
+        }
+        wireAsk(box, t);
+      });
+    }
+    draw();
+    raiCall({ action: "talk_summary", topic: t.id }).then(function (o) {
+      asked = true;
+      if (view.kind !== "summary" || view.t !== t.id) return;
+      if (o && o.made) draw(); else if ($("reading")) $("reading").remove();
+    });
   }
 
   // ---- Baselines in Talk ----
@@ -627,12 +796,14 @@
   function route() {
     var q = new URLSearchParams(location.search);
     var p = q.get("p"), u = q.get("u"), r = q.get("r"), t = q.get("t");
-    view = p && ID_RE.test(p) ? { kind: "post", p: p } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
+    var sm = q.get("s");
+    view = p && ID_RE.test(p) ? { kind: "post", p: p } : sm && ID_RE.test(sm) ? { kind: "summary", t: sm } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
     var change = r && PLACE_RE.test(r) && r !== place;
     if (change && places.indexOf(r) < 0) places.push(r);
     (change ? (place = r, $("place").innerHTML = places.map(function (x) { return '<option value="' + esc(x) + '"' + (x === place ? " selected" : "") + ">" + esc(placeName(x)) + "</option>"; }).join(""), loadTopics()) : Promise.resolve()).then(function () {
       sideList();
-      if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else showFeed();
+      window.RaiTopic = (view.kind === "feed" || view.kind === "summary") && view.t ? view.t : "";
+      if (view.kind === "summary") showSummary(); else if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else showFeed();
       scrollTo(0, 0);
     });
   }
