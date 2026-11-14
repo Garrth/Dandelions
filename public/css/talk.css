@@ -64,6 +64,7 @@
 .tk-plus { border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 999px; min-height: 34px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
 .tk-plus.on { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
 .tk-plus:disabled { cursor: default; opacity: .75; }
+.tk-agree { display: inline-flex; gap: 6px; flex-wrap: wrap; }
 .tk-comments { color: var(--ink); font-weight: 700; min-height: 34px; display: inline-flex; align-items: center; }
 .tk-tools { margin-left: auto; }
 .tk-move select { margin-left: 4px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }

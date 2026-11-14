@@ -62,7 +62,7 @@ How it works:
   It counts toward the usual 30 questions a day.
 - **Catching on**: when someone opens General, Rai groups the last 14 days of General posts into ideas (at most every
   15 minutes, only when something is new). An idea gets its own topic when enough different people took part
-  (posted, commented or gave a +1) on enough different days: county 5 people over 2 days, state 10 over 2, whole US 25 over 3.
+  (posted, commented, agreed or disagreed) on enough different days: county 5 people over 2 days, state 10 over 2, whole US 25 over 3.
   Nobody approves it. Its posts move to the new topic, and the person who started it can rename it for a day.
 - **Not about this**: an author can take their post out of an idea, and Rai leaves it alone after that.
 - Topics for every place (like Automation and work) show posts from every place.
@@ -83,7 +83,7 @@ select at, note, topic_id from public.talk_mod_log where action = 'traction_topi
 - **Suggest a topic**: in General, New post has a "Suggest this as a new topic" box. The title becomes the topic name.
   It goes straight onto Catching on and opens at the same bar as any idea. Rai's regrouping never drops a suggestion,
   and posts Rai finds about it join it. A suggestion nobody touches for 14 days drops off. Opening Catching on checks
-  the bar, so a suggestion can open right after its last +1.
+  the bar, so a suggestion can open right after its last Agree.
 - **Summaries update**: Rai reads only messages since his last summary and updates it. He rereads everything for the
   first summary, every 7 days, after any "This summary is off" note, or when more than 150 messages are new.
 - **What does (name) think?**: on a topic's Summary page. Rai sums up only that person's own posts in the topic,
@@ -97,3 +97,15 @@ Rai never joins a conversation on his own. When a post or comment says @Rai, the
 He answers once, under that message, from his knowledge and the thread, and never takes sides.
 His answers are in `talk_rai_replies`. Moderators see Hide on them (logged as hide_rai).
 Each visitor can call Rai 20 times a day, and this counts toward the site's daily Rai limit.
+
+## Agree and Disagree
+
+Run `supabase/migrations/20261116030000_talk_agree.sql` in the SQL Editor before the page and Rai changes go live
+(the page reads the new `disagrees` and `people` columns). Then paste the new Rai function and Deploy.
+
+- Main posts get Agree and Disagree with a count beside each. Comments don't, so anyone can join in without being judged.
+- Nobody sees who chose which. Tapping the same button again takes it back; tapping the other one switches.
+- Every old +1 on a main post became an Agree. Old +1s on comments were removed.
+- Each post shows how many people are taking part (who wrote the post or a comment) and how many comments it has.
+- A Baselines change needs its Agree count (the support setting) and more agree than disagree to start its discussion.
+- Rai sees the totals when he writes a summary's "how people lean".

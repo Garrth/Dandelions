@@ -173,7 +173,8 @@ export const SUMMARY_RULES = `You summarize one topic in Talk, the discussion bo
 where people work on things their area needs. People read your summary to catch up without reading every message.
 
 You get the topic's name and what it's for, then its messages, oldest first, each with a number like [12].
-Comments say which post they answer. +1s show how many people agreed with a message.
+Comments say which post they answer. A post may show how many members tapped Agree or Disagree on it; use those
+counts along with what people wrote when you say how people lean.
 
 Write:
 - lean: one or two sentences on which way people lean, from what they actually wrote, with rough counts
@@ -243,7 +244,7 @@ export function numberMessages(rows, parents) {
     const pp = m.parent_id && parents && parents[m.parent_id];
     const on = m.parent_id ? (num.get(m.parent_id) ? " (comment on [" + num.get(m.parent_id) + "])"
       : pp ? " (comment on an earlier post: \"" + oneLine((pp.title ? pp.title + ". " : "") + pp.body, 120) + "\")" : " (comment)") : "";
-    const plus = m.backers ? " +1s: " + m.backers + "." : "";
+    const plus = m.backers || m.disagrees ? " Agree: " + (m.backers || 0) + ", disagree: " + (m.disagrees || 0) + "." : "";
     const text = (m.title ? m.title + ". " : "") + (m.body || "");
     return "[" + (i + 1) + "]" + on + plus + " " + oneLine(text, 1200);
   });
@@ -586,7 +587,7 @@ export async function setup(req) {
         return data || null;
       },
       async threadMessages(root) {
-        const { data, error } = await admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,created_at,topic_id")
+        const { data, error } = await admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,disagrees,created_at,topic_id")
           .or("id.eq." + root + ",parent_id.eq." + root).eq("deleted", false).eq("hidden", false).order("created_at", { ascending: true }).limit(500);
         if (error) throw new Error(error.message);
         return data || [];
@@ -639,7 +640,7 @@ export async function setup(req) {
       },
       // All of a topic's messages (newest 300), or only those after a time.
       async topicMessages(id, after) {
-        let q = admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,created_at")
+        let q = admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,disagrees,created_at")
           .eq("topic_id", id).eq("deleted", false).eq("hidden", false);
         if (after) q = q.gt("created_at", after);
         const { data, error } = await q.order("created_at", { ascending: false }).limit(TALK_MAX_MESSAGES);
@@ -659,7 +660,7 @@ export async function setup(req) {
       },
       async generalMessages(place) {
         const since = new Date(Date.now() - 14 * 86400000).toISOString();
-        const { data, error } = await admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,created_at")
+        const { data, error } = await admin.from("talk_posts").select("id,parent_id,author_id,title,body,backers,disagrees,created_at")
           .eq("room", place).is("topic_id", null).eq("deleted", false).eq("hidden", false).eq("no_idea", false)
           .gt("created_at", since).order("created_at", { ascending: false }).limit(TALK_MAX_MESSAGES);
         if (error) throw new Error(error.message);
