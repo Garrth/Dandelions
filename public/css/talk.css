@@ -13,6 +13,8 @@
 .flagbox button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; min-height: 36px; }
 .sendbar { position: sticky; bottom: 0; display: flex; gap: 8px; align-items: flex-end; background: var(--bg); padding: 10px 0 12px; border-top: 1px solid var(--line); }
 body:has(.sendbar):not(:has(.tabs)) { padding-bottom: 0; }
+/* Leave room for the floating Ask Rai button so it never covers Send. */
+@media (min-width: 861px) { .sendbar { padding-right: max(0px, calc(140px - max(0px, (100vw - 1080px) / 2))); } }
 .sendbar textarea { flex: 1; min-width: 0; min-height: 44px; max-height: 140px; resize: none; border-radius: 22px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 11px 14px; font: inherit; line-height: 1.35; }
 .sendbar .btn { border-radius: 22px; min-height: 44px; }
 
