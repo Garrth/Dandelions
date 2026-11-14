@@ -662,7 +662,7 @@
               e.preventDefault();
               db.rpc("talk_summary_flag", { p_topic: t.id, p_note: $("offnote").value.trim() }).then(function (x) {
                 if (x.error) { toast("Couldn't send that. Try again."); return; }
-                $("offbox").innerHTML = '<p class="small muted">Thanks. Rai reads these notes at the next update.</p>';
+                $("offbox").innerHTML = '<p class="small muted">Thanks. Rai will reread the topic and rewrite the summary the next time someone opens it.</p>';
               });
             });
           });
