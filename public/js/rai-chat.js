@@ -26,8 +26,9 @@
     ".rai-head button{border:1px solid var(--line,#dfe3d2);background:var(--card,#fff);color:inherit;border-radius:10px;padding:6px 10px;font-weight:700;cursor:pointer}",
     ".rai-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}",
     ".rai-msg{max-width:88%;padding:9px 12px;border-radius:14px;font-size:15px;line-height:1.45;overflow-wrap:anywhere}",
-    ".rai-msg p+p,.rai-msg p+ul,.rai-msg ul+p{margin-top:6px}",
-    ".rai-msg ul{margin:4px 0 0;padding-left:18px}",
+    ".rai-msg p+p,.rai-msg p+ul,.rai-msg ul+p,.rai-msg p+ol,.rai-msg ol+p{margin-top:6px}",
+    ".rai-msg ul,.rai-msg ol{margin:4px 0 0;padding-left:20px}",
+    ".rai-msg li+li{margin-top:3px}",
     ".rai-msg a{color:var(--leaf,#2d7a34);font-weight:700}",
     ".rai-msg.rai{align-self:flex-start;background:var(--card,#fff);border:1px solid var(--line,#dfe3d2);border-bottom-left-radius:4px}",
     ".rai-msg.you{align-self:flex-end;background:var(--sun,#ffd21a);color:var(--sun-ink,#15210f);border-bottom-right-radius:4px}",
@@ -55,14 +56,21 @@
           return '<a href="' + u + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + ">" + t + "</a>";
         });
     }
-    var out = [], list = null;
+    var out = [], list = null, tag = "ul";
+    function close() { if (list) { out.push("<" + tag + ">" + list.join("") + "</" + tag + ">"); list = null; } }
     String(text).split(/\n/).forEach(function (line) {
-      var m = line.match(/^\s*(?:[-*]|\d+\.)\s+(.*)$/);
-      if (m) { if (!list) { list = []; } list.push("<li>" + inline(m[1]) + "</li>"); return; }
-      if (list) { out.push("<ul>" + list.join("") + "</ul>"); list = null; }
-      if (line.trim()) out.push("<p>" + inline(line.trim()) + "</p>");
+      var m = line.match(/^\s*([-*]|\d+\.)\s+(.*)$/);
+      if (m) {
+        var t = /\d/.test(m[1]) ? "ol" : "ul";
+        if (list && t !== tag) close();
+        if (!list) { list = []; tag = t; }
+        list.push("<li>" + inline(m[2]) + "</li>"); return;
+      }
+      if (!line.trim()) return;
+      close();
+      out.push("<p>" + inline(line.trim()) + "</p>");
     });
-    if (list) out.push("<ul>" + list.join("") + "</ul>");
+    close();
     return out.join("");
   }
 
