@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DDFM whitepaper | Dandelions</title>
+  <meta name="description" content="The full design Dandelions is testing: DDFM, a way to create points through verified work instead of loans. How it works, how it compares to today's system, the levels of adoption, and the risks.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/site.css">
+  <style>
+    .wp-meta { color: var(--muted); font-size: 15px; margin: 4px 0 18px; }
+    .wp-box { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 18px 0; }
+    .wp-toc { columns: 2; column-gap: 24px; padding-left: 20px; font-size: 16px; }
+    .wp-fig { margin: 20px 0; }
+    .wp-fig img { width: 100%; height: auto; border: 2px solid var(--line); border-radius: 14px; background: #fff; display: block; }
+    .wp-fig figcaption { color: var(--muted); font-size: 15px; margin-top: 8px; }
+    .wp-table { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 15px; }
+    .wp-table th, .wp-table td { text-align: left; vertical-align: top; padding: 9px 10px 9px 0; border-bottom: 2px solid var(--line); }
+    .wp-table th { font-size: 14px; color: var(--muted); font-weight: 800; }
+    .wp-table td:first-child { font-weight: 800; }
+    .prose ol li, .prose ul li { margin: 8px 0; }
+    @media (max-width: 560px) {
+      .wp-toc { columns: 1; }
+      .wp-table, .wp-table tbody, .wp-table tr, .wp-table td { display: block; width: 100%; }
+      .wp-table thead { display: none; }
+      .wp-table tr { border-bottom: 2px solid var(--line); padding: 8px 0; }
+      .wp-table td { border: 0; padding: 2px 0; }
+      .wp-table td:empty { display: none; }
+      .wp-table td[data-h]::before { content: attr(data-h) ": "; color: var(--muted); font-weight: 700; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">
+      <img src="/favicon.svg" alt="" width="30" height="30">
+      Dandelions
+    </a>
+    <a class="pill" href="/#pledge">Join</a>
+  </header>
+
+  <main class="page prose">
+    <h1>The DDFM whitepaper</h1>
+    <p class="wp-meta">Version 4 · November 2026 · for the short version, see <a href="/under-the-hood.html">Under the hood</a></p>
+
+    <p class="lead"><strong>DDFM (Decentralized Debt-Free Money) is a way to create points through verified work instead of loans, so the work people and the planet need can get funded even when it doesn't turn a profit.</strong> Dandelions runs on DDFM. Under the hood explains how Dandelions works today. This paper explains the system underneath it, and what it could become.</p>
+
+    <div class="wp-box">
+      <p><strong>Read this as the full-grown version.</strong> Everything here describes DDFM after full adoption: millions of members, most local businesses taking part, and governments accepting points. Dandelions today is a seedling. It has pledges, a business directory, Talk and Rai. Points aren't turned on yet and have no cash value. Each feature in this paper arrives only when a milestone is reached and members vote it in. Nothing here is a promise. It is the design we are testing.</p>
+    </div>
+    <p><strong>Why publish the whole thing now?</strong> Because it should be judged in the open, from the start. If the design has a flaw, we want to find it before it's built, not after.</p>
+
+    <ol class="wp-toc">
+      <li><a href="#hypothesis">The hypothesis</a></li>
+      <li><a href="#today">How money works today</a></li>
+      <li><a href="#ddfm">How DDFM works</a></li>
+      <li><a href="#side-by-side">Side by side</a></li>
+      <li><a href="#levels">Levels of adoption</a></li>
+      <li><a href="#milestones">What changes at each milestone</a></li>
+      <li><a href="#decides">Who decides</a></li>
+      <li><a href="#risks">Risks and open questions</a></li>
+    </ol>
+
+    <h2 id="hypothesis">1. The hypothesis</h2>
+    <p>Dandelions is an experiment, and this is what it tests.</p>
+    <p><strong>The axiom.</strong> The human experience is worthwhile and worth preserving. This can't be proven. We agree to it.</p>
+    <p><strong>The hypothesis.</strong> Who creates money, and on what terms, decides what work gets funded. What gets funded becomes the society we live in.</p>
+    <p>If that's true, then changing how money is created changes what gets built. Money lent into existence funds work that can repay a loan with interest. Points worked into existence, debt-free, can fund the work people and the planet actually need.</p>
+    <p><strong>The goal everything serves</strong> (from the <a href="/charter.html">charter</a>): improve quality of life while putting back more than we take. Quality of life means security: your basic needs covered, and a living-wage job for anyone who wants one. Putting back more than we take means using the planet's resources no faster than they renew, and restoring what's been damaged.</p>
+    <p><strong>What would prove it wrong?</strong> See <a href="#risks">section 8</a>. An experiment worth running has to be able to fail.</p>
+
+    <h2 id="today">2. How money works today</h2>
+    <p>Apart from coins, nearly every dollar comes into being as someone's debt: banks create money when they lend, and the Federal Reserve creates it mostly by buying government debt. So the system funds what can repay debt with interest, and needs constant growth to keep going.</p>
+    <figure class="wp-fig">
+      <a href="/images/whitepaper/money-today.webp" title="Open full size"><img src="/images/whitepaper/money-today.webp" width="1344" height="1202" loading="lazy" alt="Diagram of today's money system. Banks create new money as loans to businesses, people and the government. The Fed buys bonds and credits banks' reserves. Bondholders lend existing money to the government and are paid interest. The government spends on public works. Money flows back as loan payments with interest, and as taxes, which fall short."></a>
+      <figcaption>How money flows today: created as loans, erased when repaid. Tap to open full size.</figcaption>
+    </figure>
+    <p>Banks create most new money when they make loans, to businesses, to people and to the government. The government pays for what for-profit business can't, like roads, schools and defense. That is supposed to be covered by taxes, but taxes don't cover what is needed, so the government borrows the gap by selling bonds and pays interest to bondholders, many of them other countries. Money flows back as loan payments with interest, and as taxes. When a loan is repaid, that money disappears, so the system needs a constant stream of new loans. This is where it breaks: the work we need keeps growing, and the only way to fund it is more debt.</p>
+    <p><strong>Where it came from.</strong> Medieval goldsmiths held people's gold and handed out paper receipts. People traded the receipts instead of the gold and rarely came back for the metal. So goldsmiths issued more receipts than they had gold, and lent them out at interest. That's fractional reserve banking, the root of today's system.</p>
+    <p><strong>What it got right.</strong> Credit is powerful. Being able to fund a project before you have the cash built roads, factories and cities. Borrow to build, build to earn, earn to repay.</p>
+    <p><strong>Where it breaks.</strong></p>
+    <ul>
+      <li><strong>Only work that repays debt gets funded first.</strong> Infrastructure, healthcare, care work, education and restoring the land pay back slowly or not in cash, so they wait for taxes or charity.</li>
+      <li><strong>It needs growth to survive.</strong> Every dollar carries a debt. An economy that stops growing can't service it. The usual fix for too much debt is more debt. Governments borrow for many reasons, including tax cuts and wars, and a growing share of new borrowing goes just to pay interest on old debt.</li>
+      <li><strong>It can't see harm.</strong> A factory that poisons a river shows up as economic activity. The poisoned river doesn't show up as a loss.</li>
+      <li><strong>Inflation is built in.</strong> The 2% target makes debt cheaper to repay over time. It helps borrowers and quietly taxes savers.</li>
+      <li><strong>Labor and materials are the real limits.</strong> The system makes money the bottleneck instead, so people and materials sit idle while the work waits.</li>
+    </ul>
+    <p><strong>An example: energy.</strong> Our food, transport and homes run on fossil fuels, a resource that is finite and harms the climate as we burn it. We know how to run nearly everything on clean electricity, and we have the people and materials to build it. But much of that work pays back too slowly: new transmission lines, grid upgrades, retrofitting millions of homes. Governments say they can't afford it, investors find the returns too thin, and loans for it are hard to repay. So it moves far slower than it could.</p>
+    <p><strong>Healthcare is the same.</strong> Prevention, mental health care and long-term care pay back in healthier, more productive people, not in cash. Through today's lens they look too expensive, so people are expected to cover costs most of them can't afford.</p>
+    <p><strong>The point.</strong> Measured in people and materials, we can afford far more of this work. It's an investment in people and the workforce, and it pays back in healthier, happier people who are more productive and less destructive. Businesses and charities do give back, but the results speak for themselves: it isn't enough to get the job done as well as it could be done.</p>
+    <p><strong>The usual fixes fall short.</strong></p>
+    <ul>
+      <li><strong>Government-created money:</strong> clean in theory, but history shows governments spend it on wars and political advantage, and it ends in debasement.</li>
+      <li><strong>Universal basic income:</strong> where does the money come from when tax revenue depends on jobs? And telling people they aren't needed is its own crisis. People need purpose, not just a check.</li>
+      <li><strong>Waiting on billionaires or charity</strong> isn't a plan.</li>
+    </ul>
+
+    <h2 id="ddfm">3. How DDFM works</h2>
+    <p>In DDFM, points come into being only when verified work is done. They circulate through people and businesses, and come back through sales tax, fines, insurance payments and usage fees into distribution accounts that fund the next round of work.</p>
+    <figure class="wp-fig">
+      <a href="/images/whitepaper/points-flow.webp" title="Open full size"><img src="/images/whitepaper/points-flow.webp" width="1344" height="1066" loading="lazy" alt="Diagram of how points flow in DDFM. New points are created only for verified work and go into distribution, which pays project owners, who pay workers and suppliers. Everyone buys from businesses. Points can move into and out of savings: SOV and stocks. Insurance premiums, fees and fines, and sales tax flow back to distribution."></a>
+      <figcaption>How points flow: one way in, three ways back. Tap to open full size.</figcaption>
+    </figure>
+    <p>New points enter only through distribution. Points saved in SOV or stocks don't stop moving: they flow on to whoever builds the asset or runs the company, and savers can move them back out to spend. Insurance premiums, fees and fines, and sales tax bring points back to distribution for the next round of work.</p>
+
+    <h3>Three kinds of units</h3>
+    <table class="wp-table">
+      <thead><tr><th>Unit</th><th>What it's for</th><th>How it's created</th></tr></thead>
+      <tbody>
+        <tr><td>Points (MOE)</td><td data-h="For">Everyday spending: pay, rent, groceries, services</td><td data-h="Created">Only when a project milestone is verified done</td></tr>
+        <tr><td>Store of value (SOV)</td><td data-h="For">Saving wealth safely. Each share is 100% backed by a real asset: land, buildings, materials, equipment</td><td data-h="Created">Issued by approved operators against a real, checked asset</td></tr>
+        <tr><td>Stocks</td><td data-h="For">Investing in businesses, the way stocks work now. Value can grow, and it can fall, even to zero</td><td data-h="Created">Issued by a business that wants investors, under securities rules</td></tr>
+      </tbody>
+    </table>
+    <p>Points are for spending, not hoarding. The system is designed so holding points doesn't pay, and they keep getting kicked back into circulation. Someone who wants to save safely moves points into store of value (SOV), which holds value in real things, and can move back to points any time. Someone who wants growth, and accepts the risk, buys stocks. Businesses, with their organized people and systems, have tremendous value in any economy, including a DDFM one.</p>
+    <p><strong>One kind of point, many kinds of savings and stocks.</strong> There is only one point (MOE) for the whole system. There are many SOV and stocks, one set for each asset or business. They trade on DDFM's own exchange, so moving savings between SOV and points is quick and easy.</p>
+    <p><strong>How voting stays secure.</strong> Voting is how members run DDFM, so it has to be hard to fake. Only ID-checked members vote, one person, one vote. Each vote is tied to a verified sign-in, so it can't be bought, sold or handed to someone else. Results are public, and anyone can check the count.</p>
+
+    <h3>Projects: how points enter</h3>
+    <p>Projects are the only door new points come through.</p>
+    <ul>
+      <li><strong>Common good projects</strong> earn no revenue: a road, a park, a toxic site cleanup, teaching. Fully funded through distribution.</li>
+      <li><strong>Semi-profit projects</strong> charge something but can't survive on revenue alone. Healthcare and insurance are the main examples. Distribution covers the gap. The goal is access, not margin.</li>
+      <li><strong>For-profit work</strong> is left to the market. A business can still get project funding for a specific need, like an automation upgrade, as an alternative to a loan.</li>
+    </ul>
+    <p>Every project runs on milestones. Randomly picked, qualified, paid checkers confirm each one. Then the code creates and pays the points. Rai ranks needs, sizes projects and flags fraud, but never creates points or approves anything.</p>
+
+    <h3>Distribution accounts: the closed loop</h3>
+    <p>Distribution accounts are run by approved operators under public rules no one person controls. They hold a working balance: below the floor, points are created to top them up for approved work; above the ceiling, the extra is retired. They don't have to balance like a government budget, because they're limited by real labor and materials, not by tax collections.</p>
+    <p>What flows back in, called TFI (taxes, fines and insurance), plus usage fees:</p>
+    <ul>
+      <li><strong>Sales tax, set by footprint.</strong> The only required tax. Its rate follows the EI# of what's bought: low for things made sustainably, high for things that harm people or the planet. Using more than your share costs more.</li>
+      <li><strong>Fines.</strong> Like everything else, fines go into distribution. Cleanup is paid from distribution whether or not the fine covers it, so the harm gets fixed either way.</li>
+      <li><strong>Insurance premiums.</strong> Health, home, vehicle and liability coverage run as semi-profit projects, built to make insurance cheaper and better. Nothing is free, but coverage doesn't have to break even. Premiums don't have to cover natural disasters either: repairs after a disaster are funded as projects, and DDFM can mobilize people and materials for them quickly. No shareholders, so no reason to deny claims.</li>
+      <li><strong>Usage fees.</strong> Power, water and transit: a low price for a base amount, rising above it.</li>
+    </ul>
+    <p>No income tax, ever. Taxing work makes no sense in a system built to encourage it.</p>
+
+    <h3>The EI#: pricing the planet</h3>
+    <p>Every product, business and county gets an EI# on a scale from -100 to +100, measured against the <a href="/app/baselines.html">baselines</a>. Think of it like an account balance with the planet. Zero means using resources as fast as nature replaces them. A positive score means you have extra: you take less than nature renews, or restore more than you take. A negative score means living beyond your means: taking more than the planet can recover, and it gets more expensive the lower it goes. Scores come from measured data, not self-reported claims, and anyone can challenge them.</p>
+
+    <h3>The brakes: keeping points worth something</h3>
+    <p>DDFM targets zero inflation. The brakes are built into the code and change only by member vote.</p>
+    <ul>
+      <li><strong>Capped by real capacity.</strong> Projects can't be approved beyond the labor and materials available in an area. Trades that are nearly fully booked get no new projects.</li>
+      <li><strong>Capped by spendability.</strong> New points each month are limited by how many points businesses and landlords are ready to accept.</li>
+      <li><strong>Make way for the market.</strong> When businesses need workers, projects slow down. When hiring drops, they pick up.</li>
+      <li><strong>Scarcity triggers building.</strong> When prices rise from a real shortage, the answer is projects that build more supply, not higher rates.</li>
+      <li><strong>Savings build real things.</strong> Savings held in SOV don't sit in points competing for everyday goods. Because each SOV is backed by a real asset, saving pays for building more: housing, so supply keeps up with demand, and stockpiles of goods, so makers can produce ahead of demand without carrying all the risk themselves. Those stockpiles are a reserve to draw on when a pandemic or disaster breaks supply chains, in place of today's just-in-time system with nothing on the shelf.</li>
+      <li><strong>Infrastructure as a place to save.</strong> Points don't disappear when they're saved. They keep moving through whoever built the asset or runs the business. So DDFM offers infrastructure SOV: savings that fund roads, power, water and transit, with a very small return. Every point saved there is a point that doesn't need to be created for that work.</li>
+      <li><strong>New points only where they're needed.</strong> The loop doesn't have to balance. But when sales tax, fines, insurance and usage fees flow back in, and savings flow into infrastructure, the need for new points can stay low. Creating more than the economy can absorb would inflate the prices of assets and stocks, as easy money does today. So the price watch covers SOV and stocks too, not just everyday goods.</li>
+    </ul>
+
+    <h2 id="side-by-side">4. Side by side</h2>
+    <p>DDFM is built as a parallel layer, not a replacement: the market keeps doing what it does well, and DDFM aims at what it won't fund.</p>
+    <table class="wp-table">
+      <thead><tr><th></th><th>Today's system</th><th>DDFM at full adoption</th></tr></thead>
+      <tbody>
+        <tr><td>How new money is created</td><td data-h="Today">Banks make loans; governments borrow by selling bonds</td><td data-h="DDFM">Points are created when verified work is done</td></tr>
+        <tr><td>Who decides how much</td><td data-h="Today">Central banks and lenders</td><td data-h="DDFM">Rules in public code, capped by real labor, materials and spendability</td></tr>
+        <tr><td>What gets funded first</td><td data-h="Today">Work that can repay a loan with interest</td><td data-h="DDFM">Work ranked by real need against the charter and baselines</td></tr>
+        <tr><td>Debt and interest</td><td data-h="Today">Every dollar carries debt; interest flows to lenders</td><td data-h="DDFM">No debt, no interest</td></tr>
+        <tr><td>Inflation</td><td data-h="Today">About 2% a year by design</td><td data-h="DDFM">Zero is the target</td></tr>
+        <tr><td>Taxes</td><td data-h="Today">Income, payroll, property, sales and more</td><td data-h="DDFM">Sales tax by footprint, plus fines, insurance and usage fees. No income tax</td></tr>
+        <tr><td>The planet</td><td data-h="Today">Harm is free until it's regulated</td><td data-h="DDFM">Harm is priced through the EI#; restoring is cheap and gets funded</td></tr>
+        <tr><td>Jobs when automation hits</td><td data-h="Today">Fewer jobs, less tax revenue, little plan</td><td data-h="DDFM">Freed people move into needed work, funded by points</td></tr>
+        <tr><td>Government</td><td data-h="Today">Funded by taxes and borrowing, opaque budgets</td><td data-h="DDFM">Agencies run as projects with milestones and public outcomes</td></tr>
+        <tr><td>Who checks</td><td data-h="Today">Auditors, regulators, courts, after the fact</td><td data-h="DDFM">Random paid checkers before each payout, with every record public</td></tr>
+        <tr><td>Saving</td><td data-h="Today">Cash, stocks, bonds, property</td><td data-h="DDFM">SOV backed by real things, stocks for growth; points keep moving</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Pros and cons</h3>
+    <table class="wp-table">
+      <thead><tr><th></th><th>Strengths</th><th>Weaknesses</th></tr></thead>
+      <tbody>
+        <tr><td>Today's system</td><td data-h="Strengths">Proven at huge scale. Deep markets for saving and borrowing. Credit lets you build before you have the cash. Strong legal protections. Accepted everywhere.</td><td data-h="Weaknesses">Needs constant growth. Leaves slow-payback work waiting. Can't see harm to the planet. Inflation erodes savings. Interest moves wealth upward. No real plan for jobs lost to automation.</td></tr>
+        <tr><td>DDFM</td><td data-h="Strengths">Funds needed work without a profit test. No debt or interest. Ties new points to real output and real capacity. Prices harm and rewards restoring. Every rule and flow is public.</td><td data-h="Weaknesses">Unproven. Needs many people and businesses before points are useful. Depends on honest checking and good data. Hard questions about law, taxes and how it meets the dollar. Rules and rates are set by votes, which can be slow or captured.</td></tr>
+      </tbody>
+    </table>
+    <p>The honest summary: today's system is very good at funding what pays back fast and very bad at what doesn't. DDFM is designed for the second half. Whether it works at scale is exactly what the experiment is for.</p>
+
+    <h2 id="levels">5. Levels of adoption</h2>
+    <p>DDFM grows in levels, from today's seedling to full adoption. Each level is a gate, not a date.</p>
+    <figure class="wp-fig">
+      <a href="/images/whitepaper/levels.webp" title="Open full size"><img src="/images/whitepaper/levels.webp" width="1344" height="670" loading="lazy" alt="Diagram of eight levels of adoption. Inside a county: Seedling today, Sprout at 1%, Bloom at 5%, Puffball at 10%. Beyond the county: a region, local government, a state, full adoption. Every step opens when the milestone is reached and members vote."></a>
+      <figcaption>Levels of adoption: 8 levels, a vote at each gate. Tap to open full size.</figcaption>
+    </figure>
+    <p>The first row happens county by county. The second row needs many counties, and then governments, choosing to take part. Section 6 spells out each step.</p>
+
+    <h2 id="milestones">6. What changes at each milestone</h2>
+    <p>Each level opens only when two things are true: the milestone is reached, and members vote to turn it on. Percentages are the share of a county's population that has pledged. Every number here is a starting point, and members can change it.</p>
+    <h3>Inside a county</h3>
+    <table class="wp-table">
+      <thead><tr><th>Level</th><th>When</th><th>What turns on</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td>Seedling (today)</td><td data-h="When">First pledge</td><td data-h="Turns on">Pledges, the directory, Talk, Rai, the baselines. No points yet</td><td data-h="Why">Proves people want it and builds the business network points will need</td></tr>
+        <tr><td>Sprout</td><td data-h="When">1%</td><td data-h="Turns on">Points turn on. First projects: signing up businesses, mapping their suppliers, building Dandelions itself</td><td data-h="Why">Points are only useful where they can be spent, so the first work makes them spendable</td></tr>
+        <tr><td></td><td data-h="When">2%</td><td data-h="Turns on">Paid training</td><td data-h="Why">Fills the skills shortages that would otherwise cap projects</td></tr>
+        <tr><td></td><td data-h="When">3%</td><td data-h="Turns on">Common good projects: parks, cleanups, care</td><td data-h="Why">The first work the market won't pay for</td></tr>
+        <tr><td></td><td data-h="When">4%</td><td data-h="Turns on">Landlords take points for rent, special offers on 10spot</td><td data-h="Why">Rent is the biggest bill. When rent takes points, earning them becomes worth it</td></tr>
+        <tr><td>Bloom</td><td data-h="When">5%</td><td data-h="Turns on">Automation projects for small businesses</td><td data-h="Why">Businesses produce more and pay the people they keep more</td></tr>
+        <tr><td></td><td data-h="When">6%</td><td data-h="Turns on">Big business joins</td><td data-h="Why">Big employers and suppliers make points spendable on almost anything</td></tr>
+        <tr><td></td><td data-h="When">7%</td><td data-h="Turns on">A utility pilot: pay power or water in points</td><td data-h="Why">A must-pay bill in points makes points close to everyday cash</td></tr>
+        <tr><td></td><td data-h="When">8%</td><td data-h="Turns on">A member clinic, run as a semi-profit project</td><td data-h="Why">Healthcare paid with time and points, not insurance</td></tr>
+        <tr><td></td><td data-h="When">9%</td><td data-h="Turns on">Local fees payable in points</td><td data-h="Why">Local government starts to take part</td></tr>
+        <tr><td>Puffball</td><td data-h="When">10%</td><td data-h="Turns on">Research and development, local governance by members</td><td data-h="Why">The county can fund its own future and helps neighbors grow</td></tr>
+      </tbody>
+    </table>
+    <p><strong>The number to watch isn't only members. It's spending coverage:</strong> the share of a business's costs it can pay in points. Around 20%, points are a nice bonus. Around 50%, they're everyday money.</p>
+    <h3>Beyond the county</h3>
+    <table class="wp-table">
+      <thead><tr><th>Milestone</th><th>What changes</th></tr></thead>
+      <tbody>
+        <tr><td>A region of counties</td><td data-h="Changes">Distribution accounts share across counties. Points earned in one county spend in the next. The public record moves to a shared ledger run by many independent operators</td></tr>
+        <tr><td>Local government accepts points for fees and some taxes</td><td data-h="Changes">Agencies can run work as projects with public milestones. Every resident gets a reason to hold points</td></tr>
+        <tr><td>A state accepts points for state taxes</td><td data-h="Changes">Points become useful to everyone who owes the state, not only members. State agencies can run as projects</td></tr>
+        <tr><td>The federal government accepts points for taxes</td><td data-h="Changes">The biggest unlock. Anything that pays taxes needs points, so points become as good as cash nationwide</td></tr>
+        <tr><td>Full adoption</td><td data-h="Changes">Income tax is replaced by the footprint sales tax. Government functions run as projects with visible outcomes. Dollars and points can work side by side</td></tr>
+      </tbody>
+    </table>
+    <p><strong>What happens when a government accepts points?</strong> When people can pay their taxes in something, they want to hold it. That's the single strongest way to make points widely accepted, stronger than any business sign-up. It also changes government: an agency paid in points works like any project, with a defined goal, milestones and public checks. Government doesn't get bigger or smaller. It gets honest.</p>
+    <p><strong>What it can no longer do.</strong> Borrow against future taxes to fund deficits or wars of choice. Every point an agency spends is a project with a visible scope and outcome.</p>
+    <p>We don't plan on the dollar going away. DDFM is designed to work beside it for as long as both are useful.</p>
+
+    <h2 id="decides">7. Who decides</h2>
+    <p>DDFM has no head. We call it decentralized unity: many people and groups, each running their own work, all pulling toward one shared goal. The goal, open rules and public data keep everyone pointed the same way.</p>
+    <ul>
+      <li><strong>The charter</strong> sets the goal. It changes only by member vote, and its record is kept where no one can quietly edit it.</li>
+      <li><strong>People</strong> propose projects, do the work, check milestones, settle disputes and vote on rules. One person, one vote, and only ID-checked members vote. People can overrule AI, with a high bar like a supermajority.</li>
+      <li><strong>AI</strong> ranks needs from real data, sizes projects, estimates local capacity and flags fraud. Every recommendation shows its reasoning. More than one independent analysis checks the results, so no single AI, company or person controls the outcome. AI never creates points, approves projects or changes rules.</li>
+      <li><strong>Code</strong> creates and pays points automatically when checked work meets the rules. Nobody can create points by deciding to.</li>
+    </ul>
+    <p><strong>Permissions are earned.</strong> A member starts with the basics. ID-checked members can vote. A track record unlocks roles like checker, project owner, community organizer and operator. Permissions are credentials, not money, and can't be bought or sold.</p>
+    <p><strong>Keepers</strong> sign approved changes to the charter. They start few and grow in number, chosen in the open, with fixed terms so no group holds the keys for good.</p>
+    <p><strong>Disputes</strong> go to a mini court: file, talk it out, screening, a randomly picked panel, a ruling, and one appeal. Rulings act only on points and permissions inside DDFM.</p>
+    <p><strong>Decentralized all the way down.</strong> What a community can see and handle, it decides. Regions decide what needs a region. Only what is truly national, like defense and environmental standards, runs at that scale.</p>
+    <p><strong>The handoff.</strong> DDFM starts with one person's plan and open code, then public data, then a shared public ledger, then full member governance. The people who build it earn the right to run it.</p>
+
+    <h2 id="risks">8. Risks and open questions</h2>
+    <p>The hardest problem is the start: a system that needs trust to work can't earn trust until it works. The plan is the one every co-op and credit union used. Start small, build something real, and let the results make the argument.</p>
+    <table class="wp-table">
+      <thead><tr><th>Risk</th><th>What could go wrong</th><th>How DDFM answers it</th></tr></thead>
+      <tbody>
+        <tr><td>Too few places to spend points</td><td data-h="Risk">People earn points they can't use, and stop</td><td data-h="Answer">Spendability caps new points. Signing up businesses and their suppliers is the first project</td></tr>
+        <tr><td>Faked work</td><td data-h="Risk">Owners and checkers collude to get paid for nothing</td><td data-h="Answer">Several random, paid checkers per milestone, spot checks, public records, and a lasting record for each owner</td></tr>
+        <tr><td>Inflation anyway</td><td data-h="Risk">Too many points chase too few goods</td><td data-h="Answer">Capacity and spendability caps, a price watch that shrinks budgets, and projects that build supply</td></tr>
+        <tr><td>Bad data or a biased AI</td><td data-h="Risk">The needs list points the wrong way</td><td data-h="Answer">Open models and data, more than one independent analysis, public reasoning, and people can overrule</td></tr>
+        <tr><td>Capture by a group</td><td data-h="Risk">A faction takes over votes or keepers</td><td data-h="Answer">One person one vote, ID checks, random selection, term limits, and caps per state</td></tr>
+        <tr><td>The law</td><td data-h="Risk">Rules on money, securities, taxes and transfers</td><td data-h="Answer">Points have no cash value until the right legal steps are done. Dandelions never sells points for dollars. SOV and stocks follow securities rules and come last</td></tr>
+        <tr><td>Attacks from today's powers</td><td data-h="Risk">The people who control money today push back</td><td data-h="Answer">Open code, many operators, and a public record. The best defense is being useful to enough people</td></tr>
+      </tbody>
+    </table>
+    <p><strong>What would prove the hypothesis wrong?</strong></p>
+    <ul>
+      <li>Points created for verified work don't get the needed work done faster or better than today's system.</li>
+      <li>Prices of basics in DDFM counties rise faster than elsewhere.</li>
+      <li>Businesses won't accept points even when members bring them.</li>
+      <li>Quality of life and the EI# in DDFM counties don't improve over years.</li>
+    </ul>
+    <p>We'll publish these measures as we go, including the ones that don't look good.</p>
+    <p><strong>Open questions:</strong> how much a county needs to pledge before points are safe to turn on, how SOV assets are checked, how distribution accounts are run across regions, and how DDFM fits with tax rules before any government accepts points.</p>
+
+    <p class="cta"><a class="btn" href="/#pledge">Become a Dandelion</a></p>
+    <p class="note">Questions or a flaw to point out? Bring it to <a href="/app/talk.html">Talk</a>, or ask Rai.</p>
+  </main>
+
+  <footer>
+    <p><a href="/">Home</a> · <a href="/under-the-hood.html">Under the hood</a> · <a href="/charter.html">Charter</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
+  </footer>
+</div>
+<script src="/js/config.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>
