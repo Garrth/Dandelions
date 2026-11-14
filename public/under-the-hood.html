@@ -4,10 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Under the hood | Dandelions</title>
-  <meta name="description" content="The short version of the plan Dandelions is testing, and what we don't know yet.">
+  <meta name="description" content="How Dandelions works: points that come from verified work, how a county grows, how work gets checked, what keeps it honest, who decides, and what we don't know yet.">
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/site.css">
+  <style>
+    .uh-box { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; margin: 18px 0; }
+    .uh-table { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 16px; }
+    .uh-table th, .uh-table td { text-align: left; vertical-align: top; padding: 10px 10px 10px 0; border-bottom: 2px solid var(--line); }
+    .uh-table th { font-size: 14px; color: var(--muted); font-weight: 800; }
+    .uh-table td:first-child { font-weight: 800; white-space: nowrap; }
+    .prose ol li, .prose ul li { margin: 8px 0; }
+    @media (max-width: 520px) {
+      .uh-table, .uh-table tbody, .uh-table tr, .uh-table td { display: block; width: 100%; }
+      .uh-table thead { display: none; }
+      .uh-table tr { border-bottom: 2px solid var(--line); padding: 8px 0; }
+      .uh-table td { border: 0; padding: 2px 0; white-space: normal; }
+      .uh-table td[data-h]::before { content: attr(data-h) ": "; color: var(--muted); font-weight: 700; }
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -21,58 +36,108 @@
 
   <main class="page prose">
     <h1>Under the hood</h1>
-    <p class="lead">This is the short version of the plan Dandelions is testing. None of it is running yet. Right now Dandelions only collects pledges, so we can see how many people agree. There are no tokens and nothing to buy. And we're building it within the law, one step at a time.</p>
+    <p class="lead">Dandelions is a way to fund the work people and the planet need, by creating points only when that work is verified done. This is the short version of how it works, about a 10 minute read. The goal it serves is set in the <a href="/charter.html">charter</a>, and the measured targets are on the <a href="/app/baselines.html">Baselines</a> page.</p>
 
-    <h2>Money is a tool</h2>
-    <p>What actually gets work done is people and materials. Money is how we measure and move them, the way a ruler measures lumber. When the people and the materials are both there and the work still doesn't happen, the tool is the problem.</p>
+    <h2>1. The problem: plenty to do, and the work waits</h2>
+    <p>AI and automation are going to change a lot of jobs, and nobody has a real plan for what comes next. At the same time, there is more useful work waiting than people to do it: clean energy, a better grid, healthy soil, clean water, care for kids and elders, housing, training.</p>
+    <p>The people are here and the materials are here. What's missing is a way to put them together.</p>
+    <p><strong>Why the work waits.</strong> Most dollars today start out as loans, and a loan has to be paid back with interest. So the work that gets funded first is the work that pays back fast. Roads, clean water, healthy soil and caring for people pay back slowly, or in ways nobody can send a bill for. So they wait, no matter how many people are ready to do them.</p>
+    <p>The market is great at a lot of things, but it isn't built for this. Government runs on taxes and borrowing, which run short right when jobs disappear. And waiting for billionaires or charity to step in isn't a plan.</p>
     <div class="callout">
       <img src="/images/dandy.webp" alt="Dandy" width="503" height="720">
       <p>Andy, picture a crew next to a pile of lumber, ready to go. And the boss says, "Sorry folks, we're out of inches."</p>
     </div>
+    <p><strong>The idea in one line:</strong> human and natural resources are the real limit, not dollars. Dandelions tests a system where the work itself is what brings the points into being.</p>
 
-    <h2>Why the work waits</h2>
-    <p>Most money today starts out as a loan, and a loan has to be paid back with interest. So the work that gets done first is the work that pays back fast.</p>
-    <p>Roads, clean water, healthy soil, and caring for people pay back slowly, or not in cash at all. So they wait. The market is great at a lot of things, but it isn't built for this. Government runs on taxes and borrowing, which run short right when jobs disappear.</p>
-
-    <h2>What Dandelions tries instead</h2>
-    <p>Pay for verified work, not loans. In short:</p>
-    <ol>
-      <li><strong>A public needs list.</strong> Real data ranks what each area needs most.</li>
-      <li><strong>Local projects.</strong> Approved project owners take on work from the list, sized to what they can handle.</li>
-      <li><strong>Paid by milestone.</strong> Pay is created only when people check and confirm a milestone is done. No work, no pay.</li>
-      <li><strong>Capped by what's really there.</strong> Projects can't outgrow the local workers and materials.</li>
-      <li><strong>Make way for business.</strong> When businesses need workers, new projects slow down. When hiring drops, projects pick up the slack.</li>
-    </ol>
+    <h2>2. The idea: points that come from work</h2>
+    <p>Dandelions points are created only when verified work gets done. They are not lent into existence and carry no debt or interest. No work, no points.</p>
+    <ul>
+      <li><strong>Debt-free.</strong> Nobody has to pay points back, so a project doesn't need to earn a profit to be worth doing. It needs to serve the mission.</li>
+      <li><strong>Work first.</strong> Points are created in small pieces as each milestone of a project is checked and confirmed.</li>
+      <li><strong>For spending, not hoarding.</strong> Points are meant to move: people earn them, then spend them at local businesses that accept them.</li>
+      <li><strong>A parallel layer.</strong> Dandelions doesn't replace the market. It aims at the work the market won't fund: infrastructure, healthcare, care work, and restoring the planet.</li>
+    </ul>
     <div class="callout">
       <img src="/images/andy.webp" alt="Andy" width="555" height="720">
-      <p>Hold on, Dandy. So the money only shows up when the work does?</p>
+      <p>Hold on, Dandy. So the points only show up when the work does?</p>
     </div>
     <div class="callout">
       <img src="/images/dandy.webp" alt="Dandy" width="503" height="720">
-      <p>That's the whole trick, Andy. Nobody gets to print it just by deciding to.</p>
+      <p>That's the whole trick, Andy. Nobody gets to make them just by deciding to.</p>
     </div>
+    <div class="uh-box">
+      <p><strong>Where things stand today:</strong> points aren't turned on yet and have no cash value. Right now Dandelions is pledges, a business directory, Talk, and Rai. Points come later, one tested step at a time.</p>
+    </div>
+    <p><strong>Why businesses matter.</strong> A point is only useful if you can spend it. So signing up local businesses that will accept points is one of the first and most important jobs. How many points a county can create each month is tied to how many points its businesses are ready to accept.</p>
 
-    <h2>Who decides what</h2>
+    <h2>3. How a county grows</h2>
+    <p>Dandelions grows county by county, and each county unlocks more as more of its people take part. Progress is measured as the share of the county's population that has pledged.</p>
+    <table class="uh-table">
+      <thead><tr><th>Stage</th><th>When</th><th>What opens</th></tr></thead>
+      <tbody>
+        <tr><td>Seed</td><td data-h="When">The first pledge in the county</td><td data-h="What opens">The county shows on the map. The directory, Talk and Rai are open to everyone.</td></tr>
+        <tr><td>Sprout</td><td data-h="When">1% of the county has pledged</td><td data-h="What opens">Phase 2: small local projects people can choose to join, starting with signing up businesses and helping them accept points.</td></tr>
+        <tr><td>Bloom</td><td data-h="When">5% have pledged</td><td data-h="What opens">Bigger local projects, more roles, more checkers.</td></tr>
+        <tr><td>Puffball</td><td data-h="When">10% have pledged</td><td data-h="What opens">The county is ready for its biggest projects. It also helps nearby counties grow.</td></tr>
+      </tbody>
+    </table>
+    <p>There's no set timeline. A county grows as fast as its people take part. The details of each stage are published before a county reaches it.</p>
+
+    <h2>4. How work gets picked, done and checked</h2>
+    <p>Every project follows the same public steps, from the needs list to points paid for each checked milestone.</p>
+    <ol>
+      <li><strong>The needs list.</strong> Real data ranks what each area needs most to meet the charter's goals and the baselines. Rai helps build the list and shows its reasoning and data in public.</li>
+      <li><strong>A project is proposed.</strong> An approved project owner picks work from the list and proposes it: what gets done, the milestones, and the price in points. Project owners are ID-checked, and so is their business.</li>
+      <li><strong>The proposal is checked.</strong> A paid checker reviews every proposal before it starts: is the work real, needed, and priced fairly?</li>
+      <li><strong>Sized to the owner's record.</strong> A new owner starts small, at about 500 points a project. After that, a project can be up to twice the size of the biggest one they've finished.</li>
+      <li><strong>The work gets done.</strong> Members join the project and do the work.</li>
+      <li><strong>Each milestone is checked.</strong> Several checkers, picked at random and paid for each check, confirm the milestone is really done. Faking work doesn't get past people who don't know each other and are each paid to look.</li>
+      <li><strong>Points are created and paid.</strong> When a milestone passes, the code creates the points for it and pays them out. Nobody creates points by deciding to.</li>
+    </ol>
+    <p>A project that stalls is cancelled, and that goes on the owner's record. Projects can't be split into sub-projects to get around the size limit.</p>
+
+    <h2>5. What keeps it honest</h2>
+    <p>The rules are built so points stay tied to real work, real people and real things to buy.</p>
     <ul>
-      <li><strong>AI</strong> recommends what to work on first, and shows its reasoning and data in public. It never pays anyone, approves projects, or changes the rules.</li>
-      <li><strong>People</strong> propose projects, do the work, check each other's work, and vote on the rules. They can overrule the AI, but only with a big majority.</li>
-      <li><strong>Code</strong> pays for verified work automatically, following rules everyone can read.</li>
+      <li><strong>Capped by what's really there.</strong> Approvals can't go past the workers and materials available in an area. When labor is short, projects wait in line, open projects finish first, shortages are posted publicly, and paid training fills the gap.</li>
+      <li><strong>Capped by what businesses accept.</strong> Each month's payouts are limited by how many points local businesses and landlords have said they'll accept. That keeps points spendable.</li>
+      <li><strong>Make way for the market.</strong> When businesses need workers, new projects slow down. When private hiring drops, projects pick up the slack.</li>
+      <li><strong>Keep it moving.</strong> Points are for spending. Idle points go back into circulation or into real things, like infrastructure, that hold value.</li>
+      <li><strong>One person, one account.</strong> ID checks make sure every member, project owner and vote is one real person. Dandelions only keeps a pass or fail from the check, never your ID papers.</li>
+      <li><strong>Everything in the open.</strong> Rules, data, point flows and Rai's reasoning are public and checkable. The code is <a href="https://github.com/Garrth/Dandelions">open source</a>.</li>
     </ul>
 
-    <h2>No one in charge</h2>
-    <p>Dandelions doesn't depend on one leader. It starts with open-source code anyone can read. Then the data becomes public and checkable, then the records move to a shared public ledger, and finally the members run it by vote. Everything happens in the open: rules, data, and where the money goes.</p>
+    <h2>6. Who decides</h2>
+    <p>No one is in charge. The goal, the open rules and public data keep everyone pulling the same way. We call it decentralized unity: many people and groups, each running their own work, all pulling toward one shared goal.</p>
+    <table class="uh-table">
+      <thead><tr><th>Who</th><th>What they do</th><th>What they never do</th></tr></thead>
+      <tbody>
+        <tr><td>The charter</td><td data-h="Does">Sets the goal everything serves</td><td data-h="Never">Changes without a community vote</td></tr>
+        <tr><td>Rai (AI)</td><td data-h="Does">Ranks needs from real data, sizes projects, estimates local capacity, flags possible fraud, and shows its reasoning publicly</td><td data-h="Never">Creates points, approves projects or changes rules</td></tr>
+        <tr><td>People</td><td data-h="Does">Propose projects, do the work, check milestones, settle disputes, and vote. They can overrule Rai, with a high bar like a supermajority</td><td data-h="Never">Create points by deciding to</td></tr>
+        <tr><td>Code</td><td data-h="Does">Creates and pays points automatically when checked work meets the rules</td><td data-h="Never">Makes exceptions</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Changing the rules.</strong> Members propose changes to the charter and the baselines, talk them over in Talk, and vote. One person, one vote, and only ID-checked members vote. Votes are private, and results show when the vote closes.</p>
 
-    <h2>How it starts</h2>
+    <h2>7. The road ahead</h2>
+    <p>Dandelions moves control from its starting team to its members in steps, each one in the open.</p>
     <ol>
-      <li><strong>Now: pledges.</strong> We count who agrees, county by county, on the map.</li>
-      <li><strong>Sprout, at 1% of a county.</strong> Phase 2 starts there: small local projects you can choose to join. The details get published when the first county gets there.</li>
-      <li><strong>After that:</strong> more counties and bigger projects, one step at a time, each one in the open.</li>
+      <li><strong>Open code.</strong> Today the site runs on open-source code anyone can read and check.</li>
+      <li><strong>Public data.</strong> The data behind decisions, like the needs list and point totals, becomes public and checkable.</li>
+      <li><strong>A public record of points.</strong> Points start in Dandelions' own records, with a daily fingerprint published publicly so nobody can quietly change the past. Later the record moves to a shared public ledger run by many independent operators.</li>
+      <li><strong>Run by its members.</strong> The community takes over the rules by vote, and the jobs that run Dandelions (checking, keeping the record, reviewing code, site security) become paid roles anyone qualified can take.</li>
     </ol>
-    <p>There's no timeline. It grows as fast as people take part.</p>
+    <p>Version 1 of this plan came from one person. It's a starting point, and it's meant to change as the people who take part improve it.</p>
 
-    <h2>What we don't know yet</h2>
-    <p>The biggest one: will it work? We don't know. The only way to find out is to try it, and the only way to try it is for enough people to take part.</p>
-    <p>The first projects and priorities aren't set yet. They'll depend on what each community needs, and they'll take shape once a county reaches Sprout and the platform opens. From there it grows on its own, one county at a time.</p>
+    <h2>8. What we don't know yet</h2>
+    <p>The biggest question is whether it will work. We don't know. The only way to find out is to try it, and the only way to try it is for enough people to take part.</p>
+    <ul>
+      <li><strong>The first projects.</strong> They'll depend on what each county needs, and they'll take shape once a county reaches Sprout.</li>
+      <li><strong>The exact numbers.</strong> How fast points are created, project size limits, how many checkers each milestone needs. These are starting points, and members can change them by vote.</li>
+      <li><strong>How fast it grows.</strong> There's no timeline. It grows as fast as people take part.</li>
+    </ul>
+    <p>We'll be honest about how it's going, including what doesn't work.</p>
     <div class="callout">
       <img src="/images/andy.webp" alt="Andy" width="555" height="720">
       <p>Hey Dandy, what happens when you put a free market capitalist and a politician on a life raft?</p>
@@ -90,12 +155,16 @@
       <p>Anybody who wants to. Grab a paddle, Andy.</p>
     </div>
 
+    <div class="uh-box">
+      <p><strong>Want to go deeper?</strong> Dandelions runs on a system called DDFM. The full DDFM whitepaper describes what it could grow into after full adoption, level by level, with a side by side look at today's system. It's coming soon.</p>
+    </div>
+
     <p class="cta"><a class="btn" href="/#pledge">Become a Dandelion</a></p>
-    <p class="note">Step one is saying yes. No money, nothing to buy, and you can leave any time.</p>
+    <p class="note">Step one is saying yes. Nothing to buy, and you can leave any time.</p>
   </main>
 
   <footer>
-    <p><a href="/">Home</a> · <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
+    <p><a href="/">Home</a> · <a href="/charter.html">Charter</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
   </footer>
 </div>
 <script src="/js/config.js"></script>
