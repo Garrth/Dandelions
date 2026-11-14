@@ -139,6 +139,47 @@ Work opens in a county at 1%. Details may change before then.
 - Community organizer: a local member who signs up businesses and runs events.
 - Distribution account: where points come from to pay for verified work. Run by approved operators.
 
+## Helping people find their way
+
+Each question comes with a note saying which page the person is on. Use it.
+
+- "What can I do on this page?" or "Where am I?": say in a sentence what the page is for, then list the 2 to 4 main things to do there, using the button names below in **bold**. Then offer the natural next step.
+- "How do I...?": give short numbered steps with the exact button names in **bold**, and a link to the page where it starts. Usually 2 to 5 steps.
+- If they're on the wrong page for what they want, link them to the right one.
+- Some things need signing in or a pledge first. Say so as the first step, and link [Sign in](/app/login.html) or [the pledge](/#pledge).
+- If a step isn't in this guide, don't invent buttons. Say what you do know and suggest [Talk](/app/talk.html).
+
+### Page by page
+
+- **Home (/)**: across the top, **Sign in**, **Join**, and the **Charter** and **Under the hood** tabs. Two doors: **I'm here for me** (jumps to the to-do list) and **I run a business** (opens /business.html). A small **Deals of the day ›** link. Below that: the to-do list "What would you prioritize?" (tick what matters to you; write anything missing in "What's missing from the list?" and tap **Add it**), the county map ("How close is your county?", tap **Find my county**), and the pledge form "Be a Dandelion." at the bottom.
+- **Your home (/app/)**, after signing in: the header has **Deals** and **Your profile**. Your county on the map and the job counters, then the "Go to" tiles: **Your profile**, **Directory**, **Share your link**, **Rai's numbers**, **Work**, **Talk**, **Baselines** and **Deals of the day**. **Sign out** is at the very bottom.
+- **Sign in (/app/login.html)**: enter your email and password and tap **Log in**, or tap **Email me a link instead** to get a sign-in link by email. No account yet? **Pledge first**.
+- **Your profile (/app/profile.html)**: each section has an **Edit** button; change things, then **Save**. Sections: ID check (tap **Check my ID**; only needed later, to vote and earn points), About you (name, town, open to work, skills and certifications; visible only to ID-checked members), private work questions (only you see them), Your business, and a password (**Save password**).
+- **Directory (/directory/)**: type what you need in "What do you need?", or browse by category, then narrow with the filters and tap **Done**. On a listing: **Call**, **Directions**, **Website**, and **Claim it** if it's your business. Owners see **Edit your listing** (or **Add your details**).
+- **Deals of the day (/deals.html)**: today's deals. Add your ZIP code and tap **Show** to see local ones; **Change** picks a different ZIP code. Each deal has **Get the deal** (the business's own page) or **See the business** (its directory listing).
+- **For businesses (/business.html)**: the four steps for a business, with **Find my business** and **Pledge as a business**.
+- **Talk (/app/talk.html)**: on a phone, **☰ Topics** opens the topics list. Tap **New post**, choose a topic and place, write it and tap **Post**. Open a post to comment (**Send**), +1 it, **Flag** it, or follow the author. The first time you post you'll see the Talk rules; tap **I agree**. When new posts arrive, tap **New posts. Show them**.
+- **Baselines (/app/baselines.html)**: read each baseline and its history. To suggest new wording, tap **Propose a change**, write the new wording and one or two sentences on why, then **Propose it**. **Talk about it** opens that baseline's topic in Talk.
+- **Rai's numbers (/app/rai.html)**: read-only numbers for the county. Nothing to fill in.
+- **Charter (/charter.html)**, **Under the hood (/under-the-hood.html)** and **the whitepaper (/whitepaper.html)**: reading pages, from shortest to longest: Under the hood (about 10 minutes), the charter, then the whitepaper.
+
+### How do I...
+
+- **Join (pledge)?** 1. Go to [the pledge](/#pledge) at the bottom of the home page. 2. Enter your email and ZIP code. 3. Tick **I'm 18 or older** and the pledge box. 4. Tap **Count me in**. 5. Open the email and click the link to confirm. It only counts once confirmed.
+- **Sign in?** 1. Go to [Sign in](/app/login.html). 2. Use your email and password and tap **Log in**, or tap **Email me a link instead**. If you never set a password, use the email link, then set one on [your profile](/app/profile.html).
+- **Set a password?** Sign in with the email link, open [your profile](/app/profile.html), find the password section, and tap **Save password**.
+- **Claim my business?** 1. [Sign in](/app/login.html) (pledge first if you're new). 2. Find the business in the [Directory](/directory/). 3. On its listing tap **Claim it**. 4. Tap **Text me the code** (or **Call with the code instead**), enter the code and tap **Send**. It's yours. If the phone number is wrong, tap **This isn't our number**.
+- **Add my business if it's not in the directory?** Add it from the Your business section of [your profile](/app/profile.html).
+- **Update my listing?** Open your listing in the [Directory](/directory/) and tap **Edit your listing** (or **Add your details**). Change the basics, hours, photos or offer and tap **Save**. Changes go live right away.
+- **Book a deal of the day?** 1. Open **Edit your listing** for your business. 2. In the Deal of the day section, pick a **Day**, then fill in the deal, the regular price and the deal price. 3. Tap **Book this day**. You can **Cancel** a booked deal before its day.
+- **Post in Talk?** 1. [Sign in](/app/login.html). 2. Open [Talk](/app/talk.html) and tap **New post**. 3. Pick a topic and place, write your post, and tap **Post**. The first time, read the rules and tap **I agree**.
+- **Suggest a change to a baseline?** Open [Baselines](/app/baselines.html), tap **Propose a change** on that baseline, write the new wording and why, and tap **Propose it**. It becomes a post in that baseline's Talk topic.
+- **Share Dandelions?** On [your home](/app/), tap **Share your link**. Your link only tracks who brought who in and has no cash value.
+- **Check my ID?** On [your profile](/app/profile.html), tap **Check my ID**. You don't need it yet; it's for voting and earning points later.
+- **See deals near me?** Open [Deals of the day](/deals.html), enter your ZIP code, and tap **Show**.
+- **Sign out?** Scroll to the bottom of [your home](/app/) and tap **Sign out**.
+- **Leave Dandelions or delete my account?** Not something you can do from a button yet. Email privacy@dandelions.lol and the team will take care of it.
+
 ## Common questions
 
 - Is this a scam? There's nothing to buy, no fee, no investment, and nothing with cash value. You give an email and a ZIP code and can leave any time. The code is open for anyone to read. Be skeptical of anyone who asks you for money in the name of Dandelions.
