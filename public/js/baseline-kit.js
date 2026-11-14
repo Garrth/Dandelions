@@ -67,7 +67,7 @@ window.BaselineKit = (function () {
   function s1(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
   function stateLine(p, s) {
     switch (p.status) {
-      case "support": return "Gathering support: <b>" + p.support + " of " + s.support_needed + "</b> +1s on this post start a " + s.discuss_days + "-day discussion, then a vote.";
+      case "support": return "Gathering support: <b>" + p.support + " of " + s.support_needed + "</b> agree" + (p.against ? ", " + p.against + " disagree" : "") + ". " + s.support_needed + " agree, and more agree than disagree, start a " + s.discuss_days + "-day discussion, then a vote.";
       case "discuss": return "Discussion until <b>" + day(p.discuss_until) + "</b>. The vote opens after that.";
       case "vote": return "Voting until <b>" + dayTime(p.vote_until) + "</b>. " + s1(p.ballots, "vote") + " so far. Results show when it closes.";
       case "writing": return "It passed the vote (" + p.yes + " yes, " + p.no + " no, " + p.pass + " pass). Rai is writing the final wording now.";
@@ -90,7 +90,7 @@ window.BaselineKit = (function () {
     return '<details class="card bl-how"><summary><b>How a baseline changes</b></summary>' +
       '<p class="small muted" style="margin:8px 0">Nobody approves a change by hand. Every member can follow each step in Talk.</p><ol>' +
       "<li><b>Propose.</b> On the Baselines page, any member writes new wording. It becomes a post in that baseline's topic in Talk, shown next to the current wording.</li>" +
-      "<li><b>Gather support.</b> When the proposal gets " + s.support_needed + " +1s from other members, the discussion starts. One change per baseline at a time; the next waits its turn.</li>" +
+      "<li><b>Gather support.</b> When the proposal gets " + s.support_needed + " Agrees from other members, and more agree than disagree, the discussion starts. One change per baseline at a time; the next waits its turn.</li>" +
       "<li><b>Discuss for " + s.discuss_days + " days</b> in the comments on the proposal.</li>" +
       "<li><b>Vote for " + s.vote_days + " days.</b> One person, one vote: yes, no or pass. Only ID-checked members vote. Votes are private, and results show when the vote closes.</li>" +
       "<li><b>Passes</b> with more yes than no and at least " + s.min_votes + " votes. A tie fails.</li>" +

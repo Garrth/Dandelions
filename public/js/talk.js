@@ -1,6 +1,6 @@
 // Talk: posts with comments, newest first, in topics for your county, your state and the whole US.
 // No algorithm: every list is in time order. Anyone can read. Members agree to the Talk rules once, then post,
-// comment, +1, star topics and follow people. Follows are private, so nobody has a follower count.
+// comment, agree or disagree with posts, star topics and follow people. Follows are private, so nobody has a follower count.
 // Nobody approves posts: a post flagged by 3 different members is hidden, and moderators can hide, put back,
 // pause someone, make and edit topics, and move a post into a topic. Everything a moderator does is logged.
 (function () {
@@ -60,7 +60,7 @@
     for (var k in ERR) if (m.indexOf(k) >= 0) return ERR[k];
     return "Couldn't send just now. Try again.";
   }
-  var COLS = "id,room,topic_id,kind,author_id,author_name,title,body,replies,backers,created_at,hidden,deleted,parent_id";
+  var COLS = "id,room,topic_id,kind,author_id,author_name,title,body,replies,backers,disagrees,people,created_at,hidden,deleted,parent_id";
   var PLACE_RE = /^(us|st-[A-Z]{2}|co-[0-9]{5})$/, ID_RE = /^[0-9a-f-]{36}$/;
 
   var user = null, agreed = false, mod = false, pausedUntil = null, counties = {};
@@ -246,8 +246,8 @@
         (p.body ? '<p class="tk-body">' + bodyHtml(opt.link && p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" : "") +
         (propByPost[p.id] && bboard ? '<div class="tk-prop">' + BK.steps(propByPost[p.id]) + "<p>" + BK.stateLine(propByPost[p.id], bboard.settings) + "</p>" +
           (opt.link ? '<p><a data-nav href="' + esc(href({ p: p.id })) + '">See the wording' + (propByPost[p.id].status === "vote" || propByPost[p.id].status === "final" ? " and vote" : "") + "</a></p>" : "") + "</div>" : "")) +
-      '<div class="tk-foot">' + plusBtn(p) +
-        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + nComments(p) + (nComments(p) === 1 ? " comment" : " comments") + "</a>" : "") +
+      '<div class="tk-foot">' + agreeBtns(p) +
+        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + talkers(p) + nComments(p) + (nComments(p) === 1 ? " comment" : " comments") + "</a>" : "") +
         (p.deleted ? "" : tools(p)) + "</div>" +
     "</article>";
   }
@@ -256,7 +256,7 @@
       '<div class="tk-by"><a data-nav class="tk-name" href="' + esc(href({ u: c.author_id })) + '">' + esc(c.author_name) + '</a><span class="muted">· ' + ago(c.created_at) + "</span>" +
         (c.hidden ? ' <span class="chip warn">Hidden</span>' : "") + "</div>" +
       (c.deleted ? '<p class="muted">Removed by its author</p>' : '<p class="tk-body">' + bodyHtml(c.body) + "</p>") +
-      '<div class="tk-foot">' + plusBtn(c) + (c.deleted ? "" : tools(c)) + "</div></div></div>";
+      '<div class="tk-foot">' + (c.deleted ? "" : tools(c)) + "</div></div></div>";
   }
   // Rai's answers count as comments, so it's clear there's something to read.
   function nComments(p) { return (p.replies || 0) + (raiByPost[p.id] || 0); }
@@ -268,10 +268,18 @@
       ((x && x.data) || []).forEach(function (y) { raiByPost[y.post_id] = (raiByPost[y.post_id] || 0) + 1; });
     }, function () {});
   }
-  function plusBtn(p) {
-    var mine = user && p.author_id === user.id, on = !!backed[p.id], can = user && !mine && !p.deleted;
-    return '<button class="tk-plus' + (on ? " on" : "") + '" type="button"' + (can ? ' data-plus="' + p.id + '"' : " disabled") + ' data-n="' + p.backers + '" aria-pressed="' + on +
-      '" aria-label="' + (can ? (on ? "You gave this +1. Tap to take it back" : "Give this +1") : "+1 count") + '">+1<span class="n">' + (p.backers ? " · " + p.backers : "") + "</span></button>";
+  // People taking part: who wrote the post or a comment.
+  function talkers(p) { return p.people > 1 ? p.people + " people · " : ""; }
+  // Agree and Disagree, on main posts only. Totals only: nobody sees who chose which. Tap again to take it back.
+  function agreeBtns(p) {
+    var mine = user && p.author_id === user.id, me = backed[p.id], can = user && !mine && !p.deleted;
+    function one(a, label, n) {
+      var on = me === (a ? "a" : "d");
+      return '<button class="tk-plus' + (on ? " on" : "") + '" type="button"' + (can ? ' data-agree="' + (a ? 1 : 0) + '"' : " disabled") + ' aria-pressed="' + on + '"' +
+        (can ? "" : ' aria-label="' + label + ": " + n + '"') + ">" + label + '<span class="n">' + (n ? " · " + n : "") + "</span></button>";
+    }
+    return '<span class="tk-agree" data-post="' + p.id + '" data-na="' + (p.backers || 0) + '" data-nd="' + (p.disagrees || 0) + '">' +
+      one(true, "Agree", p.backers || 0) + one(false, "Disagree", p.disagrees || 0) + "</span>";
   }
   // What a person can do to one post: delete their own, flag someone else's, and for moderators hide, put back, pause or move.
   function tools(p) {
@@ -289,18 +297,33 @@
     return '<span class="tk-tools">' + out.join(" ") + "</span>";
   }
   function wire(root, again) {
-    each(root, "[data-plus]", function (b) {
-      b.addEventListener("click", function () {
-        var id = b.getAttribute("data-plus"), n = Number(b.getAttribute("data-n")), on = !!backed[id];
-        b.disabled = true;
-        var req = on ? db.from("talk_backs").delete().eq("post_id", id).eq("member_id", user.id) : db.from("talk_backs").insert({ post_id: id });
-        req.then(function (r) {
-          b.disabled = false;
-          if (r.error) { toast("Couldn't save that. Try again."); return; }
-          if (on) delete backed[id]; else backed[id] = true;
-          n += on ? -1 : 1;
-          b.setAttribute("data-n", n); b.querySelector(".n").textContent = n ? " · " + n : "";
-          b.classList.toggle("on", !on); b.setAttribute("aria-pressed", String(!on));
+    each(root, ".tk-agree", function (box) {
+      var id = box.getAttribute("data-post");
+      each(box, "[data-agree]", function (b) {
+        b.addEventListener("click", function () {
+          var want = b.getAttribute("data-agree") === "1" ? "a" : "d", had = backed[id], btns = box.querySelectorAll("button");
+          for (var i = 0; i < btns.length; i++) btns[i].disabled = true;
+          var q = db.from("talk_backs");
+          var req = had === want ? q.delete().eq("post_id", id).eq("member_id", user.id) :
+            had ? q.update({ agree: want === "a" }).eq("post_id", id).eq("member_id", user.id) : q.insert({ post_id: id, agree: want === "a" });
+          req.then(function (r) {
+            for (var i = 0; i < btns.length; i++) btns[i].disabled = false;
+            if (r.error) { toast("Couldn't save that. Try again."); return; }
+            var na = Number(box.getAttribute("data-na")), nd = Number(box.getAttribute("data-nd"));
+            if (had === "a") na--; if (had === "d") nd--;
+            if (had !== want) { if (want === "a") na++; else nd++; backed[id] = want; } else delete backed[id];
+            box.setAttribute("data-na", na); box.setAttribute("data-nd", nd);
+            [["1", na, "a"], ["0", nd, "d"]].forEach(function (x) {
+              var el = box.querySelector('[data-agree="' + x[0] + '"]'), on = backed[id] === x[2];
+              el.querySelector(".n").textContent = x[1] ? " · " + x[1] : "";
+              el.classList.toggle("on", on); el.setAttribute("aria-pressed", String(on));
+            });
+            // Disagreeing is a good start to a conversation.
+            if (backed[id] === "d") {
+              var ta = view.kind === "post" && view.p === id && $("rbody");
+              if (ta) { ta.placeholder = "Want to say why? (optional)"; ta.focus(); } else toast("Noted. You can say why in the comments.");
+            }
+          });
         });
       });
     });
@@ -546,7 +569,7 @@
               (x.about ? '<p class="small muted">' + esc(x.about) + "</p>" : "") + sources(x.posts) + "</div>";
           }).join("") +
           (open.length ? '<p class="small muted tk-catchnote">When ' + open[0].need_people + " different people take part over at least " + open[0].need_days +
-            " days (posting, commenting or giving a +1), an idea gets its own topic. Nobody has to approve it." +
+            " days (posting, commenting, agreeing or disagreeing), an idea gets its own topic. Nobody has to approve it." +
             (user ? " To suggest one, tap New post and tick Suggest this as a new topic." : "") + "</p>" : "") + "</div>";
         wireSources(box);
       }
@@ -657,7 +680,7 @@
   function baselineBox(b) {
     var open = bboard.proposals.filter(function (p) { return p.baseline_key === b.key && BK.isOpen(p); });
     return '<div class="card tk-bl"><p>Chat about the <b>' + esc(b.title) + '</b> baseline here. <a href="/app/baselines.html?b=' + b.key + '">Read the current wording</a>.</p>' +
-      (open.length ? '<p class="small">In progress: ' + open.map(function (p) { return '<a data-nav href="' + esc(href({ p: p.talk_post_id })) + '">' + esc(p.summary) + "</a> (" + esc(p.status === "support" ? "gathering +1s" : p.status === "discuss" ? "discussion" : p.status === "vote" ? "voting" : p.status === "final" ? "final check" : "final wording") + ")"; }).join(", ") + "</p>" : "") +
+      (open.length ? '<p class="small">In progress: ' + open.map(function (p) { return '<a data-nav href="' + esc(href({ p: p.talk_post_id })) + '">' + esc(p.summary) + "</a> (" + esc(p.status === "support" ? "gathering support" : p.status === "discuss" ? "discussion" : p.status === "vote" ? "voting" : p.status === "final" ? "final check" : "final wording") + ")"; }).join(", ") + "</p>" : "") +
       "</div>";
   }
   function proposalFull(p) {
@@ -671,7 +694,7 @@
           return '<button type="button" class="btn small' + (p.my_vote === c ? "" : " ghost") + '" data-bvote="' + c + '" aria-pressed="' + (p.my_vote === c) + '">' + label + "</button>";
         }).join("") + '</div><p class="small muted" style="margin-top:6px">' + (p.my_vote ? "You voted " + esc(p.my_vote) + ". You can change it until the vote closes." : "Your vote is private.") + "</p></div>";
     } else if (p.status === "support") {
-      act = '<p class="small muted">' + (user && p.mine ? "It needs +1s from other members. Share this post to get the word out." : "Think it should go to a vote? Give this post a +1.") + "</p>";
+      act = '<p class="small muted">' + (user && p.mine ? "It needs other members to agree, and more agree than disagree. Share this post to get the word out." : "Think it should go to a vote? Tap Agree. If not, tap Disagree and say why.") + "</p>";
     }
     return '<div class="tk-propfull">' + (act ? '<div class="card">' + act + "</div>" : "") + BK.texts(p, b) + BK.howItWorks(bboard.settings) + "</div>";
   }
@@ -922,7 +945,7 @@
     if (user) try { localStorage.removeItem("dandelions_return"); } catch (e) {}
     return (user ? Promise.all([
       db.from("members").select("county_fips").eq("id", user.id).maybeSingle(),
-      db.from("talk_backs").select("post_id").eq("member_id", user.id),
+      db.from("talk_backs").select("post_id,agree").eq("member_id", user.id),
       db.from("talk_flags").select("post_id").eq("member_id", user.id),
       db.from("talk_agreements").select("version").eq("member_id", user.id).maybeSingle(),
       db.from("talk_pauses").select("until").eq("member_id", user.id).maybeSingle(),
@@ -930,7 +953,7 @@
       db.from("talk_stars").select("topic_id").eq("member_id", user.id),
       db.from("talk_follows").select("followee_id").eq("follower_id", user.id)
     ]) : Promise.resolve([{}, {}, {}, {}, {}, {}, {}, {}])).then(function (m) {
-      (m[1].data || []).forEach(function (x) { backed[x.post_id] = true; });
+      (m[1].data || []).forEach(function (x) { backed[x.post_id] = x.agree === false ? "d" : "a"; });
       (m[2].data || []).forEach(function (x) { flagged[x.post_id] = true; });
       agreed = !!m[3].data;
       pausedUntil = m[4].data ? m[4].data.until : null;

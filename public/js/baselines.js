@@ -57,7 +57,7 @@
     }
     var s = board.settings;
     f.innerHTML = '<form class="bl-form" id="pform"><h3>Propose a change to ' + esc(b.title) + "</h3>" +
-      '<p class="small muted">Write the whole new wording. It becomes a post in Talk, next to the current wording. ' + s.support_needed + " +1s from other members start a " + s.discuss_days + "-day discussion, then a vote.</p>" +
+      '<p class="small muted">Write the whole new wording. It becomes a post in Talk, next to the current wording. ' + s.support_needed + " Agrees from other members (and more agree than disagree) start a " + s.discuss_days + "-day discussion, then a vote.</p>" +
       '<div class="field"><label for="psum">In one or two sentences, what changes and why?</label><input id="psum" maxlength="300" required placeholder="Add a question about having people you can count on."></div>' +
       '<div class="field"><label for="pbody">The new wording</label><textarea id="pbody" rows="14" maxlength="8000">' + esc(b.body) + "</textarea></div>" +
       '<p class="small muted">Use **two stars** for bold, a dash and a space for a list, and 1. for numbered steps.</p>' +
