@@ -88,3 +88,12 @@ select at, note, topic_id from public.talk_mod_log where action = 'traction_topi
   first summary, every 7 days, after any "This summary is off" note, or when more than 150 messages are new.
 - **What does (name) think?**: on a topic's Summary page. Rai sums up only that person's own posts in the topic,
   with links. Saved in `talk_person_views` and rewritten only after they post again.
+- A "This summary is off" note makes Rai rewrite the summary the next time anyone opens it (`20261116010000_talk_summary_flags_refresh.sql`).
+
+## @Rai
+
+Run `supabase/migrations/20261116020000_talk_at_rai.sql`, and update the `rai` function.
+Rai never joins a conversation on his own. When a post or comment says @Rai, the page asks Rai to answer it.
+He answers once, under that message, from his knowledge and the thread, and never takes sides.
+His answers are in `talk_rai_replies`. Moderators see Hide on them (logged as hide_rai).
+Each visitor can call Rai 20 times a day, and this counts toward the site's daily Rai limit.
