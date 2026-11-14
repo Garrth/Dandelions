@@ -137,3 +137,7 @@
 .tk-pview ul { padding-left: 20px; margin: 6px 0; }
 .tk-pview li + li { margin-top: 6px; }
 .tk-compose .check input { width: 20px; height: 20px; flex: none; margin: 0; accent-color: var(--leaf); }
+.tk-raibadge { background: var(--ink); color: var(--sun); }
+.tk-rai .tk-cbody { background: var(--soft); border-radius: 12px; padding: 6px 10px; }
+.tk-raitext p + p, .tk-raitext p + ul, .tk-raitext p + ol, .tk-raitext ul + p, .tk-raitext ol + p { margin-top: 6px; }
+.tk-raitext ul, .tk-raitext ol { padding-left: 20px; margin: 4px 0 0; }

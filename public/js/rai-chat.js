@@ -144,6 +144,6 @@
   // Lets any link or button on the site open Rai: <a href="#ask-rai">
   document.addEventListener("click", function (e) { var a = e.target.closest('a[href="#ask-rai"]'); if (a) { e.preventDefault(); open(true); } });
   // Other parts of the site can open Rai, and ask a question for the visitor: RaiChat.open("What do people agree on?")
-  window.RaiChat = { open: function (q) { open(true); if (q) ask(q); } };
+  window.RaiChat = { open: function (q) { open(true); if (q) ask(q); }, md: md };
   if (state.open) open(true);
 })();

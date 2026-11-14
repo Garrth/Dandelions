@@ -73,6 +73,23 @@
     return fetch(raiUrl, { method: "POST", headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + (cfg.supabaseKey || "") }, body: JSON.stringify(body) })
       .then(function (r) { return r.json(); }).catch(function () { return {}; });
   }
+  // @Rai: Rai only speaks in Talk when someone writes @Rai. He answers that message once, in public.
+  var AT_RAI = /(^|[^a-z0-9_])@rai([^a-z0-9_]|$)/i;
+  function askRaiIn(postId, threadId) {
+    toast("Rai is reading the conversation...");
+    raiCall({ action: "talk_mention", post: postId }).then(function (o) {
+      if (o && o.made) { if (view.kind === "post" && view.p === threadId) showPost(); else toast("Rai answered. Open the post to read it."); }
+      else if (o && /limit/.test(o.error || "")) toast("Rai has answered all he can for today. Try again tomorrow.");
+    });
+  }
+  function raiRow(x) {
+    var md = window.RaiChat && window.RaiChat.md;
+    return '<div class="tk-comment tk-rai' + (x.hidden ? " hid" : "") + '"><span class="badge tk-raibadge" aria-hidden="true">R</span><div class="tk-cbody">' +
+      '<div class="tk-by"><b class="tk-name">Rai</b> <span class="chip">AI guide</span><span class="muted">· ' + ago(x.created_at) + "</span>" + (x.hidden ? ' <span class="chip warn">Hidden</span>' : "") + "</div>" +
+      '<div class="tk-body tk-raitext">' + (md ? md(x.body) : "<p>" + esc(x.body) + "</p>") + "</div>" +
+      '<div class="tk-foot"><span class="small muted">Rai answers when asked with @Rai, and can be wrong.</span>' +
+      (mod ? ' <button class="linkbtn" type="button" data-hiderai="' + x.id + '" data-on="' + !x.hidden + '">' + (x.hidden ? "Put back" : "Hide") + "</button>" : "") + "</div></div></div>";
+  }
   // Topics for every place ('any') show posts from every place.
   function everyone(t) { return !!(t && t.room === "any"); }
   // Baselines: each one has its own topic. Proposed changes are posts in that topic, with a vote attached.
@@ -298,6 +315,15 @@
         });
       });
     });
+    each(root, "[data-hiderai]", function (b) {
+      b.addEventListener("click", function () {
+        var hide = b.getAttribute("data-on") === "true";
+        db.rpc("talk_mod_hide_rai", { p_reply: b.getAttribute("data-hiderai"), p_hide: hide }).then(function (r) {
+          if (r.error) { toast("Couldn't do that. Try again."); return; }
+          toast(hide ? "Hidden" : "Put back"); again();
+        });
+      });
+    });
     each(root, "[data-noidea]", function (b) {
       b.addEventListener("click", function () {
         db.rpc("talk_idea_skip", { p_post: b.getAttribute("data-noidea") }).then(function (r) {
@@ -410,9 +436,10 @@
         $("cmsg").textContent = "Posting...";
         var row = { room: t && bByTopic[t.id] ? "us" : place, topic_id: t ? t.id : null, kind: "post", title: title, body: body };
         if (suggest) row.suggest = true;
-        db.from("talk_posts").insert(row).then(function (r) {
+        db.from("talk_posts").insert(row).select("id").single().then(function (r) {
           if (r.error) { $("cmsg").textContent = errText(r.error); return; }
           toast(suggest ? "Suggested. It's on Catching on now." : "Posted"); showFeed();
+          if (r.data && AT_RAI.test(title + " " + body)) askRaiIn(r.data.id, r.data.id);
         });
       });
     });
@@ -704,9 +731,14 @@
     var id = view.p;
     Promise.all([
       db.from("talk_posts").select(COLS).eq("id", id).maybeSingle(),
-      db.from("talk_posts").select(COLS).eq("parent_id", id).order("created_at", { ascending: true }).limit(500)
+      db.from("talk_posts").select(COLS).eq("parent_id", id).order("created_at", { ascending: true }).limit(500),
+      db.from("talk_rai_replies").select("id,asked_by,body,created_at,hidden").eq("post_id", id).order("created_at", { ascending: true }).limit(200)
     ]).then(function (o) {
       var p = o[0].data, reps = o[1].data || [], main = $("main");
+      // Rai's answers sit in the thread right after the message that asked.
+      var rai = (o[2] && o[2].data) || [], thread = [];
+      rai.filter(function (x) { return x.asked_by === id; }).forEach(function (x) { thread.push({ rai: x }); });
+      reps.forEach(function (c) { thread.push({ c: c }); rai.filter(function (x) { return x.asked_by === c.id; }).forEach(function (x) { thread.push({ rai: x }); }); });
       if (!p || p.parent_id) { main.innerHTML = '<p class="note">That post isn\'t here anymore. <a data-nav href="' + esc(href({ r: place })) + '">Back to Talk</a></p>'; return; }
       var ready = PLACE_RE.test(p.room) && p.room !== place && places.indexOf(p.room) < 0 ? (places.push(p.room), Promise.resolve()) : Promise.resolve();
       ready.then(function () {
@@ -717,9 +749,9 @@
         document.title = (p.title || "Post") + " · Talk | Dandelions";
         main.innerHTML = '<a data-nav class="crumb" href="' + esc(href({ r: place, t: p.topic_id })) + '">‹ ' + esc(t ? t.name : "General") + "</a>" +
           postCard(p) + (propByPost[p.id] && bboard ? proposalFull(propByPost[p.id]) : "") +
-          '<div class="tk-thread" id="thread">' + (reps.length ? reps.map(commentRow).join("") : '<p class="small muted tk-none">No comments yet. Start the conversation.</p>') + "</div>" +
+          '<div class="tk-thread" id="thread">' + (thread.length ? thread.map(function (x) { return x.rai ? raiRow(x.rai) : commentRow(x.c); }).join("") : '<p class="small muted tk-none">No comments yet. Start the conversation.</p>') + "</div>" +
           (p.deleted || p.hidden ? "" : !user ? '<div style="margin-top:14px">' + joinPrompt("comment") + "</div>" : paused() ? pauseNote() :
-            '<form class="sendbar" id="replyf"><textarea id="rbody" maxlength="2000" rows="1" placeholder="Add a comment" aria-label="Add a comment"></textarea>' +
+            '<form class="sendbar" id="replyf"><textarea id="rbody" maxlength="2000" rows="1" placeholder="Comment, or ask @Rai" aria-label="Add a comment"></textarea>' +
             '<button class="btn small" type="submit">Send</button></form><p class="small muted" id="rmsg" role="status" style="text-align:center"></p>');
         wire(main, showPost);
         each(main, "[data-bvote]", function (btn) {
@@ -740,9 +772,10 @@
             if (!body) return;
             needRules(function () {
               $("rmsg").textContent = "Sending...";
-              db.from("talk_posts").insert({ room: p.room, parent_id: p.id, kind: "reply", body: body }).then(function (r) {
+              db.from("talk_posts").insert({ room: p.room, parent_id: p.id, kind: "reply", body: body }).select("id").single().then(function (r) {
                 if (r.error) { $("rmsg").textContent = errText(r.error); return; }
                 showPost();
+                if (r.data && AT_RAI.test(body)) askRaiIn(r.data.id, p.id);
               });
             });
           });
