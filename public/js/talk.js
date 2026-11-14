@@ -75,11 +75,14 @@
   }
   // @Rai: Rai only speaks in Talk when someone writes @Rai. He answers that message once, in public.
   var AT_RAI = /(^|[^a-z0-9_])@rai([^a-z0-9_]|$)/i;
-  function askRaiIn(postId, threadId) {
-    toast("Rai is reading the conversation...");
+  var raiTried = {}, raiByPost = {};
+  function askRaiIn(postId, threadId, quiet) {
+    raiTried[postId] = 1;
+    if (!quiet) toast("Rai is reading the conversation...");
     raiCall({ action: "talk_mention", post: postId }).then(function (o) {
-      if (o && o.made) { if (view.kind === "post" && view.p === threadId) showPost(); else toast("Rai answered. Open the post to read it."); }
+      if (o && o.made) { raiByPost[threadId] = 1; if (view.kind === "post" && view.p === threadId) showPost(); else if (view.kind === "feed") showFeed(); else toast("Rai answered. Open the post to read it."); }
       else if (o && /limit/.test(o.error || "")) toast("Rai has answered all he can for today. Try again tomorrow.");
+      else if (!quiet && !(o && o.made === false)) toast("Rai couldn't answer just now. Open the post in a few minutes and he'll try again.");
     });
   }
   function raiRow(x) {
@@ -244,7 +247,8 @@
         (propByPost[p.id] && bboard ? '<div class="tk-prop">' + BK.steps(propByPost[p.id]) + "<p>" + BK.stateLine(propByPost[p.id], bboard.settings) + "</p>" +
           (opt.link ? '<p><a data-nav href="' + esc(href({ p: p.id })) + '">See the wording' + (propByPost[p.id].status === "vote" || propByPost[p.id].status === "final" ? " and vote" : "") + "</a></p>" : "") + "</div>" : "")) +
       '<div class="tk-foot">' + plusBtn(p) +
-        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + p.replies + (p.replies === 1 ? " comment" : " comments") + "</a>" : "") +
+        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + p.replies + (p.replies === 1 ? " comment" : " comments") + "</a>" +
+          (raiByPost[p.id] ? ' <a data-nav class="tk-comments tk-raidid" href="' + esc(href({ p: p.id })) + '">Rai answered</a>' : "") : "") +
         (p.deleted ? "" : tools(p)) + "</div>" +
     "</article>";
   }
@@ -444,6 +448,11 @@
       });
     });
     Promise.all([feedQuery(), ideasReady]).then(function (o) {
+      var r = o[0], list = r.data || [];
+      // Which posts Rai has answered in, so the list can say so.
+      return (list.length ? db.from("talk_rai_replies").select("post_id").in("post_id", list.map(function (p) { return p.id; })).limit(500) : Promise.resolve({ data: [] }))
+        .then(function (x) { ((x && x.data) || []).forEach(function (y) { raiByPost[y.post_id] = 1; }); return o; });
+    }).then(function (o) {
       var r = o[0], list = r.data || [];
       topPost = list[0] ? list[0].id : null;
       $("posts").innerHTML = r.error ? '<p class="note">Couldn\'t load posts. Try refreshing.</p>' : list.length ?
@@ -754,6 +763,12 @@
             '<form class="sendbar" id="replyf"><textarea id="rbody" maxlength="2000" rows="1" placeholder="Comment, or ask @Rai" aria-label="Add a comment"></textarea>' +
             '<button class="btn small" type="submit">Send</button></form><p class="small muted" id="rmsg" role="status" style="text-align:center"></p>');
         wire(main, showPost);
+        // Your own @Rai message from the last hour with no answer yet (for example Rai was busy): ask again.
+        // The database makes sure Rai still answers each message only once.
+        if (user) [p].concat(reps).forEach(function (m) {
+          if (m.author_id === user.id && !m.deleted && !raiTried[m.id] && AT_RAI.test((m.title || "") + " " + (m.body || "")) &&
+              Date.now() - new Date(m.created_at).getTime() < 3300000 && !rai.some(function (x) { return x.asked_by === m.id; })) askRaiIn(m.id, p.id, true);
+        });
         each(main, "[data-bvote]", function (btn) {
           btn.addEventListener("click", function () {
             each(main, "[data-bvote]", function (x) { x.disabled = true; });
