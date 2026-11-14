@@ -275,7 +275,9 @@
     var mine = user && p.author_id === user.id, me = backed[p.id], can = user && !mine && !p.deleted;
     function one(a, label, n) {
       var on = me === (a ? "a" : "d");
-      return '<button class="tk-plus' + (on ? " on" : "") + '" type="button"' + (can ? ' data-agree="' + (a ? 1 : 0) + '"' : " disabled") + ' aria-pressed="' + on + '"' +
+      // Can't choose: the button still says why when tapped, instead of doing nothing.
+      var why = p.deleted ? "" : !user ? "Log in to agree or disagree." : "You can't agree or disagree with your own post.";
+      return '<button class="tk-plus' + (on ? " on" : "") + (can ? "" : " off") + '" type="button"' + (can ? ' data-agree="' + (a ? 1 : 0) + '"' : why ? ' data-why="' + esc(why) + '"' : " disabled") + ' aria-pressed="' + on + '"' +
         (can ? "" : ' aria-label="' + label + ": " + n + '"') + ">" + label + '<span class="n">' + (n ? " · " + n : "") + "</span></button>";
     }
     return '<span class="tk-agree" data-post="' + p.id + '" data-na="' + (p.backers || 0) + '" data-nd="' + (p.disagrees || 0) + '">' +
@@ -297,6 +299,7 @@
     return '<span class="tk-tools">' + out.join(" ") + "</span>";
   }
   function wire(root, again) {
+    each(root, "[data-why]", function (b) { b.addEventListener("click", function () { toast(b.getAttribute("data-why")); }); });
     each(root, ".tk-agree", function (box) {
       var id = box.getAttribute("data-post");
       each(box, "[data-agree]", function (b) {
