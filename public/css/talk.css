@@ -65,7 +65,6 @@
 .tk-plus.on { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
 .tk-plus:disabled { cursor: default; opacity: .75; }
 .tk-comments { color: var(--ink); font-weight: 700; min-height: 34px; display: inline-flex; align-items: center; }
-.tk-raidid { margin-left: 10px; font-weight: 600; color: var(--muted, #666); }
 .tk-tools { margin-left: auto; }
 .tk-move select { margin-left: 4px; height: 34px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
 .tk-thread { margin: 0 0 8px 18px; border-left: 2px solid var(--line); padding-left: 14px; }

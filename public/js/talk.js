@@ -80,7 +80,7 @@
     raiTried[postId] = 1;
     if (!quiet) toast("Rai is reading the conversation...");
     raiCall({ action: "talk_mention", post: postId }).then(function (o) {
-      if (o && o.made) { raiByPost[threadId] = 1; if (view.kind === "post" && view.p === threadId) showPost(); else if (view.kind === "feed") showFeed(); else toast("Rai answered. Open the post to read it."); }
+      if (o && o.made) { if (view.kind === "post" && view.p === threadId) showPost(); else if (view.kind === "feed") showFeed(); else toast("Rai answered. Open the post to read it."); }
       else if (o && /limit/.test(o.error || "")) toast("Rai has answered all he can for today. Try again tomorrow.");
       else if (!quiet && !(o && o.made === false)) toast("Rai couldn't answer just now. Open the post in a few minutes and he'll try again.");
     });
@@ -247,8 +247,7 @@
         (propByPost[p.id] && bboard ? '<div class="tk-prop">' + BK.steps(propByPost[p.id]) + "<p>" + BK.stateLine(propByPost[p.id], bboard.settings) + "</p>" +
           (opt.link ? '<p><a data-nav href="' + esc(href({ p: p.id })) + '">See the wording' + (propByPost[p.id].status === "vote" || propByPost[p.id].status === "final" ? " and vote" : "") + "</a></p>" : "") + "</div>" : "")) +
       '<div class="tk-foot">' + plusBtn(p) +
-        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + p.replies + (p.replies === 1 ? " comment" : " comments") + "</a>" +
-          (raiByPost[p.id] ? ' <a data-nav class="tk-comments tk-raidid" href="' + esc(href({ p: p.id })) + '">Rai answered</a>' : "") : "") +
+        (opt.link ? '<a data-nav class="tk-comments" href="' + esc(href({ p: p.id })) + '">' + nComments(p) + (nComments(p) === 1 ? " comment" : " comments") + "</a>" : "") +
         (p.deleted ? "" : tools(p)) + "</div>" +
     "</article>";
   }
@@ -258,6 +257,16 @@
         (c.hidden ? ' <span class="chip warn">Hidden</span>' : "") + "</div>" +
       (c.deleted ? '<p class="muted">Removed by its author</p>' : '<p class="tk-body">' + bodyHtml(c.body) + "</p>") +
       '<div class="tk-foot">' + plusBtn(c) + (c.deleted ? "" : tools(c)) + "</div></div></div>";
+  }
+  // Rai's answers count as comments, so it's clear there's something to read.
+  function nComments(p) { return (p.replies || 0) + (raiByPost[p.id] || 0); }
+  // How many answers Rai has given in each of these posts.
+  function raiCounts(list) {
+    if (!list.length) return Promise.resolve();
+    return db.from("talk_rai_replies").select("post_id").in("post_id", list.map(function (p) { return p.id; })).limit(1000).then(function (x) {
+      list.forEach(function (p) { delete raiByPost[p.id]; });
+      ((x && x.data) || []).forEach(function (y) { raiByPost[y.post_id] = (raiByPost[y.post_id] || 0) + 1; });
+    }, function () {});
   }
   function plusBtn(p) {
     var mine = user && p.author_id === user.id, on = !!backed[p.id], can = user && !mine && !p.deleted;
@@ -449,9 +458,7 @@
     });
     Promise.all([feedQuery(), ideasReady]).then(function (o) {
       var r = o[0], list = r.data || [];
-      // Which posts Rai has answered in, so the list can say so.
-      return (list.length ? db.from("talk_rai_replies").select("post_id").in("post_id", list.map(function (p) { return p.id; })).limit(500) : Promise.resolve({ data: [] }))
-        .then(function (x) { ((x && x.data) || []).forEach(function (y) { raiByPost[y.post_id] = 1; }); return o; });
+      return raiCounts(list).then(function () { return o; });
     }).then(function (o) {
       var r = o[0], list = r.data || [];
       topPost = list[0] ? list[0].id : null;
@@ -804,6 +811,8 @@
     var id = view.u, main = $("main");
     sideList();
     db.from("talk_posts").select(COLS).eq("author_id", id).is("parent_id", null).eq("deleted", false).order("created_at", { ascending: false }).limit(50).then(function (r) {
+      return raiCounts(r.data || []).then(function () { return r; });
+    }).then(function (r) {
       var list = r.data || [], name = list[0] ? list[0].author_name : "This member", mine = user && user.id === id;
       document.title = name + " · Talk | Dandelions";
       main.innerHTML = '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">Posts by</div><h1>' + esc(name) + "</h1></div>" +
