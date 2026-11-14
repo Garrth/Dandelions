@@ -114,7 +114,8 @@
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + (cfg.supabaseKey || "") },
-      body: JSON.stringify({ messages: state.msgs.slice(-24), page: { path: location.pathname, title: document.title } })
+      // On a Talk topic, Rai also reads that topic (window.RaiTopic is set by the Talk page).
+      body: JSON.stringify({ messages: state.msgs.slice(-24), page: { path: location.pathname, title: document.title }, topic: window.RaiTopic || undefined })
     }).then(function (r) { return r.json().catch(function () { return { error: "server" }; }); }).then(function (out) {
       var t = out && out.text;
       if (!t) {
@@ -142,5 +143,7 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && state.open) open(false); });
   // Lets any link or button on the site open Rai: <a href="#ask-rai">
   document.addEventListener("click", function (e) { var a = e.target.closest('a[href="#ask-rai"]'); if (a) { e.preventDefault(); open(true); } });
+  // Other parts of the site can open Rai, and ask a question for the visitor: RaiChat.open("What do people agree on?")
+  window.RaiChat = { open: function (q) { open(true); if (q) ask(q); } };
   if (state.open) open(true);
 })();
