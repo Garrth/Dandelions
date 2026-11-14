@@ -130,3 +130,10 @@
 .tk-reading { margin-bottom: 8px; }
 .note.warn { border-left-color: var(--warn); color: var(--warn); }
 .tk-catch .spread { flex-wrap: wrap; gap: 2px 10px; }
+.tk-catchhint { margin: 10px 0 0; }
+.tk-person { padding: 10px 0; border-top: 1px solid var(--line); }
+.tk-person .spread { flex-wrap: wrap; }
+.tk-pview { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--soft); }
+.tk-pview ul { padding-left: 20px; margin: 6px 0; }
+.tk-pview li + li { margin-top: 6px; }
+.tk-compose .check input { width: 20px; height: 20px; flex: none; margin: 0; accent-color: var(--leaf); }

@@ -74,3 +74,17 @@ select at, note, topic_id from public.talk_mod_log where action = 'traction_topi
 
 -- Change the bars: edit public.talk_idea_bar in the SQL file and run that function again.
 ```
+
+## Part 5: suggest a topic, summaries that update, one person's view
+
+1. Run `supabase/migrations/20261116000000_talk_rai_2.sql` once in the SQL Editor.
+2. Update the `rai` function again with the new `supabase/functions/rai/index.ts` (Edge Functions > rai > Code, Deploy).
+
+- **Suggest a topic**: in General, New post has a "Suggest this as a new topic" box. The title becomes the topic name.
+  It goes straight onto Catching on and opens at the same bar as any idea. Rai's regrouping never drops a suggestion,
+  and posts Rai finds about it join it. A suggestion nobody touches for 14 days drops off. Opening Catching on checks
+  the bar, so a suggestion can open right after its last +1.
+- **Summaries update**: Rai reads only messages since his last summary and updates it. He rereads everything for the
+  first summary, every 7 days, after any "This summary is off" note, or when more than 150 messages are new.
+- **What does (name) think?**: on a topic's Summary page. Rai sums up only that person's own posts in the topic,
+  with links. Saved in `talk_person_views` and rewritten only after they post again.

@@ -51,7 +51,9 @@
     talk_no_topic: "That topic isn't open anymore.",
     talk_no_place: "Pick a place first.",
     talk_paused: "A moderator paused your posting for a while. You can still read.",
-    talk_rules: "Agree to the Talk rules first."
+    talk_rules: "Agree to the Talk rules first.",
+    talk_suggest_title: "Give your suggested topic a name in the title.",
+    talk_suggest_exists: "There's already a topic with that name. Post there instead."
   };
   function errText(e) {
     var m = (e && e.message) || "";
@@ -217,6 +219,7 @@
     return '<article class="tk-post' + (p.hidden ? " hid" : "") + '">' +
       '<div class="tk-by">' + badge(p.author_name, p.author_id) + '<a data-nav class="tk-name" href="' + esc(href({ u: p.author_id })) + '">' + esc(p.author_name) + "</a>" +
         '<span class="muted">· ' + ago(p.created_at) + "</span>" + (p.hidden ? ' <span class="chip warn">Hidden</span>' : "") +
+        (ideaByPost[p.id] && ideaByPost[p.id].suggested && ideaByPost[p.id].posts[0] === p.id ? ' <span class="chip sun">Topic suggestion</span>' : "") +
         (opt.where ? ' <span class="muted small">in ' + esc(t ? t.name : "General") + (p.room !== place ? ", " + esc(placeName(p.room)) : "") + "</span>" : "") + follow + "</div>" +
       (p.deleted ? '<p class="muted">Removed by its author</p>' :
         (p.title ? "<h3 class=\"tk-title\">" + (opt.link ? '<a data-nav href="' + esc(href({ p: p.id })) + '">' + esc(p.title) + "</a>" : esc(p.title)) + "</h3>" : "") +
@@ -376,8 +379,10 @@
       (t && bByTopic[t.id] ? baselineBox(bByTopic[t.id]) : "") +
       '<div id="topicform"></div>' +
       (!user ? joinPrompt() : paused() ? pauseNote() :
-        '<form class="card tk-compose" id="compose" hidden><label class="field">Title (optional)<input id="ctitle" maxlength="120" placeholder="Sum it up in a few words"></label>' +
+        '<form class="card tk-compose" id="compose" hidden><label class="field"><span id="ctlabel">Title (optional)</span><input id="ctitle" maxlength="120" placeholder="Sum it up in a few words"></label>' +
         '<label class="field">Your post<textarea id="cbody" maxlength="2000" rows="3" placeholder="Say what you think, or what you\'d do about it"></textarea></label>' +
+        (t ? "" : '<label class="check"><input type="checkbox" id="csuggest"> Suggest this as a new topic</label>' +
+          '<p class="small muted" id="csuggestnote" hidden>Your suggestion goes on Catching on, and when enough people join in, the topic opens on its own.</p>') +
         '<div class="spread"><span class="small muted">In ' + esc(name) + ", " + esc(everyone(t) ? "for everyone" : placeName(place)) + '</span><div class="row"><button class="btn ghost small" type="button" id="cancelpost">Cancel</button><button class="btn small" type="submit">Post</button></div></div>' +
         '<p class="small muted" id="cmsg" role="status"></p></form>') +
       '<div id="newbar"></div><div id="posts"><p class="muted">Loading...</p></div>' +
@@ -385,6 +390,12 @@
     wireOpen(main);
     if ($("newpost")) $("newpost").addEventListener("click", function () { $("compose").hidden = false; $("cbody").focus(); });
     if ($("cancelpost")) $("cancelpost").addEventListener("click", function () { $("compose").hidden = true; });
+    if ($("csuggest")) $("csuggest").addEventListener("change", function () {
+      $("csuggestnote").hidden = !this.checked;
+      $("ctlabel").textContent = this.checked ? "Topic name" : "Title (optional)";
+      $("ctitle").placeholder = this.checked ? "The topic's name, like Community garden" : "Sum it up in a few words";
+      if (this.checked) $("ctitle").focus();
+    });
     if ($("edittopic")) $("edittopic").addEventListener("click", function () { topicForm(t); });
     if ($("renametopic")) $("renametopic").addEventListener("click", function () { renameForm(t); });
     wireAsk(main, t);
@@ -392,13 +403,16 @@
     var ideasReady = t ? Promise.resolve() : catchingOn(true);
     if ($("compose")) $("compose").addEventListener("submit", function (e) {
       e.preventDefault();
-      var title = $("ctitle").value.trim(), body = $("cbody").value.trim();
+      var title = $("ctitle").value.trim(), body = $("cbody").value.trim(), suggest = !!($("csuggest") && $("csuggest").checked);
       if (!title && !body) { $("cmsg").textContent = ERR.talk_empty; $("cbody").focus(); return; }
+      if (suggest && title.length < 3) { $("cmsg").textContent = ERR.talk_suggest_title; $("ctitle").focus(); return; }
       needRules(function () {
         $("cmsg").textContent = "Posting...";
-        db.from("talk_posts").insert({ room: t && bByTopic[t.id] ? "us" : place, topic_id: t ? t.id : null, kind: "post", title: title, body: body }).then(function (r) {
+        var row = { room: t && bByTopic[t.id] ? "us" : place, topic_id: t ? t.id : null, kind: "post", title: title, body: body };
+        if (suggest) row.suggest = true;
+        db.from("talk_posts").insert(row).then(function (r) {
           if (r.error) { $("cmsg").textContent = errText(r.error); return; }
-          toast("Posted"); showFeed();
+          toast(suggest ? "Suggested. It's on Catching on now." : "Posted"); showFeed();
         });
       });
     });
@@ -478,18 +492,19 @@
       var box = $("catching");
       if (box) {
         var open = ideas.filter(function (x) { return !x.topic_id; });
-        box.innerHTML = !ideas.length ? "" :
+        box.innerHTML = !ideas.length ? (user ? '<p class="small muted tk-catchhint">Want a new topic? Tap New post and tick Suggest this as a new topic. When enough people join in, it opens on its own.</p>' : "") :
           '<div class="card tk-catch"><div class="spread"><b>Catching on</b><span class="small muted">Rai groups posts about the same idea</span></div>' +
           ideas.map(function (x) {
             var t = x.topic_id && topicById(x.topic_id);
             if (x.topic_id) return '<div class="tk-idea done"><p>✓ <b>' + esc(x.name) + "</b> got its own topic" + (t ? ': <a data-nav href="' + esc(href({ r: at, t: x.topic_id })) + '">' + esc(t.name) + " ›</a>" : "") + "</p></div>";
             var pct = Math.min(100, Math.round(100 * x.people / x.need_people));
-            return '<div class="tk-idea"><div class="spread"><b>' + esc(x.name) + '</b><span class="small">' + x.people + " of " + x.need_people + " people</span></div>" +
+            return '<div class="tk-idea"><div class="spread"><b>' + esc(x.name) + (x.suggested ? ' <span class="chip">Suggested</span>' : "") + '</b><span class="small">' + x.people + " of " + x.need_people + " people</span></div>" +
               '<div class="tk-bar" role="img" aria-label="' + x.people + " of " + x.need_people + ' people"><i style="width:' + pct + '%"></i></div>' +
               (x.about ? '<p class="small muted">' + esc(x.about) + "</p>" : "") + sources(x.posts) + "</div>";
           }).join("") +
           (open.length ? '<p class="small muted tk-catchnote">When ' + open[0].need_people + " different people take part over at least " + open[0].need_days +
-            " days (posting, commenting or giving a +1), an idea gets its own topic. Nobody has to approve it.</p>" : "") + "</div>";
+            " days (posting, commenting or giving a +1), an idea gets its own topic. Nobody has to approve it." +
+            (user ? " To suggest one, tap New post and tick Suggest this as a new topic." : "") + "</p>" : "") + "</div>";
         wireSources(box);
       }
       // Rai catches up in the background. If it changed anything, show the new list.
@@ -497,6 +512,39 @@
         if (at !== place || view.kind !== "feed" || view.t) return;
         if (o && o.made) { toast("An idea caught on and got its own topic."); loadTopics().then(function () { sideList(); catchingOn(false); }); }
         else if (o && "made" in o) catchingOn(false);
+      });
+    });
+  }
+
+  // ---- One person's view: "What does Maria think?" ----
+  function people(box, t) {
+    var q = db.from("talk_posts").select("author_id,author_name").eq("topic_id", t.id).eq("deleted", false).eq("hidden", false).limit(1000);
+    if (!everyone(t)) q = q.eq("room", place);
+    q.then(function (r) {
+      var by = {}, order = [];
+      (r.data || []).forEach(function (x) { if (!by[x.author_id]) { by[x.author_id] = { name: x.author_name, n: 0 }; order.push(x.author_id); } by[x.author_id].n++; });
+      if (!order.length || !$("sum")) return;
+      order.sort(function (a, b) { return by[b].n - by[a].n; });
+      box.insertAdjacentHTML("beforeend", '<div class="card tk-sum tk-people"><h2>People in this conversation</h2><p class="small muted">Ask Rai to sum up what one person has said here, with links to their posts.</p>' +
+        order.slice(0, 30).map(function (id) {
+          var x = by[id];
+          return '<div class="tk-person"><div class="spread"><span class="row" style="gap:8px">' + badge(x.name, id) + '<a data-nav href="' + esc(href({ u: id })) + '">' + esc(x.name) + '</a><span class="small muted">' + x.n + (x.n === 1 ? " post" : " posts") + "</span></span>" +
+            '<button class="btn ghost small" type="button" data-pview="' + esc(id) + '">What does ' + esc(x.name) + " think?</button></div><div data-pout></div></div>";
+        }).join("") + "</div>");
+      each(box, "[data-pview]", function (b) {
+        b.addEventListener("click", function () {
+          var outEl = b.closest(".tk-person").querySelector("[data-pout]"), nm = by[b.getAttribute("data-pview")].name;
+          b.disabled = true; outEl.innerHTML = '<p class="small muted">Rai is reading ' + esc(nm) + "'s posts...</p>";
+          raiCall({ action: "talk_person", topic: t.id, author: b.getAttribute("data-pview") }).then(function (o) {
+            b.disabled = false;
+            var v = o && o.view;
+            if (!v) { outEl.innerHTML = '<p class="small muted">' + (o && /limit/.test(o.error || "") ? "Rai has done all he can for today. Try again tomorrow." : "Rai couldn't do that just now. Try again in a minute.") + "</p>"; return; }
+            outEl.innerHTML = '<div class="tk-pview"><p>' + esc(v.view) + "</p>" +
+              (v.points && v.points.length ? "<ul>" + v.points.map(function (pt) { return "<li>" + esc(pt.text) + sources(pt.posts) + "</li>"; }).join("") + "</ul>" : "") +
+              '<p class="small muted">Rai\'s summary of ' + esc(nm) + "'s own posts. Rai can be wrong, so read their posts before quoting them.</p></div>";
+            wireSources(outEl);
+          });
+        });
       });
     });
   }
@@ -551,6 +599,7 @@
           });
         }
         wireAsk(box, t);
+        people(box, t);
       });
     }
     draw();
