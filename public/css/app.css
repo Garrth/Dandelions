@@ -240,5 +240,5 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 
 /* Tabs under the header: the charter and how it works. */
 .tabs { display: flex; gap: 6px; margin: -4px 0 8px; }
-.tabs a { font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 2px solid var(--line); }
+.tabs a { flex: none; white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 2px solid var(--line); }
 .tabs a:hover { border-color: var(--ink); }
