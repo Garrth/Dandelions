@@ -24,14 +24,27 @@
   }
   function busy(on) { btn.disabled = linkBtn.disabled = on; }
 
+  // The bot check. Each answer works once, so it resets after every try.
+  var Bot = window.BotCheck, botEl = document.getElementById("bot");
+  if (Bot) Bot.mount(botEl);
+  function bot() { return Bot ? Bot.token(botEl) : Promise.resolve(undefined); }
+  function botFailed(err) {
+    if (Bot) Bot.reset(botEl);
+    if (Bot && Bot.failed(err)) { msg.textContent = "We couldn't confirm you're a person. Refresh the page and try again."; return true; }
+    return false;
+  }
+
   function sendLink() {
     var e = email(); if (!e) return;
     busy(true); msg.textContent = "Sending...";
     // shouldCreateUser: false, so log-in never makes a new member. Joining goes through the pledge.
-    db.auth.signInWithOtp({ email: e, options: { shouldCreateUser: false, emailRedirectTo: location.origin + "/app/" } })
+    bot().then(function (t) {
+      return db.auth.signInWithOtp({ email: e, options: { shouldCreateUser: false, captchaToken: t || undefined, emailRedirectTo: location.origin + "/app/" } });
+    })
       .then(function (res) {
         busy(false);
-        if (!res.error) { msg.textContent = "Check your email for the link. It works once, for about an hour."; return; }
+        if (res.error && botFailed(res.error)) return;
+        if (!res.error) { if (Bot) Bot.reset(botEl); msg.textContent = "Check your email for the link. It works once, for about an hour."; return; }
         var m = res.error.message || "", wait = m.match(/after (\d+) seconds/);
         msg.textContent = /signups not allowed|not found/i.test(m) ? "We don't have that email yet. Pledge first, then log in."
           : wait ? "We just sent you a link. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works."
@@ -46,8 +59,11 @@
     if (!pw) { sendLink(); return; }
     var e = email(); if (!e) return;
     busy(true); msg.textContent = "Logging in...";
-    db.auth.signInWithPassword({ email: e, password: pw }).then(function (res) {
+    bot().then(function (t) {
+      return db.auth.signInWithPassword({ email: e, password: pw, options: { captchaToken: t || undefined } });
+    }).then(function (res) {
       busy(false);
+      if (res.error && botFailed(res.error)) return;
       if (!res.error) { location.replace(backTo() || "/app/"); return; }
       msg.textContent = res.error.status === 429 ? "Too many tries. Wait a few minutes, or use the email link."
         : "Email or password doesn't match. No password yet? Use the email link, then set one on your profile.";

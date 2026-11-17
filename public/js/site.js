@@ -235,6 +235,8 @@
 
   // ---------- Pledge ----------
   var form = $("pledge-form"), msg = $("p-msg"), go = form.querySelector(".go");
+  var Bot = window.BotCheck, botEl = $("p-bot");
+  if (Bot) Bot.mount(botEl);
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -251,10 +253,12 @@
     msg.textContent = "Sending...";
     store("dandelions_zip", zip);
 
-    loadZips().catch(function () { return {}; }).then(function (zips) {
+    Promise.all([loadZips().catch(function () { return {}; }), Bot ? Bot.token(botEl) : undefined]).then(function (got) {
+      var zips = got[0];
       return db.auth.signInWithOtp({
         email: email,
         options: {
+          captchaToken: got[1] || undefined,
           emailRedirectTo: location.origin + "/welcome.html",
           data: {
             zip: zip,
@@ -268,7 +272,9 @@
       });
     }).then(function (res) {
       go.disabled = false;
+      if (Bot) Bot.reset(botEl);
       if (res.error) {
+        if (Bot && Bot.failed(res.error)) { msg.textContent = "We couldn't confirm you're a person. Refresh the page and try again."; return; }
         var wait = (res.error.message || "").match(/after (\d+) seconds/);
         msg.textContent = wait
           ? "We just sent you an email. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works. Already a member? Use Sign in at the top of the page."
