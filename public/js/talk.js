@@ -1,7 +1,8 @@
 // Talk: posts with comments, newest first, in topics for your county, your state and the whole US.
 // No algorithm: every list is in time order. Anyone can read. Members agree to the Talk rules once, then post,
 // comment, agree or disagree with posts, star topics and follow people. Follows are private, so nobody has a follower count.
-// Nobody approves posts: a post flagged by 3 different members is hidden, and moderators can hide, put back,
+// Nobody approves posts: a post flagged by 3 different ID-checked members is hidden (anyone can flag, 10 a day, and every
+// flag shows on the moderators' Flagged list). Moderators can hide, put back,
 // pause someone, make and edit topics, and move a post into a topic. Everything a moderator does is logged.
 (function () {
   var cfg = window.DANDELIONS_CONFIG || {};
@@ -151,6 +152,7 @@
     else if (q.s) { s.set("r", q.r || place); s.set("s", q.s); }
     else if (q.u) s.set("u", q.u);
     else if (q.following) s.set("following", "1");
+    else if (q.flagged) s.set("flagged", "1");
     else { s.set("r", q.r || place); if (q.t) s.set("t", q.t); if (q.all) s.set("all", "1"); }
     return "/app/talk.html?" + s.toString();
   }
@@ -217,7 +219,8 @@
       '<div class="tk-rule"></div>' +
       '<a data-nav class="tk-topic quiet' + (view.kind === "all" ? " on" : "") + '" href="' + esc(href({ r: place, all: 1 })) + '"><span>All topics (' + open.length + ")</span></a>" +
       (user ? '<a data-nav class="tk-topic quiet' + (view.kind === "following" ? " on" : "") + '" href="' + esc(href({ following: 1 })) + '"><span>People you follow (' + Object.keys(follows).length + ")</span></a>" :
-        '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>');
+        '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>') +
+      (mod ? '<a data-nav class="tk-topic quiet' + (view.kind === "flagged" ? " on" : "") + '" href="' + esc(href({ flagged: 1 })) + '"><span>Flagged posts (moderators)</span></a>' : "");
     each($("tlist"), "a", function (a) { a.addEventListener("click", closeSide); });
   }
   function blOrder(t) { var b = bByTopic[t.id]; return b && bboard ? bboard.baselines.indexOf(b) : 99; }
@@ -380,6 +383,7 @@
         each(host, "[data-reason]", function (x) {
           x.addEventListener("click", function () {
             db.from("talk_flags").insert({ post_id: id, reason: x.getAttribute("data-reason") }).then(function (r) {
+              if (r.error && /talk_flag_limit/.test(r.error.message || "")) { toast("Ten flags a day is the most. Try again tomorrow."); return; }
               if (r.error && !/duplicate/.test(r.error.message || "")) { toast("Couldn't send that. Try again."); return; }
               flagged[id] = true; toast("Thanks. It's been flagged."); again();
             });
@@ -851,6 +855,35 @@
     });
   }
 
+  // ---- Moderators: posts with flags nobody has looked at yet ----
+  // Only flags from ID-checked members hide a post, so this is where everyone else's flags get seen.
+  function showFlagged() {
+    var main = $("main");
+    document.title = "Flagged posts · Talk | Dandelions";
+    db.rpc("talk_mod_flagged").then(function (r) {
+      var list = r.data || [];
+      main.innerHTML = '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">Moderators</div><h1>Flagged posts</h1></div></div>' +
+          '<p class="muted tk-about">Posts and comments with flags nobody has looked at yet, newest flag first. A post hides on its own once 3 ID-checked members flag it. ' +
+          "Leave it up and flags won't hide it again. Only moderators see this page.</p></div>" +
+        (r.error ? '<p class="note">Couldn\'t load the list. Try refreshing.</p>' : !list.length ? '<p class="note">Nothing flagged right now.</p>' : list.map(function (p) {
+          var why = Object.keys(p.reasons || {}).map(function (k) { return esc(FLAGS[k] || k) + (p.reasons[k] > 1 ? " ×" + p.reasons[k] : ""); }).join(", ");
+          return '<article class="tk-post' + (p.hidden ? " hid" : "") + '">' +
+            '<div class="tk-by">' + badge(p.author_name, p.author_id) + '<a data-nav class="tk-name" href="' + esc(href({ u: p.author_id })) + '">' + esc(p.author_name) + "</a>" +
+              '<span class="muted">· ' + ago(p.created_at) + "</span>" + (p.hidden ? ' <span class="chip warn">Hidden</span>' : "") + (p.parent_id ? ' <span class="muted small">comment</span>' : "") + "</div>" +
+            (p.title ? '<h3 class="tk-title">' + esc(p.title) + "</h3>" : "") +
+            '<p class="tk-body">' + bodyHtml(p.body.length > 500 ? p.body.slice(0, 500) + "..." : p.body) + "</p>" +
+            '<p class="small muted">' + p.flags + (p.flags === 1 ? " flag" : " flags") + " (" + p.id_checked + " from ID-checked members) · " + why + " · last " + ago(p.last_flag) + "</p>" +
+            '<div class="tk-foot"><a data-nav class="tk-comments" href="' + esc(href({ p: p.parent_id || p.id })) + '">Open</a><span class="tk-tools">' +
+              '<button class="linkbtn" type="button" data-hide="' + p.id + '" data-on="false">' + (p.hidden ? "Put back" : "Leave it up") + "</button>" +
+              (p.hidden ? "" : ' <button class="linkbtn" type="button" data-hide="' + p.id + '" data-on="true">Hide</button>') +
+              (user && p.author_id !== user.id ? ' <button class="linkbtn" type="button" data-pause="' + p.author_id + '" data-name="' + esc(p.author_name) + '">Pause 7 days</button>' : "") +
+            "</span></div></article>";
+        }).join(""));
+      wireOpen(main);
+      wire(main, showFlagged);
+    });
+  }
+
   // ---- People you follow. Only you see this list. ----
   function showFollowing() {
     var main = $("main"), ids = Object.keys(follows);
@@ -929,13 +962,13 @@
     var q = new URLSearchParams(location.search);
     var p = q.get("p"), u = q.get("u"), r = q.get("r"), t = q.get("t");
     var sm = q.get("s");
-    view = p && ID_RE.test(p) ? { kind: "post", p: p } : sm && ID_RE.test(sm) ? { kind: "summary", t: sm } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
+    view = p && ID_RE.test(p) ? { kind: "post", p: p } : sm && ID_RE.test(sm) ? { kind: "summary", t: sm } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("flagged") && mod ? { kind: "flagged" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
     var change = r && PLACE_RE.test(r) && r !== place;
     if (change && places.indexOf(r) < 0) places.push(r);
     (change ? (place = r, $("place").innerHTML = places.map(function (x) { return '<option value="' + esc(x) + '"' + (x === place ? " selected" : "") + ">" + esc(placeName(x)) + "</option>"; }).join(""), loadTopics()) : Promise.resolve()).then(function () {
       sideList();
       window.RaiTopic = (view.kind === "feed" || view.kind === "summary") && view.t ? view.t : "";
-      if (view.kind === "summary") showSummary(); else if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else showFeed();
+      if (view.kind === "summary") showSummary(); else if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else if (view.kind === "flagged") showFlagged(); else showFeed();
       scrollTo(0, 0);
     });
   }

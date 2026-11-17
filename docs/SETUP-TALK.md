@@ -1,6 +1,6 @@
 # Setup: Talk
 
-Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rules_moderators.sql`, once each in the SQL Editor (project dandelions).
+Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rules_moderators.sql` (and later `20261118000000_talk_flag_limits.sql`), once each in the SQL Editor (project dandelions).
 
 ## How it works
 
@@ -10,7 +10,8 @@ Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rul
   (What should we work on? and Make the site better).
 - Anyone can read. Members who are logged in can post, reply, back ideas and flag.
 - A post shows the first name from the member's profile, or "A member" if they haven't added one.
-- Nobody approves posts. When 3 different members flag a post, it's hidden. Its author still sees it.
+- Nobody approves posts. Anyone logged in can flag (10 flags a day). When 3 different **ID-checked** members flag a post, it's hidden. Its author still sees it. Flags from other members don't hide anything, but every flag shows on the moderators' **Flagged posts** page in Talk (`/app/talk.html?flagged=1`).
+- A baseline proposal whose post is hidden before its vote pauses. Put it back and it carries on. Left hidden for 7 days, it ends.
 - A member can post up to 30 times a day.
 - Deleting a post blanks it but keeps replies in place.
 
