@@ -5,7 +5,9 @@
 // {"action": "check", claimId, code}.
 // One file on purpose, so it can be pasted into the Supabase dashboard editor.
 
-export const MAX_STARTS_PER_DAY = 10; // code requests per member per day
+export const MAX_STARTS_PER_DAY = 5; // code requests per member per day
+export const MAX_LISTING_PER_DAY = 3; // codes to one business per day, from anyone, so nobody can flood its phone
+export const MAX_SITE_PER_DAY = 300; // codes for the whole site per day (about $15 of Twilio), so the bill can't run away
 export const MAX_TRIES = 5; // wrong codes per claim
 export const CODE_MINUTES = 10; // Twilio codes last 10 minutes
 
@@ -20,7 +22,8 @@ export function e164(phone) {
 const ok = (s, re) => typeof s === "string" && re.test(s);
 
 // deps: { isMember(id), listing(fips, family, id), ownerOf(fips, id), startsToday(memberId),
-//   saveClaim(fields) -> id, getClaim(id), updateClaim(id, fields),
+//   listingStartsToday(fips, id), siteStartsToday(),
+//   saveClaim(fields) -> id, getClaim(id), updateClaim(id, fields) -> true if saved,
 //   sendCode(to, channel) -> bool, checkCode(to, code) -> bool, testPhone, testPhoneBad }
 export async function startClaim(deps, user, body) {
   const { fips, family, id, channel } = body || {};
@@ -34,6 +37,8 @@ export async function startClaim(deps, user, body) {
   const owner = await deps.ownerOf(fips, id);
   if (owner) return owner === user.id ? { status: "verified" } : { error: "already_claimed" };
   if ((await deps.startsToday(user.id)) >= MAX_STARTS_PER_DAY) return { error: "too_many" };
+  if ((await deps.listingStartsToday(fips, id)) >= MAX_LISTING_PER_DAY) return { error: "listing_busy" };
+  if ((await deps.siteStartsToday()) >= MAX_SITE_PER_DAY) return { error: "site_busy" };
   // A test phone that's set but not a real number would quietly text the business. Stop instead.
   if (deps.testPhoneBad) return { error: "test_phone_bad" };
   // While testing (Twilio trial accounts only reach numbers you've verified), codes go to the test phone.
@@ -62,7 +67,8 @@ export async function checkClaim(deps, user, body) {
   const owner = await deps.ownerOf(claim.county_fips, claim.listing_id);
   if (owner && owner !== user.id) return { error: "already_claimed" };
   // No one approves claims by hand: the code from the listing's own phone is the check.
-  await deps.updateClaim(claimId, { status: "verified", verified_at: new Date().toISOString() });
+  // Two people typing a right code at the same moment: the database lets only one become the owner.
+  if (!(await deps.updateClaim(claimId, { status: "verified", verified_at: new Date().toISOString() }))) return { error: "already_claimed" };
   return { status: "verified" };
 }
 
@@ -129,6 +135,17 @@ export async function setup(req) {
           .eq("member_id", memberId).gte("created_at", since);
         return count || 0;
       },
+      async listingStartsToday(fips, id) {
+        const since = new Date(Date.now() - 86400000).toISOString();
+        const { count } = await admin.from("listing_claims").select("id", { count: "exact", head: true })
+          .eq("county_fips", fips).eq("listing_id", id).gte("created_at", since);
+        return count || 0;
+      },
+      async siteStartsToday() {
+        const since = new Date(Date.now() - 86400000).toISOString();
+        const { count } = await admin.from("listing_claims").select("id", { count: "exact", head: true }).gte("created_at", since);
+        return count || 0;
+      },
       async saveClaim(fields) {
         const { data } = await admin.from("listing_claims").insert(fields).select("id").single();
         return data.id;
@@ -138,7 +155,9 @@ export async function setup(req) {
         return data;
       },
       async updateClaim(id, fields) {
-        await admin.from("listing_claims").update(fields).eq("id", id);
+        const { error } = await admin.from("listing_claims").update(fields).eq("id", id);
+        if (error) console.error("claim update", error.code);
+        return !error;
       },
       async sendCode(to, channel) {
         return !!(await twilio("/Verifications", { To: to, Channel: channel }));

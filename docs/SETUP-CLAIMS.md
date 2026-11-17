@@ -44,6 +44,18 @@ While `CLAIM_TEST_PHONE` is set, every code goes to that phone instead of the bu
 3. Pick **Text me the code**. The text comes to your test phone. Type the code. You should see **It's yours**.
 4. Go back to the listing. It should say **Claimed by owner**.
 
+## Limits
+
+- A member can ask for 5 codes a day.
+- One business can get 3 codes a day, from anyone, so nobody can flood its phone.
+- The whole site sends at most 300 codes a day (about $15), so the Twilio bill can't run away.
+- If two people type a right code at the same moment, only one becomes the owner. The other is told it's already claimed.
+- On a claimed listing, anyone else sees "Your business, and you didn't claim it? Tell us". That goes to the same help list as "This isn't our number", with a note starting "Claimed by someone else."
+
+## Before launch
+
+Delete `CLAIM_TEST_PHONE` in Supabase, Edge Functions, Secrets. While it's set, every code goes to the test phone.
+
 ## Looking after claims
 
 See claims and help requests in the SQL Editor:
