@@ -17,6 +17,7 @@
     <form class="card" id="login" novalidate>
       <label class="field">Email<input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
       <label class="field">Password<input id="pw" type="password" autocomplete="current-password" placeholder="Leave empty to get an email link"></label>
+      <div class="botcheck" id="bot"></div>
       <button class="btn" type="submit" id="send" style="width:100%">Log in</button>
       <button class="btn ghost" type="button" id="link" style="width:100%;margin-top:10px">Email me a link instead</button>
       <p class="small muted" id="msg" style="margin-top:10px" role="status"></p>
@@ -27,6 +28,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="/js/config.js"></script>
+<script src="/js/botcheck.js"></script>
 <script src="/js/login.js"></script>
 <script src="/js/rai-chat.js"></script>
 </body>

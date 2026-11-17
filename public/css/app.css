@@ -242,3 +242,7 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .tabs { display: flex; gap: 6px; margin: -4px 0 8px; }
 .tabs a { flex: none; white-space: nowrap; font-size: 14px; font-weight: 700; color: var(--ink); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--card); border: 2px solid var(--line); }
 .tabs a:hover { border-color: var(--ink); }
+
+/* Bot check (Cloudflare Turnstile). Takes no room unless it needs a click. */
+.botcheck:empty { display: none; }
+.botcheck { margin: 8px 0; }
