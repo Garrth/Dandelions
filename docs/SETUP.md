@@ -84,3 +84,9 @@ where u.email_confirmed_at is not null
 group by 1
 order by 2 desc;
 ```
+
+## Scripts and the safety rule (CSP)
+
+- The database library (supabase-js) is served from our own site, `public/js/vendor/supabase-js-2.118.0.js`, pinned to one version. Nothing loads from jsDelivr any more. To update it: `npm pack @supabase/supabase-js@<version>`, copy `package/dist/umd/supabase.js` to `public/js/vendor/supabase-js-<version>.js`, and change the `<script src>` in every page.
+- Every page has a `Content-Security-Policy` meta tag. It lets the browser run scripts only from our site, Cloudflare's bot check and Plaid, and talk only to our Supabase project and Plaid. Script tags slipped into a post, and inline `onclick=` style code, are blocked.
+- No inline `<script>` blocks: put code in a `.js` file. Adding a new outside service (a map, fonts, analytics) means adding its address to the meta tag in every page, or it will be blocked.
