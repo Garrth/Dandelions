@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rai's numbers | Dandelions</title>
   <meta name="description" content="Public numbers for your county: jobs, pay, prices and layoffs reported, updated every week.">
@@ -15,7 +16,7 @@
   <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/">Home</a><a href="/app/talk.html">Talk</a></nav></header>
   <main id="rai"><p class="muted">Loading...</p></main>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/js/vendor/supabase-js-2.118.0.js"></script>
 <script src="/js/config.js"></script>
 <script src="/js/rai.js"></script>
 <script src="/js/rai-chat.js"></script>
