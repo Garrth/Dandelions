@@ -97,7 +97,8 @@
         (det && (det.free_estimates || det.crew) ? "<div><b>Work</b><span>" + [det.free_estimates ? "Free estimates" : "", det.crew ? CREW[det.crew] : ""].filter(Boolean).join(" · ") + "</span></div>" : "") +
         "<div><b>Hours</b><span>" + hours(det && det.hours) + "</span></div></div>" +
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
-      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '.' + (det ? " Details from the owner." : claimed ? " The owner has claimed this listing." : ' Own this business? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
+      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '.' + (det || claimed ? (det ? " Details from the owner." : " The owner has claimed this listing.") +
+        (owner ? "" : ' Your business, and you didn\'t claim it? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '&dispute=1">Tell us</a>.') : ' Own this business? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
       '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
     // Today's deal of the day for this business, if it booked one. "Today" is Pacific time, like the deals page.
     var today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });

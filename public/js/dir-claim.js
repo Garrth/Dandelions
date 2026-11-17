@@ -13,7 +13,9 @@
   var ERR = {
     not_a_member: "Only members can claim a listing. Pledge first, then come back.",
     no_phone: "This listing has no phone number, so we can't send a code. Use \"This isn't our number\" below and we'll sort it out with you.",
-    already_claimed: "Someone already claimed this listing. If that wasn't you, use \"This isn't our number\" below and a person will look into it.",
+    already_claimed: "Someone already claimed this listing. If it's your business and that wasn't you, use \"This isn't our number\" below and a person will look into it.",
+    listing_busy: "This business has had 3 codes today, which is the most. Try again tomorrow, or ask for help below.",
+    site_busy: "We've sent a lot of codes today. Please try again tomorrow.",
     too_many: "That's a lot of codes for one day. Try again tomorrow, or ask for help below.",
     send_failed: "We couldn't send the code just now. Try again in a minute.",
     test_phone_bad: "Test mode is on but the test phone number isn't set right, so no code was sent.",
@@ -45,6 +47,7 @@
   function choose() {
     if (!biz[8]) { page('<div class="note">' + esc(ERR.no_phone) + "</div>"); return; }
     page('<div class="card"><p>We\'ll send a code to the phone on this listing, <b>' + esc(biz[8]) + '</b>. Whoever answers that phone can claim it. On a landline? Pick the phone call.</p>' +
+      '<p class="small muted" style="margin-top:6px">Only the person at the business should type the code. Dandelions will never call and ask anyone to read a code out loud.</p>' +
       '<div class="stack" style="margin-top:12px"><button class="btn" type="button" id="sms" style="width:100%">Text me the code</button>' +
       '<button class="btn ghost" type="button" id="voice" style="width:100%">Call with the code instead</button></div>' +
       '<p class="small muted" id="msg" role="status" style="margin-top:10px"></p></div>' +
@@ -92,8 +95,11 @@
       '<a class="btn ghost" href="' + back + '" style="width:100%;text-align:center">See the listing</a></div></div>');
   }
 
-  function help() {
-    page('<form class="card" id="helpform"><h2>We\'ll sort it out</h2><p style="margin-top:6px">A local organizer will call you to check that the business is yours, then fix the number.</p>' +
+  // dispute: the listing is already claimed and this person says it's their business.
+  function help(dispute) {
+    page('<form class="card" id="helpform"><h2>We\'ll sort it out</h2><p style="margin-top:6px">' +
+      (dispute ? "Someone has claimed this listing. If it's your business and it wasn't you, a local organizer will call you to check, and can take the listing back from them."
+        : "A local organizer will call you to check that the business is yours, then fix the number.") + "</p>" +
       '<label class="field" style="margin-top:10px">Best phone to reach you<input id="contact" type="tel" autocomplete="tel" maxlength="40" required></label>' +
       '<label class="field">What\'s wrong? (optional)<input id="note" maxlength="500" placeholder="For example: we moved, the new number is..."></label>' +
       '<button class="btn" type="submit" style="width:100%">Send</button><p class="small muted" id="msg" role="status" style="margin-top:10px"></p></form>');
@@ -102,7 +108,9 @@
       var msg = document.getElementById("msg"), contact = document.getElementById("contact").value.trim();
       if (contact.replace(/\D/g, "").length < 7) { say(msg, "Add a phone number we can call."); return; }
       say(msg, "Sending...");
-      db.from("claim_help").insert({ county_fips: D.COUNTY, family: fam, listing_id: id, listing_name: biz[1], contact: contact, note: document.getElementById("note").value.trim() })
+      var note = document.getElementById("note").value.trim();
+      if (dispute) note = ("Claimed by someone else. " + note).slice(0, 500);
+      db.from("claim_help").insert({ county_fips: D.COUNTY, family: fam, listing_id: id, listing_name: biz[1], contact: contact, note: note })
         .then(function (r) {
           if (r.error) { say(msg, "Couldn't send. Try again."); return; }
           page('<div class="card"><h2>Got it</h2><p style="margin-top:6px">An organizer will call you soon. Thanks for your patience.</p></div>');
@@ -127,7 +135,7 @@
   }).then(function (s) {
     if (!(s.data && s.data.session)) return signedOut();
     try { localStorage.removeItem("dandelions_return"); } catch (e) {}
-    choose();
+    if (params.get("dispute")) help(true); else choose();
   }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t find that business. <a href="/directory/">Back to What do you need?</a></p>';
   });
