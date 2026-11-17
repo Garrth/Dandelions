@@ -50,4 +50,17 @@ Do these once, in order, after the stage 1 PR is merged. Each step is small.
 
 ## Going live later
 
-When Plaid approves production for Identity Verification, change two secrets: `PLAID_ENV` to `production`, and `PLAID_SECRET` to the Production secret. Nothing else changes.
+Test passes (from Plaid's test person) count while you test. They must not count once real checks start.
+When Plaid approves production for Identity Verification:
+
+1. In Supabase, **Edge Functions**, then **Secrets**: change `PLAID_ENV` to `production`, and `PLAID_SECRET` to the Production secret.
+2. In the SQL Editor (project **dandelions**), run these two lines. The first stops test passes counting. The second clears them, so everyone checks again for real.
+
+```sql
+update public.id_check_settings set sandbox_counts = false;
+delete from public.id_checks where plaid_env = 'sandbox';
+```
+
+`PLAID_ENV` must be exactly `sandbox` or `production`. Anything else, or leaving it out, turns the ID check off instead of falling back to test mode.
+
+Each member can open the Plaid window 3 times a day, so nobody can run up Equitide's Plaid bill. In the Plaid Dashboard, also set a billing alert.
