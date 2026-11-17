@@ -5,5 +5,5 @@ window.DANDELIONS_CONFIG = {
   supabaseUrl: "https://utduohtyjbbcnzxfmutp.supabase.co",
   supabaseKey: "sb_publishable_C59TN4mfcTHrz_NWUQeF7g_GHa10T4Y",
   // Cloudflare Turnstile site key for the bot check (public). Empty turns the bot check off.
-  turnstileSiteKey: "",
+  turnstileSiteKey: "0x4AAAAAAGGBlOTISiDTUCHe",
 };
