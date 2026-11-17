@@ -73,7 +73,16 @@
         onSuccess: function () { checkNow().then(function () { toast("Thanks. Your check is in."); }); },
         onExit: function () { checkNow(); }
       }).open();
-    }).catch(function () { btn.disabled = false; toast("Couldn't start the ID check. Try again in a minute."); });
+    }).catch(function (e) {
+      btn.disabled = false;
+      // The function says why in its answer, like {"error": "too_many"}.
+      var res = e && e.context && typeof e.context.json === "function" ? e.context.json() : Promise.resolve({});
+      res.catch(function () { return {}; }).then(function (b) {
+        toast(b && b.error === "too_many" ? "That's the most ID check tries for one day. Try again tomorrow."
+          : b && b.error === "not_set_up" ? "The ID check isn't switched on right now. Try again later."
+          : "Couldn't start the ID check. Try again in a minute.");
+      });
+    });
   });
   $("idrefresh").addEventListener("click", checkNow);
 
