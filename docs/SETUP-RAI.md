@@ -30,9 +30,11 @@ Without those two secrets, questions are still saved but no email is sent.
 |---|---|---|
 | `RAI_MODEL` | Which Claude model answers | claude-haiku-5-5 |
 | `RAI_DAILY_CAP` | Questions for the whole site per day | 300 |
+| `RAI_VISITOR_CAP` | Of those, how many visitors who aren't signed in can use | half of `RAI_DAILY_CAP` |
+| `RAI_MENTION_CAP` | @Rai answers in Talk per day, counted separately from chat | 100 |
 | `SITE_URL` | Where Rai reads its knowledge from | https://www.dandelions.lol |
 
-Each visitor can ask 30 questions a day. Visitors are counted by a scrambled code, never by their address. Chats are not saved.
+Each person can ask 30 questions a day. Signed-in members are counted by their account. Visitors who aren't signed in are counted by a scrambled code made from their address (never the address itself), and since an address can be faked, all of them together can use only part of the day's questions. Chats are not saved.
 
 ## Checking it
 

@@ -70,8 +70,21 @@
   // Rai: the Catching on list for General, and which idea each General post is in.
   var ideas = [], ideaByPost = {};
   var raiUrl = (cfg.supabaseUrl || "") + "/functions/v1/rai";
+  // Signed in: send the member's own token so Rai counts their questions by account, not by address.
+  // Only a token with over a minute left, so an old one never blocks the question.
+  function raiToken() {
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!/^sb-.*-auth-token$/.test(k)) continue;
+        var t = JSON.parse(localStorage.getItem(k) || "null");
+        if (t && t.access_token && t.expires_at && t.expires_at * 1000 > Date.now() + 60000) return t.access_token;
+      }
+    } catch (e) {}
+    return cfg.supabaseKey || "";
+  }
   function raiCall(body) {
-    return fetch(raiUrl, { method: "POST", headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + (cfg.supabaseKey || "") }, body: JSON.stringify(body) })
+    return fetch(raiUrl, { method: "POST", headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + raiToken() }, body: JSON.stringify(body) })
       .then(function (r) { return r.json(); }).catch(function () { return {}; });
   }
   // @Rai: Rai only speaks in Talk when someone writes @Rai. He answers that message once, in public.
