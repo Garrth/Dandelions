@@ -301,13 +301,13 @@
         return Promise.all(list.map(function (f) {
           return json(ROOT + f + "/names/" + key + ".json", true).then(function (rows) {
             return (rows || []).filter(function (e) { return hit(e[0]); }).map(function (e) {
-              return { name: e[0], type: e[1], lat: e[2], lon: e[3], town: e[4],
+              return { name: e[0], type: e[1], lat: e[2], lon: e[3], town: e[4], fam: t[e[1]][3], row: e[5], fips: f,
                 href: "/directory/biz.html?f=" + encodeURIComponent(t[e[1]][3]) + "&row=" + e[5] + "&c=" + f };
             });
           }).catch(function () { return []; });
         }).concat([addedRows(list, at).then(function (rows) {
           return rows.filter(function (b) { return hit(b[1]) && typeof b[3] === "number"; }).map(function (b) {
-            return { name: b[1], type: b[2], lat: b[3], lon: b[4], town: b[6], href: "/directory/biz.html?" + qs(b.fam, b[0], b.c) };
+            return { name: b[1], type: b[2], lat: b[3], lon: b[4], town: b[6], fam: b.fam, id: b[0], fips: b.c, href: "/directory/biz.html?" + qs(b.fam, b[0], b.c) };
           });
         })])).then(function (o) {
           return [].concat.apply([], o).map(function (x) { x.d = miles(loc.lat, loc.lon, x.lat, x.lon); return x; })
