@@ -49,44 +49,52 @@
   }
   function host(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } }
 
-  Promise.all([D.index(), D.family(fam)]).then(function (out) {
-    var idx = out[0], b = out[1].filter(function (x) { return x[0] === id; })[0];
-    if (!b) throw new Error("missing");
-    return Promise.all([D.location(idx), D.claimed(), D.details(), mine()]).then(function (x) { return [idx, b, x[0], x[1], x[2][id], x[3]]; });
+  // Whoever added a listing can take it down (it stays in the log).
+  function addedByMe() {
+    if (!/^add-/.test(id) || !D.signedIn() || !D.db()) return Promise.resolve(false);
+    return D.db().rpc("my_added_listings").then(function (r) { return (r.data || []).some(function (a) { return a.id === id && a.status === "live"; }); }).catch(function () { return false; });
+  }
+
+  Promise.all([D.types(), D.listing(fam, id)]).then(function (out) {
+    var types = out[0], b = out[1];
+    if (!b || b.removed) throw new Error("missing");
+    return Promise.all([D.location(), D.claimed(), D.details(), mine(), addedByMe()]).then(function (x) { return [types, b, x[0], x[1], x[2][id], x[3], x[4]]; });
   }).then(function (o) {
-    var idx = o[0], b = o[1], loc = o[2], claimed = o[3].indexOf(id) >= 0, det = o[4], owner = o[5];
+    var types = o[0], b = o[1], loc = o[2], claimed = o[3].indexOf(id) >= 0, det = o[4], owner = o[5], adder = o[6];
     var safe = function (u) { return /^https?:\/\//i.test(u || "") ? u : ""; };
     var pick = function (k, i) { return det ? det[k] || "" : b[i] || ""; };
-    var name = pick("name", 1), type = idx.types[b[2]][1], town = pick("town", 6), phone = pick("phone", 8), web = safe(pick("website", 9)), social = safe(b[10]);
+    var name = pick("name", 1), type = types[b[2]][1], town = pick("town", 6), phone = pick("phone", 8), web = safe(pick("website", 9)), social = safe(b[10]);
     var street = pick("address", 5), zip = pick("zip", 7);
-    var dist = D.miles(loc.lat, loc.lon, b[3], b[4]);
+    var dist = typeof b[3] === "number" && typeof loc.lat === "number" ? D.miles(loc.lat, loc.lon, b[3], b[4]) : null;
+    var st = b.state || "CA";
     document.title = name + " | Directory | Dandelions";
     var addr = [street, [town, zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");
     var tel = phone.replace(/\D/g, "");
     var fromList = String(b[0]).indexOf("cslb-") === 0;
     // A listing from the license list has no street address unless its owner adds one.
-    var noStreet = det ? !street : fromList;
-    var maps = "https://www.google.com/maps/dir/?api=1&destination=" + (det && street ? encodeURIComponent(addr + " CA") : noStreet ? encodeURIComponent(town + " CA " + zip) : b[3] + "," + b[4]);
+    var noStreet = det ? !street : fromList || !!b.noStreet;
+    var maps = "https://www.google.com/maps/dir/?api=1&destination=" + ((det || b.added) && street ? encodeURIComponent(addr + " " + st) : noStreet || typeof b[3] !== "number" ? encodeURIComponent(town + " " + st + " " + zip) : b[3] + "," + b[4]);
     if (noStreet) addr = "";
     var licRow = b[11] ? "<div><b>License</b><span>California contractor #" + esc(b[11]) + ', active. <a href="https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=' +
       encodeURIComponent(b[11]) + '" target="_blank" rel="noopener">Check it with the state</a><br><span class="muted">' + esc(String(b[12]).split(" ").map(className).join(", ")) +
       (b[13] === 1 && !(det && det.crew && det.crew !== "1") ? ". No employees on file (one-person shop)." : "") + "</span></span></div>" : "";
-    var heading = idx.types[b[2]][0];
+    var heading = types[b[2]][0];
+    var here = D.qs(fam, id, b.c);
     var mail = function (subject) { return "mailto:hello@dandelions.lol?subject=" + encodeURIComponent(subject + ": " + name + " (" + id + ")"); };
     document.getElementById("biz").innerHTML =
       '<a class="crumb" href="/directory/list.html?t=' + encodeURIComponent(heading) + '">‹ ' + esc(type) + "</a>" +
       '<div class="bizhead"><div class="bizicon">' + icon(fam) + '</div><div style="min-width:0"><h1 style="font-size:26px">' + esc(name) + "</h1>" +
-      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + " · " + dist.toFixed(1) + " mi" + (det ? ' · <span class="lic">✓ Verified</span>' : claimed ? ' · <span class="lic">Claimed by owner</span>' : "") + "</p></div></div>" +
+      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + (dist === null ? "" : " · " + dist.toFixed(1) + " mi") + (det ? ' · <span class="lic">✓ Verified</span>' : claimed ? ' · <span class="lic">Claimed by owner</span>' : "") + "</p></div></div>" +
       '<div class="actions">' +
         '<a class="main" href="' + (tel ? "tel:" + tel : "#") + '"' + (tel ? "" : ' aria-disabled="true"') + ">Call</a>" +
         '<a href="' + maps + '" target="_blank" rel="noopener">Directions</a>' +
         '<a href="' + esc(web || "#") + '" target="_blank" rel="noopener nofollow"' + (web ? "" : ' aria-disabled="true"') + ">Website</a></div>" +
-      (owner ? '<a class="btn small" href="/directory/edit.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '" style="text-align:center">' + (det ? "Edit your listing" : "Add your details") + "</a>" : "") +
+      (owner ? '<a class="btn small" href="/directory/edit.html?' + here + '" style="text-align:center">' + (det ? "Edit your listing" : "Add your details") + "</a>" : "") +
       gallery(det) +
       (det && det.offer ? '<div class="offer"><span>Offer</span>' + esc(det.offer) + "</div>" : "") +
       (det && det.description ? '<p class="about">' + esc(det.description) + "</p>" : "") +
       '<div class="facts">' +
-        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">' + (noStreet ? "Works out of " + esc(town || "this county") + ". Call for details." : "Not listed") + "</span>") + "</span></div>" +
+        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">' + (noStreet ? "Works out of " + esc(town || "this area") + ". Call for details." : "Not listed") + "</span>") + "</span></div>" +
         licRow +
         "<div><b>Phone</b><span>" + (phone ? '<a href="tel:' + tel + '">' + esc(phone) + "</a>" : '<span class="muted">Not listed</span>') + "</span></div>" +
         "<div><b>Online</b><span>" + ([web ? '<a href="' + esc(web) + '" target="_blank" rel="noopener nofollow">' + esc(host(web) || "Website") + "</a>" : "",
@@ -97,9 +105,19 @@
         (det && (det.free_estimates || det.crew) ? "<div><b>Work</b><span>" + [det.free_estimates ? "Free estimates" : "", det.crew ? CREW[det.crew] : ""].filter(Boolean).join(" · ") + "</span></div>" : "") +
         "<div><b>Hours</b><span>" + hours(det && det.hours) + "</span></div></div>" +
       '<div class="note"><b>No Dandelions review yet</b><br>Used them? <a href="' + mail("How it went") + '">Tell us how it went</a>.</div>' +
-      '<div class="foot"><span>From ' + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data") + '.' + (det || claimed ? (det ? " Details from the owner." : " The owner has claimed this listing.") +
-        (owner ? "" : ' Your business, and you didn\'t claim it? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '&dispute=1">Tell us</a>.') : ' Own this business? <a href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
-      '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span></div>';
+      '<div class="foot"><span>' + (b.added ? "Added by a Dandelions member" : "From " + (fromList ? "the state contractor license list" : b[11] ? "public records, the state contractor license list and Overture Maps open data" : "public records and Overture Maps open data")) + '.' + (det || claimed ? (det ? " Details from the owner." : " The owner has claimed this listing.") +
+        (owner ? "" : ' Your business, and you didn\'t claim it? <a href="/directory/claim.html?' + here + '&dispute=1">Tell us</a>.') : ' Own this business? <a href="/directory/claim.html?' + here + '">Claim it</a> to add photos, hours and an offer.') + "</span>" +
+      '<span>Something wrong or closed? <a href="' + mail("Fix") + '">Tell us</a>.</span>' +
+      (adder ? '<span>You added this business. <a href="#" id="takedown">Take it down</a></span>' : "") + "</div>";
+    var td = document.getElementById("takedown");
+    if (td) td.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (td.dataset.sure !== "1") { td.dataset.sure = "1"; td.textContent = "Tap again to take it down"; return; }
+      td.textContent = "Taking it down...";
+      D.db().from("added_listings").update({ status: "removed", removed_why: "Taken down by the member who added it" }).eq("id", id).then(function (r) {
+        td.parentNode.textContent = r.error ? "Couldn't take it down. Try again in a minute." : "Taken down. It no longer shows in the directory.";
+      });
+    });
     // Today's deal of the day for this business, if it booked one. "Today" is Pacific time, like the deals page.
     var today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
     if (D.db()) D.db().from("daily_deals").select("title,details,price_was,price_now,link").eq("county_fips", D.COUNTY).eq("listing_id", id)

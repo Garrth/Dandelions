@@ -8,7 +8,7 @@
   var cfg = window.DANDELIONS_CONFIG || {};
   var db = D.db();
   var biz, claimId, channel;
-  var back = "/directory/biz.html?f=" + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id);
+  var back = "/directory/biz.html?" + D.qs(fam, id);
 
   var ERR = {
     not_a_member: "Only members can claim a listing. Pledge first, then come back.",
@@ -89,7 +89,7 @@
   }
 
   function done() {
-    var edit = "/directory/edit.html?f=" + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id);
+    var edit = "/directory/edit.html?" + D.qs(fam, id);
     page('<div class="card"><h2>It\'s yours</h2><p style="margin-top:6px">You\'re now the owner of record for this listing. Add your hours, photos and an offer, and fix anything that\'s wrong. It shows right away.</p>' +
       '<div class="stack" style="margin-top:12px"><a class="btn" href="' + edit + '" style="width:100%;text-align:center">Add your details</a>' +
       '<a class="btn ghost" href="' + back + '" style="width:100%;text-align:center">See the listing</a></div></div>');
@@ -127,9 +127,9 @@
   }
 
   if (!db) { box.innerHTML = '<p class="note">Something didn\'t load. Please refresh the page.</p>'; return; }
-  D.family(fam).then(function (rows) {
-    biz = rows.filter(function (x) { return x[0] === id; })[0];
-    if (!biz) throw new Error("missing");
+  D.listing(fam, id).then(function (row) {
+    biz = row;
+    if (!biz || biz.removed) throw new Error("missing");
     document.title = "Claim " + biz[1] + " | Dandelions";
     return db.auth.getSession();
   }).then(function (s) {

@@ -18,67 +18,109 @@
     "oil change": "automotive_repair", pharmacy: "pharmacy", groomer: "pet_groomer", nails: "nail_salon"
   };
 
-  var idx, loc, slugAt = {}, counts = [];
+  var types, pts = [], loc, slugAt = {}, counts = [], token = 0;
 
   function countAll() {
-    var r = D.radius(), pts = idx.pts, types = idx.types;
+    var r = D.radius();
     counts = new Array(types.length).fill(0);
+    if (loc.mode === "outside") return;
     for (var i = 0; i < pts.length; i += 3) {
       if (D.miles(loc.lat, loc.lon, pts[i + 1] / 1e4, pts[i + 2] / 1e4) > r) continue;
       for (var t = pts[i]; t >= 0; t = types[t][2]) counts[t]++;
     }
   }
-  function link(t) { return "/directory/list.html?t=" + encodeURIComponent(idx.types[t][0]); }
+  function link(t) { return "/directory/list.html?t=" + encodeURIComponent(types[t][0]); }
   function sorted() {
-    return idx.types.map(function (x, i) { return i; }).filter(function (i) { return counts[i] > 0; })
-      .sort(function (a, b) { return idx.types[a][1].localeCompare(idx.types[b][1]); });
+    return types.map(function (x, i) { return i; }).filter(function (i) { return counts[i] > 0; })
+      .sort(function (a, b) { return types[a][1].localeCompare(types[b][1]); });
   }
 
   function drawAZ() {
     var list = sorted(), have = {}, html = [], last = "";
     list.forEach(function (i) {
-      var L = idx.types[i][1].charAt(0).toUpperCase();
+      var L = types[i][1].charAt(0).toUpperCase();
       if (L !== last) { html.push('<h2 class="letterhead" id="L-' + L + '">' + L + "</h2>"); last = L; have[L] = true; }
-      html.push('<a class="row" href="' + link(i) + '"><span>' + esc(idx.types[i][1]) + '</span><span class="n">' + counts[i] + "</span></a>");
+      html.push('<a class="row" href="' + link(i) + '"><span>' + esc(types[i][1]) + '</span><span class="n">' + counts[i] + "</span></a>");
     });
     $("az").innerHTML = html.join("");
     $("letters").innerHTML = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(function (L) {
       return have[L] ? '<a href="#L-' + L + '">' + L + "</a>" : '<span aria-hidden="true">' + L + "</span>";
     }).join("");
-    $("total").textContent = list.length.toLocaleString() + " kinds of business within " + D.radius() + " miles, A to Z";
+    $("total").textContent = list.length ? list.length.toLocaleString() + " kinds of business within " + D.radius() + " miles, A to Z" :
+      "No businesses within " + D.radius() + " miles yet. The directory covers the 9 Bay Area counties so far. Try a bigger distance, or add a business below.";
   }
 
   function drawMatches() {
     var q = $("q").value.trim().toLowerCase();
-    $("browse").hidden = !!q; $("matches").hidden = !q;
+    $("browse").hidden = !!q || loc.mode === "outside"; $("matches").hidden = !q || loc.mode === "outside";
     if (!q) return;
     var starts = [], inside = [], seen = {};
     var word = WORDS[q] && slugAt[WORDS[q]];
     if (word !== undefined && counts[word] > 0) { starts.push(word); seen[word] = true; }
     sorted().forEach(function (i) {
       if (seen[i]) return;
-      var s = idx.types[i][1].toLowerCase();
+      var s = types[i][1].toLowerCase();
       if (s.indexOf(q) === 0) starts.push(i);
       else if ((" " + s).indexOf(" " + q) >= 0) inside.push(i);
     });
     var all = starts.concat(inside).slice(0, 60);
     $("matches").innerHTML = all.map(function (i) {
-      return '<a class="row" href="' + link(i) + '"><span>' + esc(idx.types[i][1]) + '</span><span class="n">' + counts[i] + "</span></a>";
+      return '<a class="row" href="' + link(i) + '"><span>' + esc(types[i][1]) + '</span><span class="n">' + counts[i] + "</span></a>";
     }).join("") || '<p class="note">No business type starts with that. Try one word, like "plumber" or "tacos". Asking in your own words is coming soon.</p>';
   }
 
-  function redraw() { countAll(); drawAZ(); drawMatches(); }
+  // Outside the open counties: no full directory yet, only the businesses members added there.
+  function drawOutside() {
+    var box = $("outside");
+    box.hidden = loc.mode !== "outside";
+    if (box.hidden) return;
+    box.innerHTML = '<div class="note"><b>The directory isn\'t open in ' + esc(loc.county) + " yet.</b><br>It covers the 9 Bay Area counties so far. " +
+      'Members can add businesses anywhere, and they show here.</div><div id="addedlist"><p class="countline">Loading...</p></div>' +
+      '<p class="small" style="margin-top:12px"><a href="#" id="tobay">Look around the Bay Area instead</a></p>';
+    $("tobay").addEventListener("click", function (e) {
+      e.preventDefault();
+      D.region().then(function (reg) {
+        var c = reg.counties[0];
+        try { localStorage.setItem("dir-loc", JSON.stringify({ lat: c.center[0], lon: c.center[1], label: c.name, mode: "county", fips: c.fips })); } catch (x) {}
+        window.location.reload();
+      });
+    });
+    D.addedIn(loc.fips).then(function (rows) {
+      var el = $("addedlist");
+      if (!el) return;
+      el.innerHTML = rows.length ? '<p class="countline">' + rows.length + (rows.length === 1 ? " business" : " businesses") + " added in " + esc(loc.county) + ", A to Z</p>" + rows.map(function (b) {
+        return '<a class="row" href="/directory/biz.html?' + D.qs(b.fam, b[0], b.c) + '"><span style="min-width:0"><span class="name">' + esc(b[1]) + '</span><span class="sub">' +
+          esc(types[b[2]][1]) + (b[6] ? " · " + esc(b[6]) : "") + "</span></span></a>";
+      }).join("") : '<p class="countline">None added in ' + esc(loc.county) + " yet. Yours could be the first.</p>";
+    });
+  }
 
-  D.index().then(function (i) {
-    idx = i;
-    idx.types.forEach(function (x, n) { slugAt[x[0]] = n; });
-    return D.location(idx);
-  }).then(function (l) {
-    loc = l;
-    D.locationBar(idx, loc, function (nl) { loc = nl; redraw(); });
-    redraw();
+  function redraw() { countAll(); drawAZ(); drawMatches(); drawOutside(); }
+
+  // Load the counties within reach of where we're looking, then count.
+  function load() {
+    var mine = ++token;
+    if (loc.mode === "outside") { pts = []; redraw(); return Promise.resolve(); }
+    $("total").textContent = "Loading the directory...";
+    return D.region().then(function (reg) {
+      return D.points(D.near(reg, loc, D.radius()));
+    }).then(function (p) {
+      if (mine !== token) return;
+      pts = p;
+      redraw();
+    }).catch(function () {
+      $("total").textContent = "Couldn't load the directory. Please refresh the page.";
+    });
+  }
+
+  Promise.all([D.types(), D.location()]).then(function (o) {
+    types = o[0];
+    types.forEach(function (x, n) { slugAt[x[0]] = n; });
+    loc = o[1];
+    D.locationBar(loc, function (nl) { loc = nl; load(); });
     $("q").addEventListener("input", drawMatches);
     $("q").form && $("q").form.addEventListener("submit", function (e) { e.preventDefault(); });
+    return load();
   }).catch(function () {
     $("total").textContent = "Couldn't load the directory. Please refresh the page.";
   });

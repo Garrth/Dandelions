@@ -26,21 +26,22 @@
       { v: "pts", l: "Takes points (later)", note: "Comes when points start." }]);
   }
 
-  var idx, loc, t = -1, rows = [], filters = [], det = {};
+  var types, loc, t = -1, rows = [], filters = [], det = {}, token = 0;
 
-  function under(type, top) { for (var x = type; x >= 0; x = idx.types[x][2]) if (x === top) return true; return false; }
+  function under(type, top) { for (var x = type; x >= 0; x = types[x][2]) if (x === top) return true; return false; }
 
   function draw() {
     var r = D.radius(), kind = $("kind").value, fv = $("filter").value;
     var f = filters.filter(function (x) { return x.v === fv; })[0] || filters[0];
-    var near = rows.map(function (b) { return { b: b, d: D.miles(loc.lat, loc.lon, b[3], b[4]), det: det[b[0]] }; })
+    var near = loc.mode === "outside" ? [] : rows.filter(function (b) { return typeof b[3] === "number"; })
+      .map(function (b) { return { b: b, d: D.miles(loc.lat, loc.lon, b[3], b[4]), det: det[b[0]] }; })
       .filter(function (x) { return x.d <= r; });
     // Type box: the kinds found under this heading nearby.
     var kc = {};
     near.forEach(function (x) { kc[x.b[2]] = (kc[x.b[2]] || 0) + 1; });
-    var kinds = Object.keys(kc).map(Number).sort(function (a, b) { return idx.types[a][1].localeCompare(idx.types[b][1]); });
+    var kinds = Object.keys(kc).map(Number).sort(function (a, b) { return types[a][1].localeCompare(types[b][1]); });
     $("kind").innerHTML = '<option value="">All (' + near.length + ")</option>" + (kinds.length > 1 ? kinds.map(function (k) {
-      return '<option value="' + k + '"' + (String(k) === kind ? " selected" : "") + ">" + esc(idx.types[k][1]) + " (" + kc[k] + ")</option>";
+      return '<option value="' + k + '"' + (String(k) === kind ? " selected" : "") + ">" + esc(types[k][1]) + " (" + kc[k] + ")</option>";
     }).join("") : "");
     $("kind").disabled = kinds.length < 2;
     var list = near.filter(function (x) { return (!kind || String(x.b[2]) === kind) && (!f.keep || f.keep(x.b, x.det)); });
@@ -49,6 +50,7 @@
     $("note").hidden = !f.note && list.length > 0;
     if (f.note) { $("note").textContent = f.note; list = []; }
     else if (f.empty && near.length && !list.length) $("note").textContent = f.empty;
+    else if (loc.mode === "outside") $("note").innerHTML = "The directory isn't open in " + esc(loc.county) + ' yet. <a href="/directory/">See what members added there</a>, or <a href="/directory/add.html">add a business</a>.';
     else if (!near.length) $("note").textContent = "Nothing within " + r + " miles of " + loc.label + ". Try a bigger distance.";
     var what = { lic: " licensed", solo: " one-person shops", open: " open now", ver: " verified", offer: " with an offer", est: " with free estimates", crew: " with a larger crew", price: " with prices" }[f.v] || "";
     $("count").textContent = f.note ? "" : list.length + what + " within " + r + " miles of " + loc.label + ", " + (f.v === "near" ? "closest first" : f.v === "price" ? "lowest price first" : "A to Z");
@@ -57,31 +59,42 @@
       var tags = (o ? ' · <span class="lic">✓ Verified</span>' : "") + (b[11] ? ' · <span class="lic">Licensed</span>' : "") +
         (o && o.price ? " · " + "$$$$".slice(0, o.price) : "") + (o && o.offer ? ' · <span class="lic">Offer</span>' : "") +
         (o && o.hours ? (D.openNow(o.hours) ? ' · <span class="open">Open</span>' : ' · <span class="closed">Closed</span>') : "");
-      return '<a class="row" href="/directory/biz.html?f=' + encodeURIComponent(idx.types[t][3]) + "&id=" + encodeURIComponent(b[0]) + '">' +
-        '<span style="min-width:0"><span class="name">' + esc(o ? o.name : b[1]) + '</span><span class="sub">' + esc(idx.types[b[2]][1]) + ((o ? o.town : b[6]) ? " · " + esc(o ? o.town : b[6]) : "") + tags + "</span></span>" +
+      return '<a class="row" href="/directory/biz.html?' + D.qs(types[t][3], b[0], b.c) + '">' +
+        '<span style="min-width:0"><span class="name">' + esc(o ? o.name : b[1]) + '</span><span class="sub">' + esc(types[b[2]][1]) + ((o ? o.town : b[6]) ? " · " + esc(o ? o.town : b[6]) : "") + tags + "</span></span>" +
         '<span class="n">' + x.d.toFixed(1) + " mi</span></a>";
     }).join("");
   }
 
-  D.index().then(function (i) {
-    idx = i;
-    idx.types.forEach(function (x, n) { if (x[0] === slug) t = n; });
+  // Load this heading's listings from every county within reach, then draw.
+  function load() {
+    var mine = ++token;
+    $("count").textContent = "Loading...";
+    return D.region().then(function (reg) {
+      var list = D.near(reg, loc, D.radius());
+      return Promise.all([D.families(types[t][3], list), D.details(list)]);
+    }).then(function (out) {
+      if (mine !== token) return;
+      det = out[1];
+      rows = out[0].filter(function (b) { return under(b[2], t); });
+      rows.sort(function (a, b) { return a[1].localeCompare(b[1]); });
+      draw();
+    });
+  }
+
+  Promise.all([D.types(), D.location()]).then(function (o) {
+    types = o[0];
+    types.forEach(function (x, n) { if (x[0] === slug) t = n; });
     if (t < 0) throw new Error("not found");
-    var label = idx.types[t][1];
+    var label = types[t][1];
     document.title = label + " | Directory | Dandelions";
     $("title").textContent = label;
-    filters = filtersFor(idx.types[t][3], "businesses");
+    filters = filtersFor(types[t][3], "businesses");
     $("filter").innerHTML = filters.map(function (f) { return '<option value="' + f.v + '">' + esc(f.l) + "</option>"; }).join("");
-    return Promise.all([D.family(idx.types[t][3]), D.location(idx), D.details()]);
-  }).then(function (out) {
-    det = out[2];
-    rows = out[0].filter(function (b) { return under(b[2], t); });
-    rows.sort(function (a, b) { return a[1].localeCompare(b[1]); });
-    loc = out[1];
-    D.locationBar(idx, loc, function (nl) { loc = nl; draw(); });
+    loc = o[1];
+    D.locationBar(loc, function (nl) { loc = nl; load(); });
     $("kind").addEventListener("change", draw);
     $("filter").addEventListener("change", draw);
-    draw();
+    return load();
   }).catch(function () {
     $("title").textContent = "Couldn't find that";
     $("list").innerHTML = '<p class="note">That kind of business isn\'t in the directory. <a href="/directory/">Back to What do you need?</a></p>';

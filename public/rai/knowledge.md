@@ -104,7 +104,7 @@ Joining means saying three things: this work matters; the way we do things now w
   - The name others see and your town, whether you're open to work, your skills and certifications.
   - Private work questions: how many jobs, hours and pay range. Only you see your answers. Rai only ever shows county totals, and only once at least 10 people in the county answer.
   - Your business, if you have one, which adds it to the directory. Also a password and your share link. The share link only shows who brought who in and has no cash value.
-- Directory, /directory/ : every business in the county, A to Z, with a "What do you need?" search, distance filters and filters like open now, price, licensed, verified and has an offer.
+- Directory, /directory/ : every business in the 9 Bay Area counties (Alameda, Contra Costa, Marin, Napa, San Francisco, San Mateo, Santa Clara, Solano, Sonoma), A to Z, across county lines, with a "What do you need?" search, distance filters and filters like open now, price, licensed, verified and has an offer.
   - Unverified listings show public information only. Verified listings were claimed by their owner, who can add photos, hours, a description, a menu and an offer.
   - There are no star ratings. Listings start from Overture Maps open data, and contractors' license data comes from the California CSLB.
 - Claim a listing, from the listing page: sign in, then get a code by text or phone call to the listing's own phone number, or by email at the website's domain. If the phone number is wrong, use "This isn't our number" to ask for help.
@@ -178,7 +178,7 @@ Each question comes with a note saying which page the person is on. Use it.
 - **Sign in?** 1. Go to [Sign in](/app/login.html). 2. Use your email and password and tap **Log in**, or tap **Email me a link instead**. If you never set a password, use the email link, then set one on [your profile](/app/profile.html).
 - **Set a password?** Sign in with the email link, open [your profile](/app/profile.html), find the password section, and tap **Save password**.
 - **Claim my business?** 1. [Sign in](/app/login.html) (pledge first if you're new). 2. Find the business in the [Directory](/directory/). 3. On its listing tap **Claim it**. 4. Tap **Text me the code** (or **Call with the code instead**), enter the code and tap **Send**. It's yours. If the phone number is wrong, tap **This isn't our number**.
-- **Add my business if it's not in the directory?** Add it from the Your business section of [your profile](/app/profile.html).
+- **Add my business if it's not in the directory?** 1. [Sign in](/app/login.html). 2. Go to [Add a business](/directory/add.html). 3. Fill in the name, kind of business, phone, town and ZIP, check the box and tap **Add it**. It shows right away, anywhere in the US. 4. Tap **It's mine. Claim it** to get the code and add hours, photos and an offer. Added one by mistake? Open the listing and tap **Take it down** at the bottom.
 - **Update my listing?** Open your listing in the [Directory](/directory/) and tap **Edit your listing** (or **Add your details**). Change the basics, hours, photos or offer and tap **Save**. Changes go live right away.
 - **Book a deal of the day?** 1. Open **Edit your listing** for your business. 2. In the Deal of the day section, pick a **Day**, then fill in the deal, the regular price and the deal price. 3. Tap **Book this day**. You can **Cancel** a booked deal before its day.
 - **Post in Talk?** 1. [Sign in](/app/login.html). 2. Open [Talk](/app/talk.html) and tap **New post**. 3. Pick a topic and place, write your post, and tap **Post**. The first time, read the rules and tap **I agree**.
@@ -202,5 +202,5 @@ Each question comes with a note saying which page the person is on. Use it.
 - What does it cost? Nothing.
 - What happens to my data? See /privacy.html. ID papers are never stored by Dandelions. Work answers are private and only shown as county totals of 10 or more.
 - How do I help right now? Pledge, confirm your email, share your link, check the to-do list, add your business to the directory or claim it, and join the conversation in Talk.
-- My county isn't Sonoma. Pledges count everywhere and every county shows on the map. Directory listings and Rai's numbers start with Sonoma County and more counties come as people join.
+- My county isn't Sonoma. Pledges count everywhere and every county shows on the map. The full directory covers the 9 Bay Area counties. Anywhere else, members can add businesses at /directory/add.html and they show for that county. Rai's numbers start with Sonoma County and more counties come as people join.
 - How do I contact a person? Post in Talk, or email privacy@dandelions.lol for privacy questions.

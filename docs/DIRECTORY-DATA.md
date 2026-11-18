@@ -1,6 +1,6 @@
 # Directory data
 
-The directory at `/directory/` lists every business in a county, A to Z. The listings are static files, so there's no database cost.
+The directory at `/directory/` lists every business in the 9 Bay Area counties, A to Z. Searches reach across county lines. The listings are static files, so there's no database cost.
 
 ## Where listings come from
 
@@ -10,8 +10,24 @@ The directory at `/directory/` lists every business in a county, A to Z. The lis
 
 ## Files
 
-- `public/data/dir/<county fips>/index.json` holds the business types (headings), one point per business for the distance counts, and ZIP and town centers.
+- `public/data/dir/open.json` lists the open counties (with a box around each, so the site loads only the counties within reach), and every ZIP and town in them.
+- `public/data/dir/types.json` is the one list of business types (headings) all counties share.
+- `public/data/dir/<county fips>/index.json` holds one point per business for the distance counts, and ZIP and town centers.
 - `public/data/dir/<county fips>/fam/<family>.json` holds the listings for one family of types (for example `restaurant` or `home_service`).
+
+## Businesses members add
+
+Members can add a business anywhere in the US at `/directory/add.html`. These live in the `added_listings` table (ids start with `add-`), show right away, and the owner claims them with a phone code like any listing. Whoever added one can take it down from the listing page. Nothing is deleted: a take-down sets `status = 'removed'`, so it can be put back. In open counties they sit at their ZIP center for distance. Elsewhere they show on the directory home for that county.
+
+## Adding counties or rebuilding
+
+1. `tools/pull_overture.py` reads places and county lines for an area from the Overture release.
+2. `tools/build_directory.py` builds each county (below).
+3. `tools/get_cslb.py` then `tools/add_licenses.py` add contractor licenses (California).
+4. `tools/share_types.py public/data/dir 06097 06001 ...` gives every county the shared type list. Always list 06097 first.
+5. `tools/build_region.py boundaries.json public/data/dir 06097 06001 ...` writes `open.json`.
+
+Bay Area, Nov 18 2026: Overture release 2026-10-21.0, 377,801 listings in all, 1,807 business types.
 
 ## Rebuilding a county
 

@@ -1,14 +1,24 @@
-// Shared parts of the directory: the county listings, where the visitor is, and how far to look.
-// Listings are static files built from Overture Maps open data (tools/build_directory.py).
+// Shared parts of the directory: the listings, where the visitor is, and how far to look.
+// Listings are static files, one folder per county, built from Overture Maps open data
+// (tools/build_directory.py), plus businesses members added (the added_listings table).
+// Every county uses the same list of business types (/data/dir/types.json), so a search can
+// reach across county lines.
 (function () {
-  var COUNTY = "06097";
-  var BASE = "/data/dir/" + COUNTY + "/";
+  var ROOT = "/data/dir/";
+  var FIRST = "06097"; // Sonoma County, where the directory started
+  var asked = new URLSearchParams(location.search).get("c");
+  // The county of the one listing a page is about (biz, claim and edit pages).
+  var COUNTY = /^[0-9]{5}$/.test(asked || "") ? asked : FIRST;
+  var BASE = ROOT + COUNTY + "/";
   var cache = {};
 
   function get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
   function put(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
-  function json(url) {
-    if (!cache[url]) cache[url] = fetch(url).then(function (r) { if (!r.ok) throw new Error(url); return r.json(); });
+  function json(url, missingOk) {
+    if (!cache[url]) cache[url] = fetch(url).then(function (r) {
+      if (!r.ok) { if (missingOk && r.status === 404) return null; throw new Error(url); }
+      return r.json();
+    });
     return cache[url];
   }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -19,8 +29,12 @@
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
     return 3958.8 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
+  // Link to one listing: its family, id and county.
+  function qs(fam, id, fips) {
+    return "f=" + encodeURIComponent(fam || "") + "&id=" + encodeURIComponent(id || "") + "&c=" + encodeURIComponent(fips || COUNTY);
+  }
 
-  // Where to measure from. Saved choice first, then the member's ZIP, then the middle of the county.
+  // Where to measure from. Saved choice first, then the member's ZIP, then the middle of Sonoma County.
   function signedIn() {
     try { for (var i = 0; i < localStorage.length; i++) if (/^sb-.*-auth-token$/.test(localStorage.key(i))) return true; } catch (e) {}
     return false;
@@ -65,32 +79,47 @@
       return db().from("members").select("zip").eq("id", u.id).maybeSingle().then(function (r) { return r.data ? r.data.zip : null; });
     }).catch(function () { return null; });
   }
-  function fromZip(idx, zip) {
-    var c = idx.zips[zip];
-    return c ? { lat: c[0], lon: c[1], label: zip + " " + (townForZip(idx, c) || ""), mode: "zip" } : null;
-  }
-  function townForZip(idx, c) {
+  // open.json: the counties the directory covers, with every ZIP and town in them.
+  function region() { return json(ROOT + "open.json"); }
+  function types() { return json(ROOT + "types.json"); }
+  function countyOf(reg, fips) { return reg.counties.filter(function (c) { return c.fips === fips; })[0] || null; }
+  function townNear(reg, lat, lon) {
     var best = null, d = 1e9;
-    Object.keys(idx.towns).forEach(function (t) { var p = idx.towns[t], m = miles(c[0], c[1], p[0], p[1]); if (m < d) { d = m; best = t; } });
+    Object.keys(reg.towns).forEach(function (t) { var p = reg.towns[t], m = miles(lat, lon, p[0], p[1]); if (m < d) { d = m; best = t; } });
     return best;
   }
-  function county(idx) { return { lat: idx.center[0], lon: idx.center[1], label: idx.name, mode: "county" }; }
+  function fromZip(reg, zip) {
+    var c = reg.zips[zip];
+    return c ? { lat: c[0], lon: c[1], label: zip + " " + (townNear(reg, c[0], c[1]) || ""), mode: "zip", fips: c[2] } : null;
+  }
+  function start(reg) { var c = countyOf(reg, FIRST); return { lat: c.center[0], lon: c.center[1], label: c.name, mode: "county", fips: FIRST }; }
+  // A ZIP outside the open counties: which county it's in, for the businesses members added there.
+  function outside(zip) {
+    return Promise.all([json("/data/zip-county.json"), json("/data/counties.json")]).then(function (o) {
+      var fips = o[0][zip], c = fips && o[1][fips];
+      return fips ? { mode: "outside", zip: zip, fips: fips, label: zip + (c ? " " + c[0] + ", " + c[1] : ""), county: c ? c[0] + ", " + c[1] : "your county" } : null;
+    }).catch(function () { return null; });
+  }
 
-  function location(idx) {
+  function whereFrom() {
     var saved = get("dir-loc");
-    if (saved && typeof saved.lat === "number") return Promise.resolve(saved);
-    return memberZip().then(function (zip) {
-      var loc = zip && fromZip(idx, zip);
-      if (!loc) { loc = county(idx); if (zip) loc.note = "Your ZIP " + zip + " isn't in the directory yet. We're starting with " + idx.name + "."; }
-      return loc;
+    if (saved && (typeof saved.lat === "number" || saved.mode === "outside")) return Promise.resolve(saved);
+    return Promise.all([region(), memberZip()]).then(function (o) {
+      var reg = o[0], zip = o[1];
+      var loc = zip && fromZip(reg, zip);
+      if (loc) return loc;
+      if (!zip) return start(reg);
+      return outside(zip).then(function (l) { return l || start(reg); });
     });
   }
-  // Turn "95404" or "Petaluma" into a place. Returns null when it isn't in this county yet.
-  function lookup(idx, text) {
+  // Turn "95404", "Oakland" or any US ZIP into a place. Resolves null when we don't know it.
+  function lookup(text) {
     var t = (text || "").trim();
-    if (/^\d{5}$/.test(t)) return fromZip(idx, t);
-    var key = Object.keys(idx.towns).filter(function (n) { return n.toLowerCase() === t.toLowerCase(); })[0];
-    return key ? { lat: idx.towns[key][0], lon: idx.towns[key][1], label: key, mode: "town" } : null;
+    return region().then(function (reg) {
+      if (/^\d{5}$/.test(t)) return fromZip(reg, t) || outside(t);
+      var key = Object.keys(reg.towns).filter(function (n) { return n.toLowerCase() === t.toLowerCase(); })[0];
+      return key ? { lat: reg.towns[key][0], lon: reg.towns[key][1], label: key, mode: "town", fips: reg.towns[key][2] } : null;
+    });
   }
   function nearMe() {
     return new Promise(function (ok, no) {
@@ -102,14 +131,48 @@
   }
   function radius() { var r = get("dir-rad"); return r === "me" ? 5 : [5, 10, 25].indexOf(r) >= 0 ? r : 10; }
 
+  // The open counties that reach within r miles of a place (closest point of each county's box).
+  function near(reg, loc, r) {
+    if (typeof loc.lat !== "number") return [];
+    return reg.counties.filter(function (c) {
+      var b = c.box, lat = Math.min(Math.max(loc.lat, b[0]), b[2]), lon = Math.min(Math.max(loc.lon, b[1]), b[3]);
+      return miles(loc.lat, loc.lon, lat, lon) <= r;
+    }).map(function (c) { return c.fips; });
+  }
+
+  // Businesses members added, in some counties. Each comes back shaped like a directory row.
+  function addedRows(list, slugAt) {
+    if (!list.length || !db()) return Promise.resolve([]);
+    var key = "added:" + list.slice().sort().join(",");
+    if (!cache[key]) cache[key] = db().from("added_listings")
+      .select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon")
+      .in("county_fips", list).eq("status", "live").limit(5000)
+      .then(function (r) { return r.error ? [] : r.data || []; }).catch(function () { return []; });
+    return cache[key].then(function (data) {
+      return data.filter(function (a) { return slugAt[a.type_slug] !== undefined; }).map(function (a) { return toRow(a, slugAt); });
+    });
+  }
+  function toRow(a, slugAt) {
+    var row = [a.id, a.name, slugAt[a.type_slug], a.lat, a.lon, a.show_street ? a.address : "", a.town, a.zip, a.phone, a.website || "", ""];
+    row.c = a.county_fips; row.fam = a.family; row.added = true; row.state = a.state; row.noStreet = !a.show_street;
+    return row;
+  }
+  function slugIndex(t) {
+    if (!t.slugs) { t.slugs = {}; t.forEach(function (x, n) { t.slugs[x[0]] = n; }); }
+    return t.slugs;
+  }
+
   // The location bar and distance box, shared by the first two screens.
-  function locationBar(idx, loc, onChange) {
+  function locationBar(loc, onChange) {
     var btn = document.getElementById("locbtn"), sel = document.getElementById("radius"), panel = document.getElementById("locform");
     var input = document.getElementById("where"), err = document.getElementById("locerr"), list = document.getElementById("towns");
-    if (list) list.innerHTML = Object.keys(idx.towns).map(function (t) { return '<option value="' + esc(t) + '">'; }).join("");
+    region().then(function (reg) {
+      if (list) list.innerHTML = Object.keys(reg.towns).map(function (t) { return '<option value="' + esc(t) + '">'; }).join("");
+    });
     function show() {
       btn.innerHTML = esc(loc.label) + ' <span>· change</span>';
       sel.value = get("dir-rad") === "me" && loc.mode === "me" ? "me" : String(radius());
+      sel.disabled = loc.mode === "outside";
       var n = document.getElementById("locnote");
       if (n) { n.textContent = loc.note || ""; n.hidden = !loc.note; }
     }
@@ -117,8 +180,9 @@
     btn.addEventListener("click", function () { panel.hidden = !panel.hidden; if (!panel.hidden) input.focus(); });
     document.getElementById("locform").addEventListener("submit", function (e) {
       e.preventDefault();
-      var l = lookup(idx, input.value);
-      if (l) set(l); else err.textContent = "We don't have that ZIP or town yet. The directory starts with " + idx.name + ".";
+      lookup(input.value).then(function (l) {
+        if (l) set(l); else err.textContent = "We don't know that ZIP or town. Try a 5-digit ZIP code.";
+      });
     });
     document.getElementById("loccancel").addEventListener("click", function () { panel.hidden = true; err.textContent = ""; });
     sel.addEventListener("change", function () {
@@ -134,34 +198,88 @@
   }
 
   window.DIR = {
-    COUNTY: COUNTY, BASE: BASE, esc: esc, miles: miles, json: json, location: location, radius: radius,
-    locationBar: locationBar, index: function () { return json(BASE + "index.json"); },
-    family: function (f) { return json(BASE + "fam/" + encodeURIComponent(f) + ".json"); },
+    COUNTY: COUNTY, FIRST: FIRST, BASE: BASE, esc: esc, miles: miles, json: json, qs: qs, location: whereFrom, radius: radius,
+    locationBar: locationBar, region: region, types: types, slugIndex: slugIndex, near: near,
     db: db, signedIn: signedIn, openNow: openNow, DAYS: DAYS, cleanHours: cleanHours,
-    // Ids of listings an owner has claimed. Empty if the database can't be reached.
-    claimed: function () {
-      if (!cache.claimed) {
-        cache.claimed = !db() ? Promise.resolve([]) :
-          db().rpc("claimed_listings", { fips: COUNTY })
-            .then(function (r) { return r.error || !r.data ? [] : r.data.map(function (x) { return typeof x === "string" ? x : x.claimed_listings; }); })
-            .catch(function () { return []; });
+    // Every business point (type, lat x 10000, lon x 10000) in these counties, added ones too.
+    points: function (list) {
+      return Promise.all([types()].concat(list.map(function (f) { return json(ROOT + f + "/index.json"); }))).then(function (o) {
+        var pts = [];
+        o.slice(1).forEach(function (idx) { pts = pts.concat(idx.pts); });
+        return addedRows(list, slugIndex(o[0])).then(function (rows) {
+          rows.forEach(function (b) { if (typeof b[3] === "number") pts.push(b[2], Math.round(b[3] * 1e4), Math.round(b[4] * 1e4)); });
+          return pts;
+        });
+      });
+    },
+    // Listings in one family across counties. Each row knows its county (row.c).
+    families: function (fam, list) {
+      return types().then(function (t) {
+        return Promise.all(list.map(function (f) {
+          return json(ROOT + f + "/fam/" + encodeURIComponent(fam) + ".json", true).then(function (rows) {
+            (rows || []).forEach(function (b) { b.c = f; });
+            return rows || [];
+          }).catch(function () { return []; });
+        }).concat([addedRows(list, slugIndex(t))])).then(function (o) {
+          var added = o.pop().filter(function (b) { return b.fam === fam; });
+          return [].concat.apply([], o).concat(added);
+        });
+      });
+    },
+    // One listing, from the county files or the businesses members added. Resolves null if it isn't there.
+    listing: function (fam, id) {
+      if (/^add-/.test(id)) {
+        if (!db()) return Promise.resolve(null);
+        return Promise.all([types(), db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon,status")
+          .eq("id", id).maybeSingle()]).then(function (o) {
+          var a = o[1].data, at = slugIndex(o[0]);
+          if (!a || at[a.type_slug] === undefined) return null;
+          var row = toRow(a, at); row.removed = a.status !== "live";
+          return row;
+        });
       }
-      return cache.claimed;
+      return json(BASE + "fam/" + encodeURIComponent(fam) + ".json", true).then(function (rows) {
+        var b = (rows || []).filter(function (x) { return x[0] === id; })[0];
+        if (b) b.c = COUNTY;
+        return b || null;
+      });
+    },
+    // Ids of listings an owner has claimed, in these counties. Empty if the database can't be reached.
+    claimed: function (list) {
+      list = list || [COUNTY];
+      var key = "claimed:" + list.join(",");
+      if (!cache[key]) {
+        cache[key] = !db() ? Promise.resolve([]) : Promise.all(list.map(function (f) {
+          return db().rpc("claimed_listings", { fips: f })
+            .then(function (r) { return r.error || !r.data ? [] : r.data.map(function (x) { return typeof x === "string" ? x : x.claimed_listings; }); });
+        })).then(function (o) { return [].concat.apply([], o); }).catch(function () { return []; });
+      }
+      return cache[key];
     },
     // What owners added, by listing id. Only listings with an owner of record count, so a
     // listing whose claim was taken back stops showing what that owner wrote.
-    details: function () {
-      if (!cache.details) {
-        cache.details = !db() ? Promise.resolve({}) : Promise.all([
-          db().from("listing_details").select("*").eq("county_fips", COUNTY).then(function (r) { return r.error ? [] : r.data || []; }),
-          window.DIR.claimed()
+    details: function (list) {
+      list = list || [COUNTY];
+      var key = "details:" + list.join(",");
+      if (!cache[key]) {
+        cache[key] = !db() || !list.length ? Promise.resolve({}) : Promise.all([
+          db().from("listing_details").select("*").in("county_fips", list).then(function (r) { return r.error ? [] : r.data || []; }),
+          window.DIR.claimed(list)
         ]).then(function (o) {
           var out = {};
           o[0].forEach(function (d) { if (o[1].indexOf(d.listing_id) >= 0) { d.hours = cleanHours(d.hours); out[d.listing_id] = d; } });
           return out;
         }).catch(function () { return {}; });
       }
-      return cache.details;
+      return cache[key];
+    },
+    // Businesses members added in a county outside the open ones (no map spots there yet).
+    addedIn: function (fips) {
+      return Promise.all([types(), db() ? db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon")
+        .eq("county_fips", fips).eq("status", "live").order("name").limit(2000) : Promise.resolve({ data: [] })]).then(function (o) {
+        var at = slugIndex(o[0]);
+        return (o[1].data || []).filter(function (a) { return at[a.type_slug] !== undefined; }).map(function (a) { return toRow(a, at); });
+      }).catch(function () { return []; });
     },
     photoUrl: function (path) {
       var cfg = window.DANDELIONS_CONFIG;

@@ -3,7 +3,8 @@
 window.Deals = (function () {
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function bizLink(d) {
-    return d.listing_id ? "/directory/biz.html?f=" + encodeURIComponent(d.family || "") + "&id=" + encodeURIComponent(d.listing_id) : "";
+    return d.listing_id ? "/directory/biz.html?f=" + encodeURIComponent(d.family || "") + "&id=" + encodeURIComponent(d.listing_id) +
+      (d.county_fips ? "&c=" + encodeURIComponent(d.county_fips) : "") : "";
   }
   function card(d) {
     var href = d.link || bizLink(d);
