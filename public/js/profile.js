@@ -155,7 +155,7 @@
   function saveProfile(fields, done) {
     var row = Object.assign({ id: user.id, updated_at: new Date().toISOString() }, fields);
     return db.from("profiles").upsert(row).then(function (r) {
-      if (r.error) { toast("Couldn't save. Check the fields and try again."); return false; }
+      if (r.error) { toast(/reserved_name/.test(r.error.message || "") ? "That name is kept for the site (like Rai or Moderator). Please pick another." : "Couldn't save. Check the fields and try again."); return false; }
       Object.assign(prof, fields); return true;
     });
   }

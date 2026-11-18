@@ -95,7 +95,7 @@ window.BaselineKit = (function () {
       "<li><b>Vote for " + s.vote_days + " days.</b> One person, one vote: yes, no or pass. Only ID-checked members vote. Votes are private, and results show when the vote closes.</li>" +
       "<li><b>Passes</b> with more yes than no and at least " + s.min_votes + " votes. A tie fails.</li>" +
       "<li><b>Rai writes the final wording</b> from the proposal and the discussion, without adding anything new.</li>" +
-      "<li><b>Final check for " + s.final_days + " days.</b> ID-checked members vote on one question: does this wording match what we agreed? More yes than no makes it permanent. If not, Rai rewrites it from the comments, up to " + s.max_rewrites + " tries.</li>" +
+      "<li><b>Final check for " + s.final_days + " days.</b> ID-checked members vote on one question: does this wording match what we agreed? " + (s.final_min_votes ? "It needs at least " + s.final_min_votes + " votes (if there are fewer, the check runs once more). " : "") + "More yes than no makes it permanent. If not, Rai rewrites it from the comments, up to " + s.max_rewrites + " tries.</li>" +
       "<li><b>Goes live on its own.</b> The version number goes up, and the old wording stays in the history on the Baselines page.</li>" +
       "</ol><p class=\"small muted\">A change that doesn't pass can come back " + s.retry_days + " days later. These numbers are starting points too.</p></details>";
   }
