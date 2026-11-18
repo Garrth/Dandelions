@@ -120,7 +120,7 @@
     if (v.length < 3) { note.textContent = "Add a few more words so we know what you mean."; return; }
     if (!db) { note.textContent = "Couldn't save that right now. Please try again later."; return; }
     db.from("ideas").insert({ idea: v }).then(function (res) {
-      if (res.error) { note.textContent = "Couldn't save that right now. Please try again in a bit."; return; }
+      if (res.error) { note.textContent = /ideas_full/.test(res.error.message || "") ? "The ideas box is full for today. Please try again tomorrow." : "Couldn't save that right now. Please try again in a bit."; return; }
       input.value = "";
       note.textContent = "Thanks, we saved “" + v + "”. Got another one?";
     });
