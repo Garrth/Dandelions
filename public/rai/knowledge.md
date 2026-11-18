@@ -195,7 +195,7 @@ Each question comes with a note saying which page the person is on. Use it.
 
 ## Common questions
 
-- Is this a scam? There's nothing to buy, no fee, no investment, and nothing with cash value. You give an email and a ZIP code and can leave any time. The code is open for anyone to read. Be skeptical of anyone who asks you for money in the name of Dandelions.
+- Is this a scam? There's nothing to buy, no fee, no investment, and nothing with cash value. You give an email and a ZIP code and can leave any time. The code is open for anyone to read. Joining is free, and Dandelions itself never asks you for money. If someone does in its name, it isn't us.
 - Is it crypto? Dandelions doesn't sell anything and points aren't on. Later, records are planned to move to a shared public ledger so no one can secretly change them. There's nothing to invest in.
 - Who runs it? It was started by Garth, the founder. It's built so it doesn't depend on one leader: open code, public rules, and roles handed to members over time.
 - Can I get paid? Not yet. When Work opens in your county (once 1% of the county passes the ID check), member businesses (including one-person businesses) can propose projects and earn points for verified work. There's no promise of income or jobs.
