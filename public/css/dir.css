@@ -75,3 +75,5 @@ body.dir { padding-bottom: 32px; }
 :root[data-theme="dark"] .dir .hero { background: #0b1009; }
 .dl-cancel { background: none; border: 0; padding: 0; color: var(--warn, #b5541c); text-decoration: underline; cursor: pointer; font: inherit; }
 .dir .addbiz { margin-top: 18px; }
+.dir .ownbiz { display: block; margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid #ffd21a; color: #fdfdf8; text-decoration: none; font-size: 15px; }
+.dir .ownbiz b { color: #ffd21a; }
