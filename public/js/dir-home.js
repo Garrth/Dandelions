@@ -15,7 +15,8 @@
     movers: "mover", moving: "mover", chiropractor: "chiropractic", massage: "massage_therapy", trees: "tree_service",
     gardener: "landscaping", yard: "landscaping", wine: "winery", hotel: "hotel", gym: "gym", daycare: "child_care_and_day_care",
     roofer: "roofing", electrician: "electrician", painter: "painting", handyman: "handyman", tires: "tire_shop",
-    "oil change": "automotive_repair", pharmacy: "pharmacy", groomer: "pet_groomer", nails: "nail_salon"
+    "oil change": "automotive_repair", pharmacy: "pharmacy", groomer: "pet_groomer", nails: "nail_salon",
+    novelty: "gift_shop", gifts: "gift_shop", online: "online_store", merch: "customized_merchandise_store"
   };
 
   var types, pts = [], loc, slugAt = {}, counts = [], token = 0, near = [], nameTimer, nameAsk = 0;

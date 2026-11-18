@@ -56,7 +56,7 @@
     $("count").textContent = f.note ? "" : list.length + what + " within " + r + " miles of " + loc.label + ", " + (f.v === "near" ? "closest first" : f.v === "price" ? "lowest price first" : "A to Z");
     $("list").innerHTML = list.map(function (x) {
       var b = x.b, o = x.det;
-      var tags = (o ? ' · <span class="lic">✓ Verified</span>' : "") + (b[11] ? ' · <span class="lic">Licensed</span>' : "") +
+      var tags = ((o ? o.online_only : b.online) ? " · Online" : "") + (o ? ' · <span class="lic">✓ Verified</span>' : "") + (b[11] ? ' · <span class="lic">Licensed</span>' : "") +
         (o && o.price ? " · " + "$$$$".slice(0, o.price) : "") + (o && o.offer ? ' · <span class="lic">Offer</span>' : "") +
         (o && o.hours ? (D.openNow(o.hours) ? ' · <span class="open">Open</span>' : ' · <span class="closed">Closed</span>') : "");
       return '<a class="row" href="/directory/biz.html?' + D.qs(types[t][3], b[0], b.c) + '">' +

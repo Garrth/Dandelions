@@ -147,7 +147,7 @@
     if (!list.length || !db()) return Promise.resolve([]);
     var key = "added:" + list.slice().sort().join(",");
     if (!cache[key]) cache[key] = db().from("added_listings")
-      .select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon")
+      .select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon,online_only")
       .in("county_fips", list).eq("status", "live").limit(5000)
       .then(function (r) { return r.error ? [] : r.data || []; }).catch(function () { return []; });
     return cache[key].then(function (data) {
@@ -156,7 +156,7 @@
   }
   function toRow(a, slugAt) {
     var row = [a.id, a.name, slugAt[a.type_slug], a.lat, a.lon, a.show_street ? a.address : "", a.town, a.zip, a.phone, a.website || "", ""];
-    row.c = a.county_fips; row.fam = a.family; row.added = true; row.state = a.state; row.noStreet = !a.show_street;
+    row.c = a.county_fips; row.fam = a.family; row.added = true; row.state = a.state; row.noStreet = !a.show_street || !!a.online_only; row.online = !!a.online_only;
     return row;
   }
   function slugIndex(t) {
@@ -232,7 +232,7 @@
     listing: function (fam, id) {
       if (/^add-/.test(id)) {
         if (!db()) return Promise.resolve(null);
-        return Promise.all([types(), db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon,status")
+        return Promise.all([types(), db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon,online_only,status")
           .eq("id", id).maybeSingle()]).then(function (o) {
           var a = o[1].data, at = slugIndex(o[0]);
           if (!a || at[a.type_slug] === undefined) return null;
@@ -277,7 +277,7 @@
     },
     // Businesses members added in a county outside the open ones (no map spots there yet).
     addedIn: function (fips) {
-      return Promise.all([types(), db() ? db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon")
+      return Promise.all([types(), db() ? db().from("added_listings").select("id,county_fips,family,type_slug,name,address,show_street,town,state,zip,phone,website,lat,lon,online_only")
         .eq("county_fips", fips).eq("status", "live").order("name").limit(2000) : Promise.resolve({ data: [] })]).then(function (o) {
         var at = slugIndex(o[0]);
         return (o[1].data || []).filter(function (a) { return at[a.type_slug] !== undefined; }).map(function (a) { return toRow(a, at); });

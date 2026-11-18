@@ -14,6 +14,14 @@
     add_repeat: "A business with this phone number was already added in this county."
   };
   function $(x) { return document.getElementById(x); }
+  // Words people type that aren't in the names of kinds, and the kinds they mean.
+  var ALSO = {
+    novelty: ["Gift shop", "Souvenir store", "Customized merchandise store", "Online store"],
+    merch: ["Customized merchandise store", "Custom t shirt store", "T shirt store", "Online store"],
+    online: ["Online store"], ecommerce: ["Online store"], web: ["Online store", "Web designer"], internet: ["Online store"],
+    gifts: ["Gift shop", "Flowers & gifts store"], shirts: ["T shirt store", "Custom t shirt store"],
+    handyman: ["Handyman"], builder: ["Building contractor", "Contractor"], general: ["Contractor", "Building contractor"]
+  };
   function phoneOf(p) {
     var d = String(p || "").replace(/\D/g, "");
     if (d.length === 11 && d[0] === "1") d = d.slice(1);
@@ -91,6 +99,8 @@
             '<label class="field" style="margin-top:12px">Business name<input id="name" maxlength="100" autocomplete="organization" value="' + esc(asked.name) + '" required></label>' +
       '<label class="field">What kind of business<input id="kind" list="kinds" autocomplete="off" placeholder="Start typing: plumbing, bakery, dentist" required></label>' +
       '<datalist id="kinds"></datalist>' +
+      '<label class="field">Not on the list? Tell us what it is (optional)<input id="kindnote" maxlength="100" placeholder="Pick the closest one above, and tell us here"></label>' +
+      '<label class="check"><input type="checkbox" id="online"> Online only. No storefront for customers to visit.</label>' +
       '<label class="field">Business phone<input id="phone" type="tel" autocomplete="tel" maxlength="20" placeholder="(707) 555-1234" required></label>' +
       '<label class="field">Street address (optional)<input id="address" maxlength="120" autocomplete="street-address" placeholder="123 Main St"></label>' +
       '<label class="check"><input type="checkbox" id="hide"> Don\'t show the street. I work from home or go to my customers.</label>' +
@@ -105,7 +115,9 @@
       'Once it\'s in, the owner can claim it with a code sent to the business phone, then add hours, photos and an offer.</p>');
     $("kind").addEventListener("input", function () {
       var q = $("kind").value.trim().toLowerCase();
-      $("kinds").innerHTML = q.length < 2 ? "" : Object.keys(labels).filter(function (l) { return l.toLowerCase().indexOf(q) >= 0; })
+      var also = Object.keys(ALSO).filter(function (w) { return w.indexOf(q) === 0 || q.indexOf(w) === 0; })
+        .reduce(function (a, w) { return a.concat(ALSO[w]); }, []);
+      $("kinds").innerHTML = q.length < 2 ? "" : Object.keys(labels).filter(function (l) { return l.toLowerCase().indexOf(q) >= 0 || also.indexOf(l) >= 0; })
         .sort(function (a, b) { return (a.toLowerCase().indexOf(q) === 0 ? 0 : 1) - (b.toLowerCase().indexOf(q) === 0 ? 0 : 1) || a.localeCompare(b); })
         .slice(0, 40).map(function (l) { return '<option value="' + esc(l) + '">'; }).join("");
     });
@@ -154,8 +166,9 @@
       }
       msg.textContent = "Adding...";
       return db.from("added_listings").insert({
-        county_fips: c.fips, family: fam, type_slug: type[0], name: name, address: v("address"), show_street: !$("hide").checked,
+        county_fips: c.fips, family: fam, type_slug: type[0], name: name, address: v("address"), show_street: !$("hide").checked && !$("online").checked,
         town: town, state: c.state, zip: zip, phone: phone, website: web,
+        online_only: $("online").checked, kind_note: v("kindnote"),
         lat: spot ? spot[0] : null, lon: spot ? spot[1] : null
       }).select("id").single().then(function (r) {
         if (r.error) {
