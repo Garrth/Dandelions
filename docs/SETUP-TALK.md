@@ -1,6 +1,6 @@
 # Setup: Talk
 
-Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rules_moderators.sql` (and later `20261118000000_talk_flag_limits.sql`), once each in the SQL Editor (project dandelions).
+Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rules_moderators.sql` (and later `20261118000000_talk_flag_limits.sql` and `20261118020000_talk_mod_public.sql`), once each in the SQL Editor (project dandelions).
 
 ## How it works
 
@@ -13,6 +13,7 @@ Run `supabase/migrations/20261105020000_talk.sql`, then `20261105030000_talk_rul
 - Nobody approves posts. Anyone logged in can flag (10 flags a day). When 3 different **ID-checked** members flag a post, it's hidden. Its author still sees it. Flags from other members don't hide anything, but every flag shows on the moderators' **Flagged posts** page in Talk (`/app/talk.html?flagged=1`).
 - A baseline proposal whose post is hidden before its vote pauses. Put it back and it carries on. Left hidden for 7 days, it ends.
 - A member can post up to 30 times a day.
+- Real moderators get a **Moderator** badge next to their name. Anyone can read the **Moderator log** in Talk (`/app/talk.html?modlog=1`): the last 90 days of moderator actions and the reasons given. Paused members aren't named.
 - Deleting a post blanks it but keeps replies in place.
 
 ## Looking after Talk

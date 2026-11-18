@@ -1,0 +1,68 @@
+# Weekly database backup. The Supabase Free plan keeps no backups, so this does.
+# It copies the database (tables, sign-ins, file records), locks it with a passphrase,
+# and keeps it in the Actions tab for 90 days. Run it by hand: Actions > Database backup > Run workflow.
+# Setup and how to restore: docs/SETUP-BACKUP.md.
+name: Database backup
+
+on:
+  schedule:
+    - cron: '23 11 * * 0'  # Sundays, about 3-4am in California
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check the secrets are set
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB_URL" ] || [ -z "$PASSPHRASE" ]; then
+            echo "::error::Add SUPABASE_DB_URL and BACKUP_PASSPHRASE in Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          if [ ${#PASSPHRASE} -lt 20 ]; then
+            echo "::error::BACKUP_PASSPHRASE should be at least 20 characters."
+            exit 1
+          fi
+
+      - name: Copy the database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          mkdir -p out
+          docker run --rm -e DB_URL -v "$PWD/out:/out" postgres:17 \
+            sh -c 'pg_dump "$DB_URL" --format=custom --schema=public --schema=auth --schema=storage --file=/out/dandelions.dump'
+          size=$(stat -c %s out/dandelions.dump)
+          echo "Backup size: $size bytes"
+          if [ "$size" -lt 10000 ]; then
+            echo "::error::The backup is too small to be real."
+            exit 1
+          fi
+
+      # The repo is public, so the file is locked before it's stored. Only someone with the passphrase can open it.
+      - name: Lock it with the passphrase
+        env:
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          name="dandelions-$(date -u +%Y-%m-%d).dump.gpg"
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
+            --symmetric --cipher-algo AES256 --output "out/$name" out/dandelions.dump 3<<<"$PASSPHRASE"
+          shred -u out/dandelions.dump
+          echo "NAME=$name" >> "$GITHUB_ENV"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: out/${{ env.NAME }}
+          retention-days: 90
+          compression-level: 0

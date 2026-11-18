@@ -65,7 +65,7 @@
   var PLACE_RE = /^(us|st-[A-Z]{2}|co-[0-9]{5})$/, ID_RE = /^[0-9a-f-]{36}$/;
 
   var user = null, agreed = false, mod = false, pausedUntil = null, counties = {};
-  var places = [], place = "", topics = [], stars = {}, follows = {}, backed = {}, flagged = {};
+  var places = [], place = "", topics = [], stars = {}, follows = {}, backed = {}, flagged = {}, mods = {};
   var view = {}, topPost = null, notices = [];
   // Rai: the Catching on list for General, and which idea each General post is in.
   var ideas = [], ideaByPost = {};
@@ -125,6 +125,8 @@
     return id === "us" ? "The whole US" : id && id.indexOf("co-") === 0 && c ? c[0] + ", " + c[1] : id && id.indexOf("st-") === 0 ? "All of " + id.slice(3) : "Talk";
   }
   function topicById(id) { return topics.filter(function (t) { return t.id === id; })[0]; }
+  // Real moderators get a badge, so nobody can pass as one.
+  function modChip(id) { return mods[id] ? ' <span class="chip">Moderator</span>' : ""; }
   function paused() { return pausedUntil && new Date(pausedUntil) > new Date(); }
   function pauseNote() {
     return '<p class="note">A moderator paused your posting until ' + esc(new Date(pausedUntil).toLocaleDateString("en-US", { month: "short", day: "numeric" })) + ". You can still read.</p>";
@@ -166,6 +168,7 @@
     else if (q.u) s.set("u", q.u);
     else if (q.following) s.set("following", "1");
     else if (q.flagged) s.set("flagged", "1");
+    else if (q.modlog) s.set("modlog", "1");
     else { s.set("r", q.r || place); if (q.t) s.set("t", q.t); if (q.all) s.set("all", "1"); }
     return "/app/talk.html?" + s.toString();
   }
@@ -233,6 +236,7 @@
       '<a data-nav class="tk-topic quiet' + (view.kind === "all" ? " on" : "") + '" href="' + esc(href({ r: place, all: 1 })) + '"><span>All topics (' + open.length + ")</span></a>" +
       (user ? '<a data-nav class="tk-topic quiet' + (view.kind === "following" ? " on" : "") + '" href="' + esc(href({ following: 1 })) + '"><span>People you follow (' + Object.keys(follows).length + ")</span></a>" :
         '<p class="small muted tk-hint">Log in to star topics so they stay here.</p>') +
+      '<a data-nav class="tk-topic quiet' + (view.kind === "modlog" ? " on" : "") + '" href="' + esc(href({ modlog: 1 })) + '"><span>Moderator log</span></a>' +
       (mod ? '<a data-nav class="tk-topic quiet' + (view.kind === "flagged" ? " on" : "") + '" href="' + esc(href({ flagged: 1 })) + '"><span>Flagged posts (moderators)</span></a>' : "");
     each($("tlist"), "a", function (a) { a.addEventListener("click", closeSide); });
   }
@@ -253,7 +257,7 @@
     var t = p.topic_id && topicById(p.topic_id), mine = user && p.author_id === user.id;
     var follow = user && !mine ? '<button class="linkbtn tk-follow" type="button" data-follow="' + p.author_id + '" data-name="' + esc(p.author_name) + '">' + (follows[p.author_id] ? "Following" : "Follow") + "</button>" : "";
     return '<article class="tk-post' + (p.hidden ? " hid" : "") + '">' +
-      '<div class="tk-by">' + badge(p.author_name, p.author_id) + '<a data-nav class="tk-name" href="' + esc(href({ u: p.author_id })) + '">' + esc(p.author_name) + "</a>" +
+      '<div class="tk-by">' + badge(p.author_name, p.author_id) + '<a data-nav class="tk-name" href="' + esc(href({ u: p.author_id })) + '">' + esc(p.author_name) + "</a>" + modChip(p.author_id) +
         '<span class="muted">· ' + ago(p.created_at) + "</span>" + (p.hidden ? ' <span class="chip warn">Hidden</span>' : "") +
         (ideaByPost[p.id] && ideaByPost[p.id].suggested && ideaByPost[p.id].posts[0] === p.id ? ' <span class="chip sun">Topic suggestion</span>' : "") +
         (opt.where ? ' <span class="muted small">in ' + esc(t ? t.name : "General") + (p.room !== place ? ", " + esc(placeName(p.room)) : "") + "</span>" : "") + follow + "</div>" +
@@ -269,7 +273,7 @@
   }
   function commentRow(c) {
     return '<div class="tk-comment' + (c.hidden ? " hid" : "") + '">' + badge(c.author_name, c.author_id) + '<div class="tk-cbody">' +
-      '<div class="tk-by"><a data-nav class="tk-name" href="' + esc(href({ u: c.author_id })) + '">' + esc(c.author_name) + '</a><span class="muted">· ' + ago(c.created_at) + "</span>" +
+      '<div class="tk-by"><a data-nav class="tk-name" href="' + esc(href({ u: c.author_id })) + '">' + esc(c.author_name) + "</a>" + modChip(c.author_id) + '<span class="muted">· ' + ago(c.created_at) + "</span>" +
         (c.hidden ? ' <span class="chip warn">Hidden</span>' : "") + "</div>" +
       (c.deleted ? '<p class="muted">Removed by its author</p>' : '<p class="tk-body">' + bodyHtml(c.body) + "</p>") +
       '<div class="tk-foot">' + (c.deleted ? "" : tools(c)) + "</div></div></div>";
@@ -897,6 +901,28 @@
     });
   }
 
+  // ---- What moderators did, for everyone to see. Paused members are never named. ----
+  var MODACT = { hide: "hid a post", put_back: "put a post back", hide_rai: "hid one of Rai's answers", put_back_rai: "put one of Rai's answers back",
+    move: "moved a post to another topic", unpause: "lifted a pause", topic_create: "made a topic", topic_edit: "edited a topic",
+    topic_archive: "archived a topic", topic_rename_own: "renamed a topic", traction_topic: "opened a topic that caught on", deal_remove: "removed a deal" };
+  function modAct(a) { var m = /^pause_(\d+)_days$/.exec(a); return m ? "paused a member for " + m[1] + (m[1] === "1" ? " day" : " days") : MODACT[a] || a.replace(/_/g, " "); }
+  function showModLog() {
+    var main = $("main");
+    document.title = "Moderator log · Talk | Dandelions";
+    db.rpc("talk_mod_log_public").then(function (r) {
+      var list = r.data || [];
+      main.innerHTML = '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">Talk</div><h1>Moderator log</h1></div></div>' +
+          '<p class="muted tk-about">Everything moderators did in the last 90 days, newest first, and the reason they gave. People who were paused aren\'t named.</p></div>' +
+        (r.error ? '<p class="note">Couldn\'t load the log. Try refreshing.</p>' : !list.length ? '<p class="note">Nothing yet.</p>' :
+          '<div class="tk-tlist">' + list.map(function (x) {
+            return '<div class="tk-trow" style="padding-left:14px"><div style="flex:1;min-width:0"><b>' + esc(x.moderator) + "</b> " + esc(modAct(x.action)) +
+              ' <span class="muted small">· ' + ago(x.at) + "</span>" + (x.note ? '<div class="small muted">' + esc(x.note) + "</div>" : "") + "</div>" +
+              (x.post_id && !/^pause|^unpause|^topic|^deal/.test(x.action) ? '<a data-nav class="small" style="flex:0 0 auto" href="' + esc(href({ p: x.post_id })) + '">See post</a>' : "") + "</div>";
+          }).join("") + "</div>");
+      wireOpen(main);
+    });
+  }
+
   // ---- People you follow. Only you see this list. ----
   function showFollowing() {
     var main = $("main"), ids = Object.keys(follows);
@@ -975,13 +1001,13 @@
     var q = new URLSearchParams(location.search);
     var p = q.get("p"), u = q.get("u"), r = q.get("r"), t = q.get("t");
     var sm = q.get("s");
-    view = p && ID_RE.test(p) ? { kind: "post", p: p } : sm && ID_RE.test(sm) ? { kind: "summary", t: sm } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("flagged") && mod ? { kind: "flagged" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
+    view = p && ID_RE.test(p) ? { kind: "post", p: p } : sm && ID_RE.test(sm) ? { kind: "summary", t: sm } : u && ID_RE.test(u) ? { kind: "person", u: u } : q.get("following") ? { kind: "following" } : q.get("flagged") && mod ? { kind: "flagged" } : q.get("modlog") ? { kind: "modlog" } : q.get("all") ? { kind: "all" } : { kind: "feed", t: t && ID_RE.test(t) ? t : "" };
     var change = r && PLACE_RE.test(r) && r !== place;
     if (change && places.indexOf(r) < 0) places.push(r);
     (change ? (place = r, $("place").innerHTML = places.map(function (x) { return '<option value="' + esc(x) + '"' + (x === place ? " selected" : "") + ">" + esc(placeName(x)) + "</option>"; }).join(""), loadTopics()) : Promise.resolve()).then(function () {
       sideList();
       window.RaiTopic = (view.kind === "feed" || view.kind === "summary") && view.t ? view.t : "";
-      if (view.kind === "summary") showSummary(); else if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else if (view.kind === "flagged") showFlagged(); else showFeed();
+      if (view.kind === "summary") showSummary(); else if (view.kind === "post") showPost(); else if (view.kind === "person") showPerson(); else if (view.kind === "all") showAll(); else if (view.kind === "following") showFollowing(); else if (view.kind === "flagged") showFlagged(); else if (view.kind === "modlog") showModLog(); else showFeed();
       scrollTo(0, 0);
     });
   }
@@ -1017,7 +1043,8 @@
       if (PLACE_RE.test(asked) && places.indexOf(asked) < 0) places.push(asked);
       place = PLACE_RE.test(asked) ? asked : places[0];
       frame();
-      return Promise.all([loadTopics(), loadBaselines()]).then(function () { route(); bell(); });
+      return Promise.all([loadTopics(), loadBaselines(), db.rpc("talk_moderator_ids").then(function (r) { (r.data || []).forEach(function (id) { mods[id] = true; }); }, function () {})])
+        .then(function () { route(); bell(); });
     });
   }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t load Talk. Try refreshing.</p>';
