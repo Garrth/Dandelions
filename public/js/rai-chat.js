@@ -103,6 +103,19 @@
     document.documentElement.classList.toggle("rai-open", on);
     if (on) { draw(); if (window.innerWidth >= 900) box.focus(); }
   }
+  // Signed in: send the member's own token so Rai counts their questions by account, not by address.
+  // Only a token with over a minute left, so an old one never blocks the question.
+  function raiToken() {
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!/^sb-.*-auth-token$/.test(k)) continue;
+        var t = JSON.parse(localStorage.getItem(k) || "null");
+        if (t && t.access_token && t.expires_at && t.expires_at * 1000 > Date.now() + 60000) return t.access_token;
+      }
+    } catch (e) {}
+    return cfg.supabaseKey || "";
+  }
   function ask(text) {
     text = String(text || "").trim();
     if (!text || busy) return;
@@ -113,7 +126,7 @@
     var url = (cfg.supabaseUrl || "") + "/functions/v1/rai";
     fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + (cfg.supabaseKey || "") },
+      headers: { "Content-Type": "application/json", apikey: cfg.supabaseKey || "", Authorization: "Bearer " + raiToken() },
       // On a Talk topic, Rai also reads that topic (window.RaiTopic is set by the Talk page).
       body: JSON.stringify({ messages: state.msgs.slice(-24), page: { path: location.pathname, title: document.title }, topic: window.RaiTopic || undefined })
     }).then(function (r) { return r.json().catch(function () { return { error: "server" }; }); }).then(function (out) {

@@ -2,10 +2,15 @@
 // Anyone can ask, signed in or not. What Rai knows lives on the site at /rai/knowledge.md,
 // so it can be updated with a normal code change and no redeploy.
 // Limits: questions per visitor per day, and questions for the whole site per day.
+// Signed-in members are counted by their account, which can't be faked. Visitors who aren't signed in are counted
+// by a scrambled form of their internet address, and together they can use only part of the site's daily questions,
+// so nobody faking addresses can use up Rai for members. @Rai answers in Talk have their own daily pool.
 // One file on purpose, so it can be pasted into the Supabase dashboard editor.
 
 export const PER_VISITOR_PER_DAY = 30;
 export const SITE_PER_DAY_DEFAULT = 300; // change with the RAI_DAILY_CAP secret
+export const VISITOR_SHARE = 0.5; // visitors who aren't signed in share at most this part of the site's questions; RAI_VISITOR_CAP sets a number
+export const MENTION_PER_DAY_DEFAULT = 100; // @Rai answers in Talk per day, separate from chat; RAI_MENTION_CAP changes it
 export const MAX_TURNS = 24; // messages kept from the conversation
 export const MAX_CHARS = 1500; // per message from the visitor
 
@@ -502,7 +507,7 @@ export async function mentionReply(deps, visitor, postId) {
   const root = await deps.claimMention(postId);
   if (!root) return { made: false };
   try {
-    if (!(await deps.take("site", deps.siteCap))) return { error: "site_limit" };
+    if (!(await deps.take("mention", deps.mentionCap || MENTION_PER_DAY_DEFAULT))) return { error: "site_limit" };
     const [thread, rai, system] = await Promise.all([deps.threadMessages(root), deps.raiReplies(root), systemFor(deps)]);
     const asked = thread.find((m) => m.id === postId);
     if (!asked) return { made: false };
@@ -527,6 +532,7 @@ export async function answer(deps, visitor, body) {
   const messages = cleanMessages(body && body.messages);
   if (!messages) return { error: "bad_request" };
   if (!(await deps.take("v:" + visitor, PER_VISITOR_PER_DAY))) return { error: "visitor_limit" };
+  if (!deps.member && !(await deps.take("anon", deps.visitorCap || Math.floor(deps.siteCap * VISITOR_SHARE)))) return { error: "site_limit" };
   if (!(await deps.take("site", deps.siteCap))) return { error: "site_limit" };
   const system = await systemFor(deps);
   // The page note rides on the latest question, after the cached part, so moving between pages keeps the cache.
@@ -559,13 +565,24 @@ export async function setup(req) {
   const site = env("SITE_URL") || "https://www.dandelions.lol";
   const model = env("RAI_MODEL") || "claude-haiku-5-5";
   const client = new Anthropic({ apiKey: env("ANTHROPIC_API_KEY") });
-  // The visitor is counted by a scrambled form of their address. The address itself is never stored.
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
-  const visitor = await hash(ip + "|" + (env("SUPABASE_SERVICE_ROLE_KEY") || "").slice(-16));
+  // A signed-in member is counted by their account. Anyone else by a scrambled form of their address,
+  // which can be faked, so visitors share a smaller pool (see answer). The address itself is never stored.
+  const salt = (env("SUPABASE_SERVICE_ROLE_KEY") || "").slice(-16);
+  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  let memberId = "";
+  if (token.split(".").length === 3) {
+    const { data } = await admin.auth.getUser(token).catch(() => ({ data: null }));
+    memberId = (data && data.user && data.user.id) || "";
+  }
+  const ip = (req.headers.get("cf-connecting-ip") || (req.headers.get("x-forwarded-for") || "").split(",")[0]).trim() || "unknown";
+  const visitor = memberId ? "u" + (await hash(memberId + "|" + salt)) : await hash(ip + "|" + salt);
   return {
     visitor,
     deps: {
+      member: !!memberId,
       siteCap: Number(env("RAI_DAILY_CAP")) || SITE_PER_DAY_DEFAULT,
+      visitorCap: Number(env("RAI_VISITOR_CAP")) || 0,
+      mentionCap: Number(env("RAI_MENTION_CAP")) || MENTION_PER_DAY_DEFAULT,
       bgCap: Number(env("RAI_BG_CAP")) || BG_PER_DAY_DEFAULT,
       async claimSummary(id) {
         const { data, error } = await admin.rpc("talk_summary_claim", { p_topic: id });
