@@ -20,7 +20,7 @@ import openpyxl
 src, fips, root = sys.argv[1], sys.argv[2], sys.argv[3]
 out = os.path.join(root, fips)
 index = json.load(open(os.path.join(out, 'index.json')))
-types = index['types']
+types = index['types'] if 'types' in index else json.load(open(os.path.join(root, 'types.json')))
 slug_idx = {t[0]: n for n, t in enumerate(types)}
 
 # Closest directory type for each classification. Anything not listed is "Contractor".

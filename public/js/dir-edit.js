@@ -6,7 +6,7 @@
   var fam = params.get("f") || "", id = params.get("id") || "";
   var box = document.getElementById("edit");
   var db = D.db();
-  var back = "/directory/biz.html?f=" + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id);
+  var back = "/directory/biz.html?" + D.qs(fam, id);
   var FOOD = ["restaurant", "casual_eatery", "alcoholic_beverage_venue"];
   var TRADES = ["home_service", "building_or_construction_service"];
   var DAY_NAMES = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
@@ -227,13 +227,13 @@
   }
   function notOwner() {
     shell('<div class="card"><p>Only the owner of this listing can change it. Is it yours?</p>' +
-      '<p style="margin-top:12px"><a class="btn" href="/directory/claim.html?f=' + encodeURIComponent(fam) + "&id=" + encodeURIComponent(id) + '">Claim it</a></p></div>');
+      '<p style="margin-top:12px"><a class="btn" href="/directory/claim.html?' + D.qs(fam, id) + '">Claim it</a></p></div>');
   }
 
   if (!db) { box.innerHTML = '<p class="note">Something didn\'t load. Please refresh the page.</p>'; return; }
-  D.family(fam).then(function (rows) {
-    biz = rows.filter(function (x) { return x[0] === id; })[0];
-    if (!biz) throw new Error("missing");
+  D.listing(fam, id).then(function (row) {
+    biz = row;
+    if (!biz || biz.removed) throw new Error("missing");
     document.title = "Edit " + biz[1] + " | Dandelions";
     return db.auth.getSession();
   }).then(function (s) {

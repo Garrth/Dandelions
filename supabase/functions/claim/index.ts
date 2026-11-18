@@ -119,6 +119,12 @@ export async function setup(req) {
       },
       // The listing as the directory shows it: [id, name, type, lat, lon, address, town, zip, phone, ...]
       async listing(fips, family, id) {
+        // A business a member added lives in the database, not in the county files.
+        if (id.startsWith("add-")) {
+          const { data } = await admin.from("added_listings").select("name, phone")
+            .eq("id", id).eq("county_fips", fips).eq("status", "live").maybeSingle();
+          return data ? { name: data.name, phone: data.phone } : null;
+        }
         const url = site + "/data/dir/" + fips + "/fam/" + family + ".json";
         if (!files[url]) files[url] = fetch(url).then((r) => (r.ok ? r.json() : []));
         const row = (await files[url]).find((b) => b[0] === id);

@@ -14,13 +14,17 @@ places, boundary, fips, name, out_root = sys.argv[1:6]
 poly = prep(wkt.loads(json.load(open(boundary))[name]))
 
 SKIP = re.compile(r'(^|_)(park|trail|beach|land_feature|water_feature|historic_site|monument|landmark|atm|public_toilet|parking|bus_stop|geographic_entities|structure_and_geography)($|_)')
-TOWN_FIX = {'saint helena': 'St Helena', 'st. helena': 'St Helena', 'sonoma county': '', 'napa county': ''}
+TOWN_FIX = {'saint helena': 'St Helena', 'st. helena': 'St Helena', 'sf': 'San Francisco'}
 
+KEEP_UPPER = {'AFB'}
 def town_of(s):
-    s = (s or '').strip().replace('-', ' ')
+    s = re.sub(r',\s*CA(,\s*US)?$', '', (s or '').strip()).replace('-', ' ')
     k = s.lower()
     if k in TOWN_FIX: return TOWN_FIX[k]
-    return ' '.join(w if w.isupper() and len(w) <= 3 and w not in ('THE',) else w.capitalize() for w in s.split()) if s.isupper() else s
+    if k.endswith(' county'): return ''
+    if s.isupper() or any(w.isupper() and len(w) > 1 and w not in KEEP_UPPER for w in s.split()):
+        s = ' '.join(w if w in KEEP_UPPER else w.capitalize() for w in s.split())
+    return s
 
 def phone_of(p):
     d = re.sub(r'\D', '', p or '')
