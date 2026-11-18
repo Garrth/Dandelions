@@ -18,7 +18,7 @@
     "oil change": "automotive_repair", pharmacy: "pharmacy", groomer: "pet_groomer", nails: "nail_salon"
   };
 
-  var types, pts = [], loc, slugAt = {}, counts = [], token = 0;
+  var types, pts = [], loc, slugAt = {}, counts = [], token = 0, near = [], nameTimer, nameAsk = 0;
 
   function countAll() {
     var r = D.radius();
@@ -64,9 +64,28 @@
       else if ((" " + s).indexOf(" " + q) >= 0) inside.push(i);
     });
     var all = starts.concat(inside).slice(0, 60);
-    $("matches").innerHTML = all.map(function (i) {
+    $("matches").innerHTML = (all.length ? '<h2 class="letterhead">Kinds of business</h2>' : "") + all.map(function (i) {
       return '<a class="row" href="' + link(i) + '"><span>' + esc(types[i][1]) + '</span><span class="n">' + counts[i] + "</span></a>";
-    }).join("") || '<p class="note">No business type starts with that. Try one word, like "plumber" or "tacos". Asking in your own words is coming soon.</p>';
+    }).join("") + '<div id="bynames"><p class="countline">Looking for businesses by name...</p></div>';
+    clearTimeout(nameTimer);
+    nameTimer = setTimeout(function () { drawNames(q, all.length); }, 250);
+  }
+
+  // Businesses by name, closest first.
+  function drawNames(q, kinds) {
+    var ask = ++nameAsk;
+    D.names(q, loc, D.radius(), near).then(function (list) {
+      var el = $("bynames");
+      if (ask !== nameAsk || !el) return;
+      var more = list.length > 40;
+      el.innerHTML = list.length ? '<h2 class="letterhead">Businesses named "' + esc(q) + '"</h2>' + list.slice(0, 40).map(function (x) {
+        return '<a class="row" href="' + x.href + '"><span style="min-width:0"><span class="name">' + esc(x.name) + '</span><span class="sub">' +
+          esc(types[x.type][1]) + (x.town ? " · " + esc(x.town) : "") + '</span></span><span class="n">' + x.d.toFixed(1) + " mi</span></a>";
+      }).join("") + (more ? '<p class="countline">Showing the closest 40. Type more of the name to narrow it down.</p>' : "") :
+        '<p class="note">' + (kinds ? "No business by that name within " + D.radius() + " miles." :
+          'Nothing matches that within ' + D.radius() + ' miles. Try one word, like "plumber" or "tacos", or part of a business name.') +
+        ' Missing a business? <a href="/directory/add.html">Add it</a>.</p>';
+    });
   }
 
   // Outside the open counties: no full directory yet, only the businesses members added there.
@@ -103,7 +122,8 @@
     if (loc.mode === "outside") { pts = []; redraw(); return Promise.resolve(); }
     $("total").textContent = "Loading the directory...";
     return D.region().then(function (reg) {
-      return D.points(D.near(reg, loc, D.radius()));
+      near = D.near(reg, loc, D.radius());
+      return D.points(near);
     }).then(function (p) {
       if (mine !== token) return;
       pts = p;

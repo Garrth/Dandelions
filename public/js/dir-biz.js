@@ -55,7 +55,16 @@
     return D.db().rpc("my_added_listings").then(function (r) { return (r.data || []).some(function (a) { return a.id === id && a.status === "live"; }); }).catch(function () { return false; });
   }
 
-  Promise.all([D.types(), D.listing(fam, id)]).then(function (out) {
+  // A name search links by row number in the family file. Turn that into the listing's id.
+  var row = params.get("row");
+  var found = id || !/^[0-9]{1,6}$/.test(row || "") ? Promise.resolve() :
+    D.json(D.BASE + "fam/" + encodeURIComponent(fam) + ".json", true).then(function (rows) {
+      var b = rows && rows[Number(row)];
+      if (!b) return;
+      id = b[0];
+      try { history.replaceState(null, "", "/directory/biz.html?" + D.qs(fam, id)); } catch (e) {}
+    });
+  found.then(function () { return Promise.all([D.types(), D.listing(fam, id)]); }).then(function (out) {
     var types = out[0], b = out[1];
     if (!b || b.removed) throw new Error("missing");
     return Promise.all([D.location(), D.claimed(), D.details(), mine(), addedByMe()]).then(function (x) { return [types, b, x[0], x[1], x[2][id], x[3], x[4]]; });

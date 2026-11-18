@@ -11,6 +11,8 @@
   var COUNTY = /^[0-9]{5}$/.test(asked || "") ? asked : FIRST;
   var BASE = ROOT + COUNTY + "/";
   var cache = {};
+  // Small words the name search skips (same list as tools/build_names.py).
+  var SMALL = ["the", "and", "of", "a", "an", "at", "in", "on", "for", "to", "by", "inc", "llc", "co", "corp", "ltd"];
 
   function get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } }
   function put(key, v) { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} }
@@ -181,7 +183,7 @@
     document.getElementById("locform").addEventListener("submit", function (e) {
       e.preventDefault();
       lookup(input.value).then(function (l) {
-        if (l) set(l); else err.textContent = "We don't know that ZIP or town. Try a 5-digit ZIP code.";
+        if (l) set(l); else err.textContent = "We don't know that ZIP or town. Looking for a business by name? Type it in the search box above.";
       });
     });
     document.getElementById("loccancel").addEventListener("click", function () { panel.hidden = true; err.textContent = ""; });
@@ -280,6 +282,38 @@
         var at = slugIndex(o[0]);
         return (o[1].data || []).filter(function (a) { return at[a.type_slug] !== undefined; }).map(function (a) { return toRow(a, at); });
       }).catch(function () { return []; });
+    },
+    // Businesses whose name has words starting with every word typed, within reach, closest first.
+    // Each comes back as {name, type, lat, lon, town, href, d}.
+    names: function (q, loc, r, list) {
+      var words = String(q || "").toLowerCase().replace(/&/g, " ").match(/[a-z0-9]+/g) || [];
+      // "and", "the" and "of" don't need to match. The file to look in comes from the first word that isn't a small word.
+      words = words.filter(function (w) { return ["and", "the", "of"].indexOf(w) < 0; });
+      var first = words.filter(function (w) { return SMALL.indexOf(w) < 0; })[0];
+      if (!first || first.length < 2 || typeof loc.lat !== "number") return Promise.resolve([]);
+      var key = first.slice(0, 2).replace(/[^a-z]/g, "0");
+      function hit(name) {
+        var ws = (" " + name.toLowerCase().replace(/&/g, " ").replace(/[^a-z0-9]+/g, " "));
+        return words.every(function (w) { return ws.indexOf(" " + w) >= 0; });
+      }
+      return types().then(function (t) {
+        var at = slugIndex(t);
+        return Promise.all(list.map(function (f) {
+          return json(ROOT + f + "/names/" + key + ".json", true).then(function (rows) {
+            return (rows || []).filter(function (e) { return hit(e[0]); }).map(function (e) {
+              return { name: e[0], type: e[1], lat: e[2], lon: e[3], town: e[4],
+                href: "/directory/biz.html?f=" + encodeURIComponent(t[e[1]][3]) + "&row=" + e[5] + "&c=" + f };
+            });
+          }).catch(function () { return []; });
+        }).concat([addedRows(list, at).then(function (rows) {
+          return rows.filter(function (b) { return hit(b[1]) && typeof b[3] === "number"; }).map(function (b) {
+            return { name: b[1], type: b[2], lat: b[3], lon: b[4], town: b[6], href: "/directory/biz.html?" + qs(b.fam, b[0], b.c) };
+          });
+        })])).then(function (o) {
+          return [].concat.apply([], o).map(function (x) { x.d = miles(loc.lat, loc.lon, x.lat, x.lon); return x; })
+            .filter(function (x) { return x.d <= r; }).sort(function (a, b) { return a.d - b.d; });
+        });
+      });
     },
     photoUrl: function (path) {
       var cfg = window.DANDELIONS_CONFIG;
