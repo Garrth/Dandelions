@@ -5,17 +5,31 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>The Dandelions Charter | Dandelions</title>
-  <meta name="description" content="The founding document of Dandelions: why it exists, its mission, its baselines for people and the planet, how points work, who decides what, and the principles every part must follow.">
+  <meta name="description" content="The founding agreement of Dandelions: the mandate, core objectives, baselines, principles, how points are created, who runs the network, how decisions are made, member rights and duties, and what Dandelions will never do.">
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/site.css">
   <style>
     .ch-meta { color: var(--muted); font-size: 15px; margin: 4px 0 18px; }
     .ch-box { background: var(--soft, #f3f5ea); border-radius: 14px; padding: 14px 16px; margin: 0 0 20px; font-size: 16px; }
+    .ch-mandate { font-size: 24px; font-weight: 800; line-height: 1.3; margin: 8px 0 12px; }
+    .ch-toc { columns: 2; column-gap: 24px; padding-left: 22px; font-size: 16px; }
     .ch-defs { margin: 0 0 12px; }
     .ch-defs dt { font-weight: 800; margin-top: 12px; }
     .ch-defs dd { margin: 2px 0 0; }
+    .ch-table { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 15px; }
+    .ch-table th, .ch-table td { text-align: left; vertical-align: top; padding: 9px 10px 9px 0; border-bottom: 2px solid var(--line); }
+    .ch-table th { font-size: 14px; color: var(--muted); font-weight: 800; }
+    .ch-table td:first-child { font-weight: 800; }
     .prose ol li, .prose ul li { margin: 8px 0; }
+    @media (max-width: 560px) {
+      .ch-toc { columns: 1; }
+      .ch-table, .ch-table tbody, .ch-table tr, .ch-table td { display: block; width: 100%; }
+      .ch-table thead { display: none; }
+      .ch-table tr { border-bottom: 2px solid var(--line); padding: 8px 0; }
+      .ch-table td { border: 0; padding: 2px 0; }
+      .ch-table td[data-h]::before { content: attr(data-h) ": "; color: var(--muted); font-weight: 700; }
+    }
   </style>
 </head>
 <body>
@@ -30,63 +44,95 @@
 
   <main class="page prose">
     <h1>The Dandelions Charter</h1>
-    <p class="ch-meta">Version 1 · October 1, 2026 · written by Garth, the founder</p>
+    <p class="ch-meta">Version 2 · November 2026 · written by Garth, the founder · for the full design, see the <a href="/whitepaper.html">whitepaper</a></p>
 
     <div class="ch-box">
-      <p><strong>What this is.</strong> The charter is the founding document. It sets the goal that everything else serves. Rai, the site's AI guide, uses it along with the <a href="/app/baselines.html">baselines</a> when it ranks needs and explains its reasoning. Rai never decides what gets done: people and the public rules do. The charter is a starting point, and members will be able to change it by vote.</p>
+      <p>This charter is the founding agreement of Dandelions. Every member can read it, every decision is measured against it, and everything in it can be improved by the members except the mandate. Rai, the site's AI guide, uses it along with the <a href="/app/baselines.html">baselines</a> when it ranks needs and explains its reasoning. Rai never decides what gets done: people and the public rules do.</p>
     </div>
 
-    <p class="lead">Dandelions exists to improve quality of life while putting back more than we take. Every system we build serves that goal.</p>
+    <ol class="ch-toc">
+      <li><a href="#mandate">The mandate</a></li>
+      <li><a href="#beliefs">Founding beliefs</a></li>
+      <li><a href="#objectives">Core objectives</a></li>
+      <li><a href="#definitions">Definitions</a></li>
+      <li><a href="#baselines">Baselines</a></li>
+      <li><a href="#principles">Principles</a></li>
+      <li><a href="#means">Means and methods</a></li>
+      <li><a href="#roles">Key roles</a></li>
+      <li><a href="#people-ai-code">People, AI and code</a></li>
+      <li><a href="#decisions">How decisions are made</a></li>
+      <li><a href="#changes">How this charter changes</a></li>
+      <li><a href="#rights">Member rights</a></li>
+      <li><a href="#duties">Member duties</a></li>
+      <li><a href="#disputes">Disputes</a></li>
+      <li><a href="#never">What Dandelions will never do</a></li>
+      <li><a href="#founder">The founder's role and handover</a></li>
+      <li><a href="#legal">Legal home</a></li>
+      <li><a href="#ends">If Dandelions ends</a></li>
+      <li><a href="#disclaimers">Disclaimers</a></li>
+    </ol>
 
-    <h2>Founding beliefs</h2>
+    <h2 id="mandate">1. The mandate</h2>
+    <p class="ch-mandate">Improve quality of life while putting back more than we take.</p>
+    <p>The mandate can never be changed. What it means in practice will be argued and refined, and everything below can change to serve it better. If a group of members wants a different mandate, they should start a different organization.</p>
+
+    <h2 id="beliefs">2. Founding beliefs</h2>
     <p><strong>The axiom.</strong> The human experience is worthwhile and worth preserving. This can't be proven. We agree to it.</p>
     <p><strong>The hypothesis.</strong> Who creates money, and on what terms, decides what work gets funded. What gets funded becomes the society we live in.</p>
-    <p>Today, money is lent into existence, so only work that can repay a loan with interest gets funded. Dandelions points are worked into existence, debt-free, for projects that serve the mission. So the work that gets funded is the work people and the planet actually need.</p>
+    <p>Today, money is lent into existence, so only work that can repay a loan with interest gets funded. Dandelions points are worked into existence, debt-free, for projects that serve the mandate. So the work that gets funded is the work people and the planet actually need.</p>
 
-    <h2>Mission</h2>
+    <h2 id="objectives">3. Core objectives</h2>
+    <p>These six objectives turn the mandate into things we can count. They are what we are working toward. None of this exists yet, and none of it is a promise. Rai tracks a number for each, in every county, so members can see whether we're getting closer.</p>
     <ol>
-      <li>Improve quality of life by preventing needless suffering and working toward security: a living-wage job for anyone who wants one.</li>
-      <li>Put back more than we take from the planet that sustains us.</li>
+      <li><strong>Everyone who wants work can find it.</strong> A living-wage job, or paid training toward one, for anyone who wants it.</li>
+      <li><strong>Work pays enough to live on.</strong> Pay covers the baseline for people below, set by the real local cost of living.</li>
+      <li><strong>A job for anyone who wants one, and a floor for those who can't work.</strong> If someone wants a job, there is one, even if the job is getting better or learning new skills. Those jobs are projects run by businesses whose work is exactly that, paid for checked progress like any other project. People who are retired or severely disabled get shelter, food and healthcare from today's systems. If those systems fail, Dandelions aims to cover them too. This is built into the system and sized to what the network can produce, so it doesn't depend on anyone's charity. The job might not be glamorous, and none of this is a promise. It is what we are aiming for.</li>
+      <li><strong>Local businesses thrive.</strong> Dandelions is a parallel layer, not a replacement for the market. The market keeps doing what it does well. Dandelions funds what the market won't: infrastructure, healthcare, care work, training, and restoring the planet.</li>
+      <li><strong>We put back more than we take.</strong> We use the planet's resources no faster than they renew, and we restore what has been damaged.</li>
+      <li><strong>A safer internet.</strong> Online theft and hacking should not be worth the risk. We fund the defensive work that makes it so: helping victims recover, teaching people and small businesses to protect themselves, fixing weak systems, and giving law enforcement well-prepared reports on online criminals. The dream is a world where a password left in plain sight would still be safe. All of this happens within the law and members' privacy.</li>
     </ol>
-    <p>Dandelions is a parallel layer, not a replacement for the market. The market keeps doing what it does well. Dandelions aims at what the market won't fund: infrastructure, healthcare, care work, and restoring the planet.</p>
 
-    <h2>Definitions</h2>
+    <h2 id="definitions">4. Definitions</h2>
     <dl class="ch-defs">
       <dt>Quality of life</dt>
-      <dd>Security: knowing your basic needs are covered and there is always a job that pays a living wage. The security of the 1950s and 60s middle class, for everyone this time.</dd>
+      <dd>Security. Knowing your basic needs are covered and there is a job that pays a living wage for anyone who wants one. The security of the 1950s and 60s middle class, for everyone this time.</dd>
       <dt>Needless suffering</dt>
       <dd>Suffering caused by lack of basic needs: hunger, no home, no medical care, no way to earn. Some suffering is part of being human and can't be solved with material goods. We aim to end the needless kind. Happiness is not the goal.</dd>
       <dt>Work</dt>
-      <dd>Any genuine contribution: building, growing, caring, teaching, learning a skill. For some people, work is getting better, and that job is always open to anyone who wants it.</dd>
+      <dd>Any genuine contribution: building, growing, caring, teaching, learning a skill. For some people, work is getting better or learning a skill. That happens inside a project run by a business whose work is care, recovery or training. A trainee is a student of that business, not its worker. They stay a student, learning new skills, until an employer needs them, for as long as that takes.</dd>
       <dt>Living wage</dt>
-      <dd>Pay that covers the basic needs below, set by the real local cost of living and adjusted automatically.</dd>
-      <dt>The floor</dt>
-      <dd>No one falls below shelter, food, and healthcare, whether or not they work.</dd>
+      <dd>The pay that covers the baseline for people, in dollars, set by the real local cost of living and adjusted automatically. It is the target we measure against. At the start there is no wage rule. Members can add one later.</dd>
       <dt>Putting back more than we take</dt>
       <dd>Using the planet's resources no faster than they renew, and actively restoring what has been damaged.</dd>
+      <dt>Member</dt>
+      <dd>A person who has joined Dandelions. A verified member has also passed the ID check. An active member has used Dandelions in the last 90 days.</dd>
+      <dt>Business</dt>
+      <dd>Any business listed in the directory, including a one-person business. Points are paid only to projects, and only verified businesses run projects. Only businesses do paid work. A person who is getting better or learning a skill takes part in a project. They don't have to be a business. The business running it is paid for what it provides to each person and for the goals it meets.</dd>
+      <dt>Points (MOE)</dt>
+      <dd>The everyday unit of Dandelions, used to pay for work and spent with businesses that accept it.</dd>
+      <dt>Distribution account</dt>
+      <dd>An account on the blockchain that pays out points for checked work. It refills from new points and from points coming back.</dd>
     </dl>
 
-    <h2>Baseline for people</h2>
-    <p>The living wage covers, for one person:</p>
+    <h2 id="baselines">5. Baselines</h2>
+    <p><strong>Baseline for people.</strong> The living wage covers, for one person:</p>
     <ul>
       <li>About 400 square feet of living space, scaled up for each person in the household</li>
-      <li>Utilities: water, power, heating, and cooling</li>
+      <li>Utilities: water, power, heating and cooling</li>
       <li>Food and clothing</li>
       <li>Phone and internet</li>
       <li>Transportation</li>
-      <li>Healthcare, including dental, vision, and mental health</li>
+      <li>Healthcare, including dental, vision and mental health</li>
       <li>Education or paid training</li>
       <li>Childcare for working parents</li>
       <li>Time off to rest</li>
     </ul>
     <p>People who can't work, because of age or disability, are covered too. Their contribution is already made, or simply different.</p>
-
-    <h2>Baseline for the planet</h2>
-    <p>We measure against the Planetary Boundaries framework so the targets rest on science, not opinion.</p>
+    <p><strong>Baseline for the planet.</strong> We measure against the Planetary Boundaries framework so the targets rest on science, not opinion.</p>
     <ul>
-      <li><strong>Food:</strong> grow it while improving the soil, without chemicals.</li>
-      <li><strong>Oceans:</strong> take only the fish the ocean can sustain. Expand aquaculture.</li>
-      <li><strong>Energy:</strong> run everything on renewables, with fossil fuels as a reserve only.</li>
+      <li><strong>Food:</strong> grow it while improving the soil, with far less synthetic fertilizer and pesticide.</li>
+      <li><strong>Oceans:</strong> take only the fish the ocean can sustain. Expand fish farming that doesn't harm the water around it.</li>
+      <li><strong>Energy:</strong> run everything on clean power, with fossil fuels as a reserve only.</li>
       <li><strong>Forests:</strong> use less lumber than the planet regrows.</li>
       <li><strong>Water:</strong> take no more from rivers and aquifers than they recharge.</li>
       <li><strong>Wild land:</strong> protect and restore habitat and biodiversity.</li>
@@ -94,49 +140,228 @@
       <li><strong>Waste:</strong> work toward zero garbage.</li>
       <li><strong>Mining:</strong> recycle metals and mine responsibly so the clean energy build-out doesn't create new damage.</li>
       <li><strong>Restoration:</strong> pull carbon back out of the air and heal damaged land and water.</li>
-      <li><strong>Research and robotics:</strong> fund the research, AI, and robotics needed to reach these goals, alongside the human labor it will take for a long time to come.</li>
+      <li><strong>Research and robotics:</strong> fund the research, AI and robotics needed to reach these goals, alongside the human labor it will take for a long time to come.</li>
     </ul>
-    <p>The measured version of these lives on the <a href="/app/baselines.html">Baselines</a> page, where members can propose changes.</p>
+    <p>The measured version of both baselines lives on the <a href="/app/baselines.html">Baselines</a> page, where members can propose changes.</p>
 
-    <h2>How points work</h2>
-    <p>Points are worked into existence, debt-free, only when verified work gets done. Points aren't turned on yet and have no cash value today.</p>
-    <ol>
-      <li><strong>The needs list.</strong> Real data ranks what each area needs most to meet the mission.</li>
-      <li><strong>Projects.</strong> Approved project owners propose work from the list, sized to what they're approved to handle.</li>
-      <li><strong>Paid by milestone.</strong> Points are created in small pieces as each milestone is verified. No work, no points.</li>
-      <li><strong>Capped by what's really there.</strong> Approvals can't exceed the workers and materials available in an area. When labor is short, projects wait in line, open projects finish first, shortages are posted publicly, and paid training fills the gap.</li>
-      <li><strong>Make way for the market.</strong> When businesses need workers, new projects slow down. When private hiring drops, projects pick up the slack.</li>
-      <li><strong>Keep it moving.</strong> Points are for spending, not hoarding. Idle points go back into circulation or into real things, like infrastructure, that hold value.</li>
-    </ol>
-
-    <h2>People and AI</h2>
-    <dl class="ch-defs">
-      <dt>The charter</dt>
-      <dd>Sets the goal. Changes only by community vote.</dd>
-      <dt>AI</dt>
-      <dd>Uses real data to rank needs, size projects, estimate local capacity, and flag fraud. Every recommendation shows its reasoning and data publicly. AI never issues points, approves projects, or changes rules on its own.</dd>
-      <dt>People</dt>
-      <dd>Propose projects, do the work, verify milestones, settle disputes, and vote on rules. People can overrule AI, but only with a high bar, like a supermajority.</dd>
-      <dt>Code</dt>
-      <dd>Issues points automatically when verified work meets the rules. Nobody can create points by deciding to.</dd>
-    </dl>
-    <p>The AI models and data are open-source and checked by more than one independent analysis, so no single AI, company, or person controls the outcome.</p>
-
-    <h2>Principles</h2>
+    <h2 id="principles">6. Principles</h2>
     <p>Every system we build must follow these:</p>
     <ol>
-      <li><strong>Serve the mission.</strong> If it doesn't improve quality of life or put back more than we take, we don't build it.</li>
-      <li><strong>No one can print points.</strong> Points only come from verified work.</li>
-      <li><strong>Offer, never force.</strong> Better options win people over. Bans and mandates are a last resort.</li>
+      <li><strong>Serve the mandate.</strong> If it doesn't improve quality of life or put back more than we take, we don't build it.</li>
+      <li><strong>No one person can print points.</strong> Points only come from checked work, through the protocol. Anything that creates points or changes the code or the records needs several signers, picked at random from a list of approved signers. Getting on that list takes its own check.</li>
+      <li><strong>Lean by design.</strong> Dandelions issues points and keeps the network running. Everything else, including running the network, is done by businesses.</li>
+      <li><strong>Offer, never force.</strong> Better options win people over. Bans and mandates are a last resort. Dandelions' rules apply only to members and only inside the network. We have no power over anyone else and don't want any.</li>
       <li><strong>Pull, not push.</strong> Inside Dandelions, businesses list what they offer and people seek it out. No unsolicited selling.</li>
       <li><strong>Consume less, care more.</strong> Shift resources from things that don't improve lives toward caring for people and the planet. Slowly but surely.</li>
-      <li><strong>Everything in the open.</strong> Rules, data, point flows, and AI reasoning are public and checkable.</li>
+      <li><strong>Keep points moving.</strong> Points are for spending, not holding. Saving belongs in asset and stock tokens.</li>
+      <li><strong>Everything in the open.</strong> Rules, data, point flows, code and AI reasoning are public and checkable. Personal details are not.</li>
+      <li><strong>Decide and move.</strong> Decisions have deadlines. Whoever does the work decides how it's done. Arguments don't get to stall the work.</li>
       <li><strong>Honest with members.</strong> No promises we can't keep.</li>
-      <li><strong>Changeable by vote.</strong> This charter is a starting point. The community can improve it.</li>
     </ol>
 
-    <p class="note"><a href="/">Home</a> · <a href="/app/baselines.html">Baselines</a> · <a href="/under-the-hood.html">Under the hood</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a></p>
+    <h2 id="means">7. Means and methods</h2>
+    <p>Dandelions does one thing: it runs a protocol that issues points for checked work that serves the mandate. Businesses do all the work, including the work of running the network.</p>
+
+    <h3>The three units</h3>
+    <table class="ch-table">
+      <thead><tr><th>Unit</th><th>What it is</th><th>Meant for</th></tr></thead>
+      <tbody>
+        <tr><td>Points (MOE)</td><td data-h="What it is">The everyday unit. One for the whole system. Holding it pays nothing.</td><td data-h="Meant for">Paying for work and buying from businesses that accept it</td></tr>
+        <tr><td>Asset tokens (SOV)</td><td data-h="What it is">Planned for later. Savings held in real things, like buildings and infrastructure. Value follows the asset and can fall.</td><td data-h="Meant for">Saving</td></tr>
+        <tr><td>Stock tokens</td><td data-h="What it is">Planned for later. Shares in a business. They can gain, lose, or go to zero, the same as stocks today.</td><td data-h="Meant for">Investing in businesses</td></tr>
+      </tbody>
+    </table>
+    <p>Points live on the Dandelions blockchain. Asset and stock tokens are planned for later and open only when they can be offered legally. When they open, they belong to their holders. The rest of their rules get written then.</p>
+
+    <h3>How points are created and come back</h3>
+    <ol>
+      <li><strong>Points are created only into distribution accounts,</strong> and only as checked work calls for them. No person or group can create points by deciding to. Dandelions itself never issues points. The code does, the way Bitcoin's code does.</li>
+      <li><strong>Each distribution account has a low line and a high line.</strong> Below the low line, the protocol creates new points to refill it. Above the high line, the extra moves to another distribution account or is retired for good. The code sets the lines from data such as how fast points are moving. Changing that code takes a project and a member vote.</li>
+      <li><strong>How points come back.</strong> At launch, points work alongside the dollar, not in place of it. The only points that come back to distribution are fees members agree to, such as directory fees once those start. Later, if members vote for it and the law allows it, points could also come back through a footprint sales tax, fines, insurance premiums and usage fees. Whatever comes back returns to distribution.</li>
+      <li><strong>The total is capped by what's really there.</strong> New points can't pay for more work than local workers, materials and places to spend can handle. Each month, new points can be no more than half of what members have pledged to accept.</li>
+    </ol>
+    <p><strong>Emergencies.</strong> If there is a hack, a bug or faked work, keepers together with randomly picked signers can pause payouts and distribution accounts while it is fixed. A pause ends by itself after 14 days unless members vote to extend it. Points already in a member's wallet are never taken back. The held-back last draw of each project covers what it can. The emergency steps are written down and tested before the first point.</p>
+
+    <h3>Who runs the network</h3>
+    <p>Dandelions and its DAO LLC never sell, buy or trade points. They publish the open code for the protocol that creates points into distribution accounts and retires them, automatically. Randomly picked signers approve each payout. The LLC holds no key that can create, move or retire points.</p>
+    <ul>
+      <li><strong>A set number of validators.</strong> Validators are the nodes that keep the network moving. The network starts with a small set of named operators (5 to 10), listed publicly, and grows toward a fixed number (around 100), sized so it never slows down. Seats go to businesses that pass a check and are approved by a heavy vote, spread across places. One seat per business, and one per verified person no matter how many businesses they own. A validator that falls below the minimum uptime loses its seat to the next in line.</li>
+      <li><strong>Token issuers pay a monthly fee</strong> to the validators, in points. That fee is the price of issuing an asset or stock token on the network. An issuer that meets the bar can take an open validator seat instead.</li>
+      <li><strong>A handful of validators also run distribution accounts.</strong> Their one extra job is keeping their account between its low and high lines. The protocol moves the points, not the operator. Operators never trade points or act as market makers.</li>
+      <li><strong>Validators are paid from network fees and issuer fees.</strong> Until those fees are enough, operators are paid per month of checked uptime from distribution, like any other work. If Dandelions goes away, validators may keep running on fees, but nothing makes them.</li>
+      <li><strong>No one group</strong> holds a third or more of the network's voting power, so the network keeps running if any one group leaves.</li>
+    </ul>
+
+    <h3>How projects work</h3>
+    <ol>
+      <li><strong>Rai ranks the needs</strong> in each area from real data. People decide what gets done. Rai also keeps a fair price range for each kind of project, built from past jobs and local costs, and publishes it.</li>
+      <li><strong>A business proposes a project:</strong> what it will do, by when, at what price in points, and how results will be checked. Both the person and the business must be verified. A price above Rai's range needs a written reason, and the checkers see both. There is no competitive bidding for now. Members can add it later if prices drift.</li>
+      <li><strong>A random checker reviews the proposal</strong> before it starts. Projects over a set size get three checkers, from outside the county where possible. Checkers are paid the same for a no as for a yes. Project size is capped by the business's track record.</li>
+      <li><strong>Paid in draws, like a construction loan.</strong> Points go out piece by piece as each milestone is checked by random checkers with no ties to the business. A random share of passed work is checked again, and a checker whose passes fail the re-check loses the role. No work, no points.</li>
+      <li><strong>Stalled projects are cancelled,</strong> unpaid points go back to distribution, and it goes on the owner's record.</li>
+      <li><strong>Make way for the market.</strong> When businesses need workers, new projects slow down. When private hiring drops, projects pick up the slack.</li>
+    </ol>
+
+    <h3>How it grows</h3>
+    <p>Work opens county by county once 1% of the county are members who have passed the ID check. That is the starting line. After that, how many points can be made depends on how many points people, businesses and landlords in the county have pledged to accept each month: people on top of their dollar pay, businesses for sales, and landlords for rent. Only pledges from verified members and businesses count. Each month, new points can be no more than half of the points pledged to be accepted that month. If businesses pledge to accept 1,000 points a month, up to 500 new points can be made that month.</p>
+    <p>Sign-up pledges still show on the map, but they don't open anything. Each new kind of work opens when the members vote it in. No more than a third of new points in a county can pay for growing Dandelions itself (sign-ups, promotion, building the network). The rest goes to work the public can see, and a small common good project starts in the same step that points turn on. The first jobs and what comes next will be listed on a Roles and rules page.</p>
+    <p><strong>Built to work small.</strong> Dandelions may never need to grow past its first levels. If it doesn't, it works as rewards points for local small businesses, and that is a success too. Every part is built to work well at that size, and to be ready to grow if it is ever needed.</p>
+
+    <h2 id="roles">8. Key roles</h2>
+    <p>Dandelions contracts with independent businesses and does not intend to have employees. The lawyer decides which roles can work this way. Any role that can't is paid in dollars or waits. Every role is a service that a business provides, paid per piece or per checked milestone. People choose their own hours. Talking through ideas and voting are never paid, for anyone.</p>
+    <table class="ch-table">
+      <thead><tr><th>Role</th><th>What they do</th></tr></thead>
+      <tbody>
+        <tr><td>Community organizer</td><td data-h="What they do">Signs up businesses and runs events in a town or county. Paid for checked results at a business (a claimed listing, a live offer), never per member signed up, and never a cut of what others later earn</td></tr>
+        <tr><td>Marketer</td><td data-h="What they do">Spreads the word on social and traditional media</td></tr>
+        <tr><td>Checker</td><td data-h="What they do">Reviews proposals and checks finished work</td></tr>
+        <tr><td>Talk moderator</td><td data-h="What they do">Keeps conversations civil. Paid per report reviewed, the same whether the post stays or goes, with a random share re-checked by a second moderator</td></tr>
+        <tr><td>Member help</td><td data-h="What they do">Answers the questions Rai can't, handles reports</td></tr>
+        <tr><td>Data analyst</td><td data-h="What they do">Studies Rai's numbers and writes up changes for a vote</td></tr>
+        <tr><td>Code reviewer</td><td data-h="What they do">Reads every code change before it goes live</td></tr>
+        <tr><td>Site maintainer</td><td data-h="What they do">Puts reviewed changes live</td></tr>
+        <tr><td>Site security</td><td data-h="What they do">Watches for attacks and fixes weak spots</td></tr>
+        <tr><td>Node operator</td><td data-h="What they do">Runs a copy of the blockchain and a distribution account</td></tr>
+        <tr><td>Keeper</td><td data-h="What they do">Signs off on charter changes and can pause things in an emergency</td></tr>
+      </tbody>
+    </table>
+    <p>Full descriptions, how to qualify, and how each is checked will be on the Roles and rules page. New roles can be added by a heavy vote.</p>
+
+    <h2 id="people-ai-code">9. People, AI and code</h2>
+    <dl class="ch-defs">
+      <dt>The charter</dt>
+      <dd>Sets the goal.</dd>
+      <dt>AI (Rai)</dt>
+      <dd>Uses real data to rank needs, size projects, estimate local capacity, flag fraud and summarize conversations. Every recommendation shows its reasoning and data. Rai speaks in Talk only when asked. AI never issues points, approves projects or changes rules.</dd>
+      <dt>People</dt>
+      <dd>Propose projects, do the work, check milestones, settle disputes and vote. Rai's advice has no force. People decide by the normal vote. Changes to Rai's instructions and to the local capacity formula are code changes, reviewed and public like any other.</dd>
+      <dt>Code</dt>
+      <dd>Issues points automatically when checked work meets the rules. Nobody can create points by deciding to.</dd>
+    </dl>
+    <p>The code, AI instructions and data are open, so no single AI, company or person controls the outcome.</p>
+
+    <h2 id="decisions">10. How decisions are made</h2>
+    <p>Members vote on priorities and rules, never on how a job gets done. Every vote has a deadline, so decisions keep moving.</p>
+    <ul>
+      <li><strong>Who votes:</strong> verified members, one person one vote. A vote is a record tied to a checked identity, not a token, so it can't be bought or sold. Each voter gets a receipt to confirm their vote was counted.</li>
+      <li><strong>Whoever does the work decides how.</strong> The business that owns a project makes its own day-to-day calls.</li>
+      <li><strong>Small changes pass unless people object.</strong> A small change goes ahead after 7 days unless 25 members, or 1% of active verified members if that is more, object. Then it becomes a light vote. Any 10 members can challenge which kind of vote a proposal gets.</li>
+      <li><strong>Hard deadlines.</strong> Talk for 7 days, vote for 3, done. No extensions. The same proposal can't come back for 90 days.</li>
+      <li><strong>Rai summarizes both sides</strong> fairly before every vote, so people vote on the idea, not on who argued loudest.</li>
+      <li><strong>Ideas start in Talk.</strong> An idea becomes a vote once enough members back it.</li>
+    </ul>
+    <table class="ch-table">
+      <thead><tr><th>Decision</th><th>Example</th><th>To pass</th></tr></thead>
+      <tbody>
+        <tr><td>Light</td><td data-h="Example">A local priority, a new project idea</td><td data-h="To pass">10 backers to start, then more than half of votes cast</td></tr>
+        <tr><td>Heavy</td><td data-h="Example">A new kind of work, a new role, a state or national rule</td><td data-h="To pass">Backers equal to 1% of the area (at least 100), 75% yes, at least 10% of active verified members voting</td></tr>
+        <tr><td>Charter</td><td data-h="Example">Any change to this charter</td><td data-h="To pass">Backers equal to 5% of members, 75% yes, at least 25% of active verified members voting, then a 30-day wait and keeper sign-off</td></tr>
+      </tbody>
+    </table>
+    <p>These numbers are starting points and change as we learn, by a heavy vote.</p>
+
+    <h2 id="changes">11. How this charter changes</h2>
+    <ol>
+      <li><strong>The mandate never changes.</strong></li>
+      <li><strong>Everything else can change</strong> by a charter vote (above).</li>
+      <li><strong>After a change passes,</strong> the members who proposed it write the final wording, with Rai's help, and members take one last vote: "Is this wording accurate?" If that vote fails, the wording is redone once. If it fails again, the change is dropped.</li>
+      <li><strong>After a 30-day wait,</strong> keepers sign the change and it takes effect. Keepers can't block a change the members passed, unless it breaks the mandate.</li>
+      <li><strong>Every version is kept</strong> and public, with what changed and why.</li>
+      <li><strong>Before points are issued,</strong> the founder may update this charter to finish the build. Every change is logged publicly.</li>
+    </ol>
+    <p><strong>Keepers.</strong> There are 3 keepers to start, growing to 9. Members choose them by vote for fixed terms that end at different times, and can remove one by a heavy vote. Blocking a passed change for breaking the mandate takes two thirds of the keepers and a written reason, and members can override a block with a second charter vote. An emergency pause ends by itself after 14 days unless members vote to extend it.</p>
+
+    <h2 id="rights">12. Member rights</h2>
+    <p>Every member can always count on these:</p>
+    <ol>
+      <li><strong>Leave any time,</strong> and take your data with you.</li>
+      <li><strong>See how it works.</strong> Rules, code, point flows and decisions are public.</li>
+      <li><strong>One person, one vote.</strong> No one's vote counts more because of money or position.</li>
+      <li><strong>Speak freely in Talk.</strong> Polite disagreement stays up, including disagreement with Dandelions.</li>
+      <li><strong>Privacy.</strong> Your ID details, contact details and how you voted are never published. Dandelions never holds ID papers and never sells member data. Payments, wallets, project records and business track records are public and permanent, so know that before you join.</li>
+      <li><strong>Own what you hold.</strong> Your tokens are in your wallet, under your control.</li>
+      <li><strong>Appeal.</strong> Any decision about you, by a person or by AI, can be appealed.</li>
+      <li><strong>Propose changes</strong> to anything except the mandate.</li>
+    </ol>
+
+    <h2 id="duties">13. Member duties</h2>
+    <ol>
+      <li><strong>Be 18 or older,</strong> with one account per person.</li>
+      <li><strong>Pass the ID check</strong> to vote, hold a wallet, start or join paid work, or take a role.</li>
+      <li><strong>Be honest</strong> about your work and your reports.</li>
+      <li><strong>Never check your own work,</strong> or the work of a business you're tied to.</li>
+      <li><strong>Keep Talk civil</strong> and follow the code of conduct.</li>
+      <li><strong>Say when a post is paid</strong> promotion.</li>
+      <li><strong>Follow the law,</strong> including paying wages in dollars where the law requires it and reporting points received for taxes. Project owners are told the wage law when they sign up, and a business that breaks it more than once is removed.</li>
+    </ol>
+
+    <h2 id="disputes">14. Disputes</h2>
+    <ol>
+      <li><strong>File it.</strong> Any member can open a dispute about work, pay, a check or a moderation decision.</li>
+      <li><strong>Talk it out.</strong> The two sides get 7 days to settle it themselves.</li>
+      <li><strong>Screening.</strong> A screener checks that the dispute has what it needs.</li>
+      <li><strong>Random panel.</strong> Verified members with no ties to either side hear it and rule.</li>
+      <li><strong>One appeal</strong> to a new, larger panel. Its ruling is final inside Dandelions. Members keep their right to go to court.</li>
+    </ol>
+    <p>Rulings are carried out only on points and permissions inside Dandelions: holding or releasing a payment, removing a role, or pausing a member's permissions. Points already paid out are never frozen or taken back. Instead, the last draw of every project (about 10%) is held for 60 days so a ruling has something to act on. Panel members are paid per case, like checkers.</p>
+
+    <h2 id="never">15. What Dandelions will never do</h2>
+    <ol>
+      <li>Pay anyone in points where the law requires dollars.</li>
+      <li>Create points without checked work, or set any aside for the founder, insiders or anyone else.</li>
+      <li>Sell, buy, lend or trade points, ever, or hold members' points or dollars for them.</li>
+      <li>Set the price of points or promise what they will be worth.</li>
+      <li>Pay anyone for talking or voting.</li>
+      <li>Let AI issue points, approve projects or change rules.</li>
+      <li>Hold ID papers or sell member data.</li>
+      <li>Promise jobs, income or returns, or that any token can be redeemed or sold.</li>
+      <li>Force anyone to join, buy or take part.</li>
+    </ol>
+    <p><strong>Ties are public.</strong> Any business tied to the founder, a keeper, a node operator or a checker is named on a public list, with the tie spelled out. Those businesses, including 10spot and Equitide, can run approved projects like anyone else. They go through the same random checkers and Rai's price range. No one approves, checks or rules on a dispute about a project they are tied to. Once other businesses can do a core service, a tied business can't be the only one doing it. No one is paid points for work done before points started.</p>
+    <p><strong>Dollars.</strong> Dandelions has no bank account, takes no dollars and raises no money. Its few dollar costs today (hosting, phone codes, legal) are paid by the founder. Businesses tied to the founder, such as 10spot, may buy points with their own profits. When they do, it is public.</p>
+
+    <h2 id="founder">16. The founder's role and handover</h2>
+    <p>Dandelions starts as one person's plan and is handed to its members, part by part, as each part is ready.</p>
+    <ol>
+      <li><strong>Until points are issued,</strong> Dandelions is a one-person company. The founder builds the network, takes feedback, and changes things quickly. Every change is public.</li>
+      <li><strong>Before the first point is issued,</strong> everything needed to run without the founder must be in place and staffed: more than one manager of the legal entity, outside code reviewers and maintainers, at least 3 seated keepers, at least 5 independent validators, at least 7 approved signers, at least 10 checkers in each open area, moderators, a working disputes process, backups (at least two people besides the founder who can reach the domain, hosting, code and LLC accounts), a written legal opinion on points, a tax reporting plan, and an outside security audit of the chain and site.</li>
+      <li><strong>After that, control passes part by part.</strong> Each part (checks, moderation, the code, the keys) is handed over once it has run well for 3 months with people in place.</li>
+      <li><strong>The founder's veto can only stop a change, never make one.</strong> It can't create points or skip a vote. It ends 24 months after the first point is issued, or sooner if the founder gives it up or a charter vote ends it.</li>
+      <li><strong>The founder gets no points without work,</strong> the same as everyone else.</li>
+    </ol>
+
+    <h2 id="legal">17. Legal home</h2>
+    <p>Dandelions is organized as a DAO LLC. Its operating agreement adopts the binding parts of this charter: the mandate, principles, how decisions are made, member rights and duties, disputes, and what Dandelions will never do. The objectives and baselines are aims, not binding rules. The LLC stays lean: it holds the domain, the code and service accounts, and its contracts, and subs out all of its tasks to businesses. It holds no points and no member money. Which state it is formed in, and who its legal members are, gets settled with the lawyer before the first point.</p>
+
+    <h2 id="ends">18. If Dandelions ends</h2>
+    <p>If Dandelions stops operating as an organization:</p>
+    <ol>
+      <li><strong>Tokens stay on the blockchain.</strong> Holders keep them in any wallet that works with Cosmos. Validators may choose to keep the network running on fees. If they don't, tokens could become unusable and worthless.</li>
+      <li><strong>No new points are created.</strong> Points left unclaimed in distribution accounts are retired. No other points are retired.</li>
+      <li><strong>Asset and stock tokens</strong>, if any exist by then, stay owned by their holders.</li>
+      <li><strong>The code stays public,</strong> so anyone can keep the network running or start it again.</li>
+      <li><strong>Personal data kept off the chain is deleted</strong> as the privacy policy describes, except records the law requires us to keep. Nothing on the blockchain can be deleted, which is why it never holds personal details.</li>
+    </ol>
+
+    <h2 id="disclaimers">19. Disclaimers</h2>
+    <ul>
+      <li><strong>Points are not money and not an investment.</strong> They are work credits, like rewards points, that member businesses agree to accept. A point starts out meant to buy about a dollar's worth, and Dandelions tracks what a point buys against what a dollar buys. Dandelions doesn't sell points, set their price, or promise what they will be worth. Others may trade points on independent exchanges, where prices can rise, fall, or go to zero.</li>
+      <li><strong>Asset and stock tokens can lose value.</strong> Stock tokens can go to zero. They open only after legal review.</li>
+      <li><strong>No promises.</strong> Dandelions doesn't promise jobs, income, returns, or that any feature will open in your area.</li>
+      <li><strong>Not an employer, bank or charity.</strong> Dandelions does not plan to hire anyone, lends nothing, and takes no deposits. Businesses that do work are independent.</li>
+      <li><strong>Taxes are yours.</strong> Points received for work or sales may be taxable income. Tax is owed in dollars on the value of points when you receive them, even if you never sell them. Members and businesses are responsible for reporting them.</li>
+      <li><strong>Wages are paid in dollars</strong> wherever the law requires it. Points can help a business with its costs but never replace a legally required wage.</li>
+      <li><strong>Experimental.</strong> Dandelions is new software and a new way of working. It can change, have bugs, or stop.</li>
+      <li><strong>18 and older only.</strong></li>
+      <li><strong>The <a href="/terms.html">Terms of use</a> and <a href="/privacy.html">Privacy policy</a></strong> are part of this agreement.</li>
+    </ul>
+
+    <p class="note">Version 1 (October 1, 2026) was the first draft. Version 2 adds the mandate, core objectives, how points are created and come back, who runs the network, how decisions are made, member rights and duties, disputes, the founder's handover, and the rules on ties and dollars. Questions or a flaw to point out? Bring it to <a href="/app/talk.html">Talk</a>, or ask Rai.</p>
   </main>
+
+  <footer>
+    <p><a href="/">Home</a> · <a href="/app/baselines.html">Baselines</a> · <a href="/under-the-hood.html">Under the hood</a> · <a href="/whitepaper.html">Whitepaper</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
+  </footer>
 </div>
 <script src="/js/vendor/supabase-js-2.118.0.js"></script>
 <script src="/js/config.js"></script>

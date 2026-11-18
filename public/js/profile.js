@@ -178,7 +178,7 @@
     ["pledged", "🌱", "Pledged", "You're counted in your county.", "Confirm your pledge from the email we sent."],
     ["verified", "🪪", "ID checked", "You can see other members' profiles.", "Do the ID check below."],
     ["business", "🏪", "Business owner", "Your business is in the directory.", "Claim your listing in the directory, or add your business below."],
-    ["earn", "⭐", "Can earn points", "", "Opens when your county reaches 1%. Needs the ID check."],
+    ["earn", "⭐", "Can earn points", "", "Opens when 1% of your county passes the ID check. You need the ID check too."],
     ["vote", "🗳️", "Can vote", "One person, one vote on what gets done.", "Needs the ID check. Voting opens with Work."],
     ["project_owner", "📋", "Project owner", "You can start and run projects.", "Opens with Work, for ID-checked business owners."],
     ["checker", "✅", "Checker", "You check that work is done.", "Opens with Work, for ID-checked members."],
