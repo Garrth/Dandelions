@@ -81,7 +81,8 @@
     var tel = phone.replace(/\D/g, "");
     var fromList = String(b[0]).indexOf("cslb-") === 0;
     // A listing from the license list has no street address unless its owner adds one.
-    var noStreet = det ? !street : fromList || !!b.noStreet;
+    var online = det ? !!det.online_only : !!b.online;
+    var noStreet = det ? !street || online : fromList || !!b.noStreet;
     var maps = "https://www.google.com/maps/dir/?api=1&destination=" + ((det || b.added) && street ? encodeURIComponent(addr + " " + st) : noStreet || typeof b[3] !== "number" ? encodeURIComponent(town + " " + st + " " + zip) : b[3] + "," + b[4]);
     if (noStreet) addr = "";
     var licRow = b[11] ? "<div><b>License</b><span>California contractor #" + esc(b[11]) + ', active. <a href="https://www.cslb.ca.gov/OnlineServices/CheckLicenseII/LicenseDetail.aspx?LicNum=' +
@@ -93,17 +94,17 @@
     document.getElementById("biz").innerHTML =
       '<a class="crumb" href="/directory/list.html?t=' + encodeURIComponent(heading) + '">‹ ' + esc(type) + "</a>" +
       '<div class="bizhead"><div class="bizicon">' + icon(fam) + '</div><div style="min-width:0"><h1 style="font-size:26px">' + esc(name) + "</h1>" +
-      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + (dist === null ? "" : " · " + dist.toFixed(1) + " mi") + (det ? ' · <span class="lic">✓ Verified</span>' : claimed ? ' · <span class="lic">Claimed by owner</span>' : "") + "</p></div></div>" +
+      '<p style="margin-top:4px">' + esc(type) + (town ? " · " + esc(town) : "") + (online ? " · Online" : "") + (dist === null ? "" : " · " + dist.toFixed(1) + " mi") + (det ? ' · <span class="lic">✓ Verified</span>' : claimed ? ' · <span class="lic">Claimed by owner</span>' : "") + "</p></div></div>" +
       '<div class="actions">' +
         '<a class="main" href="' + (tel ? "tel:" + tel : "#") + '"' + (tel ? "" : ' aria-disabled="true"') + ">Call</a>" +
-        '<a href="' + maps + '" target="_blank" rel="noopener">Directions</a>' +
+        (online ? '<a href="#" aria-disabled="true">Online only</a>' : '<a href="' + maps + '" target="_blank" rel="noopener">Directions</a>') +
         '<a href="' + esc(web || "#") + '" target="_blank" rel="noopener nofollow"' + (web ? "" : ' aria-disabled="true"') + ">Website</a></div>" +
       (owner ? '<a class="btn small" href="/directory/edit.html?' + here + '" style="text-align:center">' + (det ? "Edit your listing" : "Add your details") + "</a>" : "") +
       gallery(det) +
       (det && det.offer ? '<div class="offer"><span>Offer</span>' + esc(det.offer) + "</div>" : "") +
       (det && det.description ? '<p class="about">' + esc(det.description) + "</p>" : "") +
       '<div class="facts">' +
-        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">' + (noStreet ? "Works out of " + esc(town || "this area") + ". Call for details." : "Not listed") + "</span>") + "</span></div>" +
+        "<div><b>Address</b><span>" + (esc(addr) || '<span class="muted">' + (online ? "Shops online" + (town ? ". Based in " + esc(town) : "") + "." : noStreet ? "Works out of " + esc(town || "this area") + ". Call for details." : "Not listed") + "</span>") + "</span></div>" +
         licRow +
         "<div><b>Phone</b><span>" + (phone ? '<a href="tel:' + tel + '">' + esc(phone) + "</a>" : '<span class="muted">Not listed</span>') + "</span></div>" +
         "<div><b>Online</b><span>" + ([web ? '<a href="' + esc(web) + '" target="_blank" rel="noopener nofollow">' + esc(host(web) || "Website") + "</a>" : "",

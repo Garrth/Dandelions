@@ -11,7 +11,7 @@
   var TRADES = ["home_service", "building_or_construction_service"];
   var DAY_NAMES = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday", sun: "Sunday" };
   var MAX_PHOTOS = 5;
-  var biz, user, photos = [], removed = [];
+  var biz, user, photos = [], removed = [], lastDetails = null;
 
   function $(x) { return document.getElementById(x); }
   function shell(inner) {
@@ -43,10 +43,12 @@
         field("address", "Street address", v("address", 5), 'maxlength="120" placeholder="Leave blank to show your town only"') +
         '<div class="two">' + field("town", "Town", v("town", 6), 'maxlength="60"') + field("zip", "ZIP", v("zip", 7), 'inputmode="numeric" maxlength="5"') + "</div>" +
         field("website", "Website", v("website", 9), 'type="url" maxlength="300" placeholder="https://"') +
+        '<label class="check"><input type="checkbox" id="online_only"' + ((d ? d.online_only : biz.online) ? " checked" : "") + '> Online only. No storefront for customers to visit. Hides your street and Directions.</label>' +
         (food ? field("menu_url", "Menu link", d ? d.menu_url : "", 'type="url" maxlength="300" placeholder="https://"') : "") +
         '<label class="field">About your business<textarea id="description" maxlength="600" rows="4" placeholder="What you do, what you\'re known for">' + esc(d ? d.description : "") + "</textarea></label>" +
       "</div></div>" +
       '<div class="card"><h3>Hours</h3><p class="small muted" style="margin-top:4px">Turns on "Open now". Closing after midnight? Pick the closing time, like 1:00 AM.</p>' +
+        '<p style="margin-top:10px"><button class="btn ghost small" type="button" id="allday">Open 24 hours, every day</button></p>' +
         '<div class="hours" style="margin-top:10px">' + hoursRows(d && d.hours) + "</div></div>" +
       '<div class="card"><h3>Photos</h3><p class="small muted" style="margin-top:4px">Up to ' + MAX_PHOTOS + '. Only photos you have the right to use. We shrink them and take out location data.</p>' +
         '<div class="photos" id="photos" style="margin-top:10px"></div>' +
@@ -67,6 +69,14 @@
       $("open-" + day).addEventListener("change", function () { $("from-" + day).disabled = $("to-" + day).disabled = !this.checked; });
     });
     $("file").addEventListener("change", function () { addFiles(Array.prototype.slice.call(this.files)); this.value = ""; });
+    // Online stores and the like: every day, midnight to midnight, which shows as "Open 24 hours".
+    $("allday").addEventListener("click", function () {
+      D.DAYS.forEach(function (day) {
+        $("open-" + day).checked = true;
+        $("from-" + day).disabled = $("to-" + day).disabled = false;
+        $("from-" + day).value = "00:00"; $("to-" + day).value = "00:00";
+      });
+    });
     $("f").addEventListener("submit", function (e) { e.preventDefault(); save(); });
     drawPhotos();
   }
@@ -130,6 +140,8 @@
       free_estimates: $("free_estimates") ? $("free_estimates").checked : false, crew: $("crew") ? $("crew").value : "",
       updated_at: new Date().toISOString()
     };
+    // Only send online_only once the database has it (older setups don't), or when it's turned on.
+    if ($("online_only").checked || (lastDetails && "online_only" in lastDetails)) row.online_only = $("online_only").checked;
     if (row.name.length < 2) { msg.textContent = "Add the business name."; $("name").focus(); return; }
     if (row.zip && !/^[0-9]{5}$/.test(row.zip)) { msg.textContent = "The ZIP should be 5 numbers."; $("zip").focus(); return; }
     if (row.phone && row.phone.replace(/\D/g, "").length < 10) { msg.textContent = "The phone number looks short."; $("phone").focus(); return; }
@@ -247,6 +259,7 @@
       if (!o[0].data) return notOwner();
       var d = o[1].data;
       if (d) d.hours = D.cleanHours(d.hours);
+      lastDetails = d;
       form(d);
       dealCard(!!d);
     });
