@@ -370,6 +370,36 @@
     });
   });
 
+  // ---- Businesses claimed in the directory: a link to edit each one, and its monthly pledge ----
+  function listingQs(c) { return "f=" + encodeURIComponent(c.family) + "&id=" + encodeURIComponent(c.listing_id) + "&c=" + encodeURIComponent(c.county_fips); }
+  function showClaimed(claims, pledges) {
+    var seen = {}, rows = (claims || []).filter(function (c) { var k = c.county_fips + "|" + c.listing_id; if (seen[k]) return false; seen[k] = true; return true; });
+    $("claimed").hidden = !rows.length;
+    if (!rows.length) return;
+    var pts = {};
+    (pledges || []).forEach(function (x) { pts[x.county_fips + "|" + x.listing_id] = x.points; });
+    $("claimlist").innerHTML = rows.map(function (c, i) {
+      var k = c.county_fips + "|" + c.listing_id, qs = listingQs(c);
+      return '<div class="card" style="margin-bottom:12px"><div class="spread"><b>' + esc(c.listing_name) + '</b><span class="chip ok">Yours</span></div>' +
+        '<div class="row" style="margin:10px 0 14px"><a class="btn small" href="/directory/edit.html?' + qs + '">Edit your listing</a><a class="btn ghost small" href="/directory/biz.html?' + qs + '">See it in the directory</a></div>' +
+        '<label class="field">Points a month this business would accept <span class="muted">(private)</span><input type="number" min="0" max="1000000" step="50" inputmode="numeric" placeholder="0" id="cl-pts-' + i + '" value="' + (pts[k] != null ? pts[k] : "") + '"></label>' +
+        '<p class="small muted" style="margin:-4px 0 12px">Points aren\'t on yet. It counts toward your county\'s starting numbers on the <a href="/app/work.html">Work page</a>.</p>' +
+        '<button class="btn small" type="button" data-cl="' + i + '">Save</button></div>';
+    }).join("");
+    document.querySelectorAll("[data-cl]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var i = +b.getAttribute("data-cl"), c = rows[i], n = Math.round(+$("cl-pts-" + i).value || 0);
+        if (n < 0 || n > 1000000) { toast("Pick a number from 0 to 1,000,000."); return; }
+        b.disabled = true;
+        db.from("accept_pledges").upsert({ member_id: user.id, county_fips: c.county_fips, listing_id: c.listing_id, points: n, updated_at: new Date().toISOString() },
+          { onConflict: "member_id,county_fips,listing_id" }).then(function (r) {
+          b.disabled = false;
+          toast(r.error ? "Couldn't save. Try again." : n ? "Saved. Thanks for pledging." : "Saved");
+        });
+      });
+    });
+  }
+
   // ---- Load everything ----
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
@@ -382,7 +412,9 @@
       loadId(),
       fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
       db.from("businesses").select(BIZ_COLS).eq("owner_id", user.id).maybeSingle(),
-      db.from("accept_pledges").select("points").eq("member_id", user.id).eq("listing_id", "").maybeSingle()
+      db.from("accept_pledges").select("points").eq("member_id", user.id).eq("listing_id", "").maybeSingle(),
+      db.from("listing_claims").select("county_fips,family,listing_id,listing_name,verified_at").eq("member_id", user.id).eq("status", "verified").order("verified_at", { ascending: true }),
+      db.from("accept_pledges").select("county_fips,listing_id,points").eq("member_id", user.id).neq("listing_id", "")
     ]).then(function (out) {
       var m = out[0].data || {}, c = m.county_fips && out[4][m.county_fips];
       $("where").textContent = c ? c[0] + ", " + c[1] : m.zip ? "ZIP " + m.zip : "Member";
@@ -392,6 +424,7 @@
       loadPhoto().then(showMe); showSkills(); loadPerms();
       showWork(out[2].data);
       showBiz(out[5].data); loadBusy(); showPledge(out[6]);
+      showClaimed(out[7].data, out[8].data);
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
       // Pick up a check that finished while the page was closed.
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
