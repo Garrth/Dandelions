@@ -6,6 +6,7 @@
   window.__raiChat = true;
   var cfg = window.DANDELIONS_CONFIG || {};
   var KEY = "dandelions_rai";
+  var FEEDBACK_TOPIC = "f33db4c0-0000-4000-8000-000000000001";
   var HELLO = "Hi, I'm Rai, the AI guide here. Ask me anything about Dandelions or this page.";
   var STARTERS = ["What is Dandelions?", "What can I do on this page?", "How do points work?", "Is this legit?"];
   var state = { open: false, msgs: [] };
@@ -17,6 +18,9 @@
     ".rai-fab svg{width:28px;height:28px}",
     "body:has(.sendbar) .rai-fab,body:has(.savebar) .rai-fab,body:has(.tabs) .rai-fab{bottom:88px}",
     "html.rai-open .rai-fab{display:none}",
+    ".site-fb{position:fixed;left:16px;bottom:22px;z-index:30;background:var(--card,#fff);color:var(--ink,#15210f);border:1px solid var(--line,#dfe3d2);border-radius:999px;padding:9px 13px;font:700 13px/1 var(--body,system-ui,sans-serif);text-decoration:none}",
+    "body:has(.sendbar) .site-fb,body:has(.savebar) .site-fb,body:has(.tabs) .site-fb{bottom:94px}",
+    "html.rai-open .site-fb{display:none}",
     ".rai-panel{position:fixed;z-index:40;inset:0;display:none;flex-direction:column;background:var(--bg,#fdfdf8);color:var(--ink,#15210f)}",
     "html.rai-open .rai-panel{display:flex}",
     "@media (min-width:900px){html.rai-open body{margin-right:400px}.rai-panel{inset:0 0 0 auto;width:400px;border-left:1px solid var(--line,#dfe3d2);box-shadow:-6px 0 24px rgba(0,0,0,.08)}}",
@@ -84,8 +88,12 @@
     '<button type="button" data-new>New chat</button><button type="button" data-close aria-label="Close">Close</button></div>' +
     '<div class="rai-log" role="log" aria-live="polite"></div>' +
     '<form class="rai-form"><textarea rows="1" maxlength="1500" placeholder="Ask Rai anything" aria-label="Your question"></textarea><button type="submit">Send</button></form>' +
-    '<p class="rai-note">Don\'t share private details like ID or account numbers. Chats aren\'t saved. Questions Rai can\'t answer are kept without your name. <a href="/privacy.html">Privacy</a></p>';
+    '<p class="rai-note">Don\'t share private details like ID or account numbers. Chats aren\'t saved. Questions Rai can\'t answer are kept without your name. <a href="/privacy.html">Privacy</a> · Found something broken? <a href="/app/talk.html?t=' + FEEDBACK_TOPIC + '">Site feedback</a></p>';
   document.body.appendChild(fab); document.body.appendChild(panel);
+  // Early look: one place for everyone's feedback, the "Site feedback" topic in Talk.
+  var fb = document.createElement("a");
+  fb.className = "site-fb"; fb.href = "/app/talk.html?t=" + FEEDBACK_TOPIC; fb.textContent = "Feedback";
+  if (location.search.indexOf(FEEDBACK_TOPIC) < 0) document.body.appendChild(fb);
   var log = panel.querySelector(".rai-log"), form = panel.querySelector("form"), box = form.querySelector("textarea"), send = form.querySelector("button");
   var busy = false;
 
