@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Work | Dandelions</title>
+  <meta name="description" content="How paid work will run in Dandelions: local businesses take on projects, random checkers confirm the work, and points are paid when it checks out. Not open yet.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/work.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/">Home</a><a href="/app/talk.html">Talk</a></nav></header>
+  <main id="work">
+    <div class="page-head">
+      <div class="eyebrow">Work · not open yet</div>
+      <h1>There's plenty to do.</h1>
+      <p>Work is where local businesses take on projects that make life better here, and get paid in points once the work is checked. It opens county by county. Nothing here pays yet, and nothing is promised.</p>
+    </div>
+
+    <h2 class="section-title">What has to happen first</h2>
+    <p class="muted small" id="gates-where">All four have to be true before the first point is paid.</p>
+    <div class="stack" id="gates"></div>
+
+    <h2 class="section-title">How a job will work</h2>
+    <ol class="flow" id="flow"></ol>
+
+    <h2 class="section-title">Kinds of work</h2>
+    <p class="muted small">These open first. Tap one to see a sample project. Members vote in more kinds as the network grows.</p>
+    <div class="stack" id="types"></div>
+
+    <h2 class="section-title">Line up for a position</h2>
+    <p class="muted small" id="lineup-intro">Pick the positions you'd like when Work opens. It saves your interest. It isn't a job offer or a promise of work.</p>
+    <div id="positions"></div>
+
+    <h2 class="section-title">Dandelions doesn't hire anyone</h2>
+    <div class="card">
+      <ul class="rules">
+        <li><b>Points go to businesses, never to a person.</b> Working on your own? List yourself as a one-person business.</li>
+        <li><b>Nobody picks the winner by hand.</b> Businesses bid, and a public formula of price and track record decides.</li>
+        <li><b>You set your own hours and methods.</b> Dandelions checks results, not people.</li>
+        <li><b>Nobody checks their own work,</b> or the work of a business they're tied to.</li>
+        <li><b>Everything is in a public log,</b> so anyone can see what was paid and why.</li>
+      </ul>
+    </div>
+
+    <h2 class="section-title">Helping early</h2>
+    <div class="card">
+      <p>People who bring in ID-checked members before Work opens get first pick of projects when they open, if they open. Your share link is on your <a href="/app/">home page</a>.</p>
+    </div>
+
+    <p class="note" style="margin-top:24px">Questions or ideas about Work? Bring them to <a href="/app/talk.html">Talk</a> or ask Rai.</p>
+  </main>
+</div>
+<script src="/js/vendor/supabase-js-2.118.0.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/work.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>
