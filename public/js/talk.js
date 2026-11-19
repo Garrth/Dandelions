@@ -65,11 +65,13 @@
   var PLACE_RE = /^(us|st-[A-Z]{2}|co-[0-9]{5})$/, ID_RE = /^[0-9a-f-]{36}$/;
 
   var user = null, agreed = false, mod = false, pausedUntil = null, counties = {};
-  var places = [], place = "", topics = [], stars = {}, follows = {}, backed = {}, flagged = {}, mods = {};
+  var places = [], place = "", topics = [], stars = {}, follows = {}, tfollows = {}, backed = {}, flagged = {}, mods = {}, mailOn = true;
   var view = {}, topPost = null, notices = [];
   // Rai: the Catching on list for General, and which idea each General post is in.
   var ideas = [], ideaByPost = {};
   var raiUrl = (cfg.supabaseUrl || "") + "/functions/v1/rai";
+  // After a post or comment, ask the talk-mail function to email anyone whose bell just rang. Fire and forget.
+  function pokeMail() { try { fetch((cfg.supabaseUrl || "") + "/functions/v1/talk-mail", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", keepalive: true }).catch(function () {}); } catch (e) {} }
   // Signed in: send the member's own token so Rai counts their questions by account, not by address.
   // Only a token with over a minute left, so an old one never blocks the question.
   function raiToken() {
@@ -457,7 +459,8 @@
       '<div class="tk-head"><div class="tk-headrow">' + topicsButton() + '<div class="tk-htext"><div class="eyebrow">' + esc(t && bByTopic[t.id] ? "Baselines · everyone" : everyone(t) ? "Everyone" : placeName(place)) + "</div><h1>" + esc(name) + "</h1></div>" +
         (user && !paused() ? '<button class="btn small" type="button" id="newpost">New post</button>' : "") + "</div>" +
         '<p class="muted tk-about">' + (t ? esc(t.about || "") : "Anything goes here. Ideas that catch on get their own topic.") + "</p>" +
-        (t ? '<div class="row tk-actions"><a data-nav class="btn ghost small" href="' + esc(href({ r: place, s: t.id })) + '">✦ Summary</a>' +
+        (t ? '<div class="row tk-actions">' + (user ? '<button class="btn small' + (tfollows[t.id] ? " ghost" : "") + '" type="button" id="followtopic" aria-pressed="' + !!tfollows[t.id] + '">' + (tfollows[t.id] ? "Following" : "Follow topic") + "</button>" : "") +
+          '<a data-nav class="btn ghost small" href="' + esc(href({ r: place, s: t.id })) + '">✦ Summary</a>' +
           '<button class="btn ghost small" type="button" data-askrai>Ask Rai about this topic</button></div>' : "") +
         (t && canRename(t) ? '<p class="small"><button class="linkbtn" type="button" id="renametopic">Rename this topic</button> <span class="muted">(you started it, so you can rename it today)</span></p>' : "") +
         (t && mod ? '<button class="linkbtn" type="button" id="edittopic">Edit topic</button>' : "") + "</div>" +
@@ -482,6 +485,18 @@
       $("ctitle").placeholder = this.checked ? "The topic's name, like Community garden" : "Sum it up in a few words";
       if (this.checked) $("ctitle").focus();
     });
+    if ($("followtopic")) $("followtopic").addEventListener("click", function () {
+      var b = this, on = !!tfollows[t.id];
+      b.disabled = true;
+      var req = on ? db.from("talk_topic_follows").delete().eq("member_id", user.id).eq("topic_id", t.id) : db.from("talk_topic_follows").insert({ topic_id: t.id });
+      req.then(function (r) {
+        b.disabled = false;
+        if (r.error) { toast("Couldn't do that. Try again."); return; }
+        if (on) delete tfollows[t.id]; else tfollows[t.id] = true;
+        b.textContent = on ? "Follow topic" : "Following"; b.classList.toggle("ghost", !on); b.setAttribute("aria-pressed", String(!on));
+        toast(on ? "Stopped following " + t.name : "Following " + t.name + ". The bell" + (mailOn ? " and an email" : "") + " will tell you about new posts and comments here.");
+      });
+    });
     if ($("edittopic")) $("edittopic").addEventListener("click", function () { topicForm(t); });
     if ($("renametopic")) $("renametopic").addEventListener("click", function () { renameForm(t); });
     wireAsk(main, t);
@@ -498,7 +513,7 @@
         if (suggest) row.suggest = true;
         db.from("talk_posts").insert(row).select("id").single().then(function (r) {
           if (r.error) { $("cmsg").textContent = errText(r.error); return; }
-          toast(suggest ? "Suggested. It's on Catching on now." : "Posted"); showFeed();
+          toast(suggest ? "Suggested. It's on Catching on now." : "Posted"); showFeed(); pokeMail();
           if (r.data && AT_RAI.test(title + " " + body)) askRaiIn(r.data.id, r.data.id);
         });
       });
@@ -843,7 +858,7 @@
               $("rmsg").textContent = "Sending...";
               db.from("talk_posts").insert({ room: p.room, parent_id: p.id, kind: "reply", body: body }).select("id").single().then(function (r) {
                 if (r.error) { $("rmsg").textContent = errText(r.error); return; }
-                showPost();
+                showPost(); pokeMail();
                 if (r.data && AT_RAI.test(body)) askRaiIn(r.data.id, p.id);
               });
             });
@@ -956,12 +971,18 @@
       $("bell").addEventListener("click", function (e) { e.stopPropagation(); togglePanel(); });
       document.addEventListener("click", function (e) { var pn = $("bellpanel"); if (pn && !pn.contains(e.target)) closePanel(); });
     }
-    return db.from("talk_notices").select("id,kind,post_id,from_name,seen,at").eq("member_id", user.id).order("at", { ascending: false }).limit(30).then(function (r) {
+    function q(cols) { return db.from("talk_notices").select(cols).eq("member_id", user.id).order("at", { ascending: false }).limit(30); }
+    return q("id,kind,post_id,from_name,seen,at,topic:talk_topics(name)").then(function (r) { return r.error ? q("id,kind,post_id,from_name,seen,at") : r; }).then(function (r) {
       notices = r.data || [];
       var n = notices.filter(function (x) { return !x.seen; }).length;
       $("belln").hidden = !n; $("belln").textContent = n > 9 ? "9+" : String(n);
       $("bell").setAttribute("aria-label", n ? n + " new notifications" : "Notifications");
     });
+  }
+  function noteText(x) {
+    var tn = (x.topic && x.topic.name) || (x.topic_id && topicById(x.topic_id) ? topicById(x.topic_id).name : "");
+    var inT = tn ? " in " + esc(tn) : "";
+    return x.kind === "comment" ? " commented on your post" : x.kind === "topic_comment" ? " commented" + inT : " posted" + inT;
   }
   function closePanel() { var pn = $("bellpanel"); if (pn) pn.remove(); $("bell").setAttribute("aria-expanded", "false"); }
   function togglePanel() {
@@ -970,9 +991,10 @@
     pn.className = "tk-panel"; pn.id = "bellpanel";
     pn.innerHTML = "<b>Notifications</b>" + (notices.length ? notices.map(function (x) {
       return '<a data-nav class="tk-note' + (x.seen ? "" : " new") + '" href="' + esc(href({ p: x.post_id })) + '" data-seen="' + x.id + '">' +
-        esc(x.from_name) + (x.kind === "comment" ? " commented on your post" : " posted") + '<span class="muted small"> · ' + ago(x.at) + "</span></a>";
-    }).join("") : '<p class="small muted">Nothing yet. Follow people to hear when they post.</p>') +
-      '<p class="small muted" style="margin-top:8px">No emails yet. A daily digest by email comes later, and it will be your choice.</p>';
+        esc(x.from_name) + noteText(x) + '<span class="muted small"> · ' + ago(x.at) + "</span></a>";
+    }).join("") : '<p class="small muted">Nothing yet. Follow a topic or a person to hear about new posts.</p>') +
+      '<label class="check small" style="margin-top:8px"><input type="checkbox" id="mailon"' + (mailOn ? " checked" : "") + "> Email me too (at most one every 15 minutes)</label>" +
+      '<p class="small" style="margin-top:6px"><a href="/app/install.html">Put Dandelions on your phone</a></p>';
     document.body.appendChild(pn);
     $("bell").setAttribute("aria-expanded", "true");
     var ids = notices.filter(function (x) { return !x.seen; }).map(function (x) { return x.id; });
@@ -980,6 +1002,13 @@
       notices.forEach(function (x) { x.seen = true; }); $("belln").hidden = true; $("bell").setAttribute("aria-label", "Notifications");
     });
     each(pn, "a", function (a) { a.addEventListener("click", closePanel); });
+    $("mailon").addEventListener("change", function () {
+      var c = this, want = c.checked;
+      db.rpc("talk_mail_set", { p_on: want }).then(function (r) {
+        if (r.error) { c.checked = !want; toast("Couldn't change that. Try again."); return; }
+        mailOn = want; toast(want ? "Emails on. At most one every 15 minutes." : "Emails off. The bell still works.");
+      });
+    });
   }
 
   // ---- Every 30 seconds, check for new posts and notifications while the page is open ----
@@ -1026,8 +1055,10 @@
       db.from("talk_pauses").select("until").eq("member_id", user.id).maybeSingle(),
       db.rpc("is_talk_mod"),
       db.from("talk_stars").select("topic_id").eq("member_id", user.id),
-      db.from("talk_follows").select("followee_id").eq("follower_id", user.id)
-    ]) : Promise.resolve([{}, {}, {}, {}, {}, {}, {}, {}])).then(function (m) {
+      db.from("talk_follows").select("followee_id").eq("follower_id", user.id),
+      db.from("talk_topic_follows").select("topic_id").eq("member_id", user.id),
+      db.from("talk_mail").select("email_on").eq("member_id", user.id).maybeSingle()
+    ]) : Promise.resolve([{}, {}, {}, {}, {}, {}, {}, {}, {}, {}])).then(function (m) {
       (m[1].data || []).forEach(function (x) { backed[x.post_id] = x.agree === false ? "d" : "a"; });
       (m[2].data || []).forEach(function (x) { flagged[x.post_id] = true; });
       agreed = !!m[3].data;
@@ -1035,6 +1066,8 @@
       mod = m[5].data === true;
       (m[6].data || []).forEach(function (x) { stars[x.topic_id] = true; });
       (m[7].data || []).forEach(function (x) { follows[x.followee_id] = true; });
+      (m[8].data || []).forEach(function (x) { tfollows[x.topic_id] = true; });
+      mailOn = !(m[9].data && m[9].data.email_on === false);
       var fips = m[0].data && m[0].data.county_fips, c = fips && counties[fips];
       var asked = new URLSearchParams(location.search).get("r") || "";
       var askedC = /^co-[0-9]{5}$/.test(asked) && counties[asked.slice(3)];

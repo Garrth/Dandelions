@@ -1,0 +1,24 @@
+# Talk emails: every 15 minutes, ask the talk-mail function to send any bell emails that are waiting.
+# Talk already pokes the function right after each post and comment. This picks up the rest,
+# like people who were emailed less than 15 minutes ago. Run it by hand from the Actions tab: Talk emails > Run workflow.
+name: Talk emails
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: talk-mail
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Send waiting Talk emails
+        run: |
+          curl -sS --max-time 120 -X POST -H "Content-Type: application/json" -d '{}' https://utduohtyjbbcnzxfmutp.supabase.co/functions/v1/talk-mail

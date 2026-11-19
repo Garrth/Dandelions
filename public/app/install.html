@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Put Dandelions on your phone | Dandelions</title>
+  <meta name="description" content="Add Dandelions to your home screen so it opens like an app.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/images/app/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Dandelions">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/talk.html">Talk</a></nav></header>
+  <main>
+    <div class="page-head"><div class="eyebrow">Phone app</div><h1>Put Dandelions on your phone</h1><p>It takes about 10 seconds. Dandelions gets its own icon on your home screen and opens full screen, like any other app. Nothing to download from an app store.</p></div>
+
+    <div class="card" id="already" hidden><p><b>You're in the app now.</b> You can close this page. Dandelions is on your home screen.</p></div>
+
+    <div class="card" id="android">
+      <h2>Android phone</h2>
+      <p id="installbox" hidden><button class="btn" type="button" id="installbtn" style="width:100%">Add Dandelions to my home screen</button></p>
+      <ol>
+        <li>Open <b>www.dandelions.lol</b> in <b>Chrome</b>.</li>
+        <li>Tap the <b>three dots</b> at the top right.</li>
+        <li>Tap <b>Add to Home screen</b> (or <b>Install app</b>), then <b>Install</b>.</li>
+      </ol>
+    </div>
+
+    <div class="card" id="iphone">
+      <h2>iPhone</h2>
+      <ol>
+        <li>Open <b>www.dandelions.lol</b> in <b>Safari</b>.</li>
+        <li>Tap the <b>Share</b> button (the square with an arrow pointing up). On newer iPhones it may be behind the <b>three dots</b> at the bottom right.</li>
+        <li>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</li>
+      </ol>
+      <p class="small muted">Chrome on iPhone works too on iOS 16.4 and newer: Share, then Add to Home Screen.</p>
+    </div>
+
+    <div class="card">
+      <h2>Good to know</h2>
+      <ul>
+        <li><b>Log in once inside the app.</b> On iPhone the app keeps its own log in, separate from Safari. Use your password; email links open in Safari, not the app.</li>
+        <li><b>Notifications:</b> follow a topic in Talk and you'll get an email when someone posts or comments there. Phone pop-up alerts come next.</li>
+        <li>It's the same site, so it's always up to date. To remove it, press and hold the icon and remove it like any app.</li>
+      </ul>
+    </div>
+  </main>
+</div>
+<script src="/js/install.js"></script>
+<script src="/js/vendor/supabase-js-2.118.0.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>
