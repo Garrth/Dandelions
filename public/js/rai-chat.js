@@ -167,4 +167,8 @@
   // Other parts of the site can open Rai, and ask a question for the visitor: RaiChat.open("What do people agree on?")
   window.RaiChat = { open: function (q) { open(true); if (q) ask(q); }, md: md };
   if (state.open) open(true);
+  // Phone app: register the small helper that shows an offline page when there's no signal (see /sw.js).
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
+  }
 })();
