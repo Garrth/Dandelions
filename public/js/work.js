@@ -91,17 +91,20 @@
     var pct = have ? Math.min(100, have / target * 100) : 0;
     return '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
   }
-  function drawGates(county, status, claimed) {
+  function drawGates(county, status) {
     var people = county ? Math.max(100, Math.ceil(county[2] * 0.001)) : 0, have = status && status.id_checked;
+    var biz = (status && status.businesses_pledged) || 0, pledged = status && status.pledged, pledgers = (status && status.pledgers) || 0;
     $("gates").innerHTML =
       gate(1, "ID-checked people", "0.1% of the people in the county pass the ID check, and at least 100." +
           (county ? " " + county[0] + " needs " + fmt(people) + "." : ""),
         county ? (have != null ? fmt(have) + " of " + fmt(people) : "Under 10 so far") : "Sign in to see",
         county ? bar(have, people) : "") +
-      gate(2, "Local businesses", "At least 25 businesses claim their listing in the directory and say how many points a month they'll accept.",
-        county ? fmt(claimed || 0) + " of 25" : "Sign in to see", county ? bar(claimed || 0, 25) : "") +
-      gate(3, "Points pledged each month", "People and businesses say how many points a month they'd accept for what they sell. Up to half of that total can be paid out for work each month. Points are never in place of anyone's pay.",
-        "Pledges open soon");
+      gate(2, "Local businesses", "At least 25 businesses in the directory say how many points a month they'll accept.",
+        county ? fmt(biz) + " of 25" : "Sign in to see", county ? bar(biz, 25) : "") +
+      gate(3, "Points pledged each month", "People and businesses say how many points a month they'd accept. The county needs 20,000 a month pledged to start. Up to half of all pledges can be paid out for work each month. Points are extra, never in place of anyone's pay.",
+        county ? (pledged != null ? fmt(pledged) + " of 20,000" : pledgers ? "Under 5 pledges so far" : "None yet") : "Sign in to see",
+        (county ? bar(pledged || 0, 20000) : "") +
+        '<p class="small" style="margin-top:8px"><a href="/app/profile.html#pledge">Add your pledge</a> on your profile. Business owners add theirs when they edit their listing.</p>');
   }
 
   // ---- Positions and line-up ----
@@ -146,7 +149,7 @@
     });
   }
 
-  drawGates(null, null, 0);
+  drawGates(null, null);
   drawPositions();
   if (!window.supabase) return;
   db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
@@ -165,10 +168,10 @@
       drawPositions();
       if (!county) return;
       $("gates-where").textContent = "For " + county[0] + ", " + county[1] + ". Work can start here once all three are reached.";
-      Promise.all([db.rpc("work_county_status", { p_county: fips }), db.rpc("claimed_listings", { fips: fips })]).then(function (r) {
-        var s = r[0].data || {};
+      db.rpc("work_county_status", { p_county: fips }).then(function (r) {
+        var s = r.data || {};
         counts = s.lineup || {};
-        drawGates(county, s, (r[1].data || []).length);
+        drawGates(county, s);
         drawPositions();
         if (s.people) $("lineup-intro").textContent = fmt(s.people) + (s.people === 1 ? " person has" : " people have") + " lined up in " + county[0] + " so far. Pick the positions you'd like when Work starts. It saves your interest. It isn't a job offer or a promise of work.";
       });

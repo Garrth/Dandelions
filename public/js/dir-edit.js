@@ -60,6 +60,9 @@
         (trade ? '<label class="check"><input type="checkbox" id="free_estimates"' + (d && d.free_estimates ? " checked" : "") + "> Free estimates</label>" +
           '<label class="field">How many people work there?<select id="crew"><option value="">Not given</option><option value="1">Just me</option><option value="2-5">2 to 5</option><option value="6-20">6 to 20</option><option value="21+">21 or more</option></select></label>' : "") +
         "</div></div>" : "") +
+      '<div class="card" id="plcard" hidden><h3>Points a month you\'ll accept</h3><p class="small muted" style="margin-top:4px">Private. Points aren\'t on yet. Your pledge counts toward your county\'s starting numbers on the <a href="/app/work.html">Work page</a>, and only the county total is shown. Change it any time.</p>' +
+        '<label class="field" style="margin-top:10px">Points a month<input id="plpoints" type="number" min="0" max="1000000" step="50" inputmode="numeric" placeholder="0"></label>' +
+        '<button class="btn ghost small" type="button" id="plsave">Save pledge</button><p class="small" id="plmsg" role="status" style="margin-top:8px"></p></div>' +
       '<div class="savebar"><button class="btn" type="submit" id="save" style="width:100%">Save</button><p class="small" id="msg" role="status" style="margin-top:8px"></p></div>' +
       "</form>" +
       '<div class="foot"><span>Every change is kept, so anything can be put back. Questions? <a href="mailto:hello@dandelions.lol?subject=' + encodeURIComponent("My listing: " + biz[1] + " (" + id + ")") + '">Email us</a>.</span></div>');
@@ -121,6 +124,25 @@
         photos.push({ blob: b, preview: URL.createObjectURL(b) });
         drawPhotos();
       }).catch(function () { msg.textContent = "One of those couldn't be read as a photo."; });
+    });
+  }
+
+  // Monthly pledge for this listing. Saved on its own, so the listing still saves if pledges aren't set up yet.
+  function pledgeCard() {
+    db.from("accept_pledges").select("points").eq("member_id", user.id).eq("county_fips", D.COUNTY).eq("listing_id", id).maybeSingle().then(function (r) {
+      if (r.error || !$("plcard")) return;
+      $("plcard").hidden = false;
+      $("plpoints").value = r.data ? r.data.points : "";
+      $("plsave").addEventListener("click", function () {
+        var n = Math.round(+$("plpoints").value || 0), msg = $("plmsg");
+        if (n < 0 || n > 1000000) { msg.textContent = "Pick a number from 0 to 1,000,000."; return; }
+        $("plsave").disabled = true; msg.textContent = "Saving...";
+        db.from("accept_pledges").upsert({ member_id: user.id, county_fips: D.COUNTY, listing_id: id, points: n, updated_at: new Date().toISOString() },
+          { onConflict: "member_id,county_fips,listing_id" }).then(function (x) {
+          $("plsave").disabled = false;
+          msg.textContent = x.error ? "Couldn't save just now. Try again." : n ? "Saved. Thanks for pledging." : "Saved.";
+        });
+      });
     });
   }
 
@@ -261,6 +283,7 @@
       if (d) d.hours = D.cleanHours(d.hours);
       lastDetails = d;
       form(d);
+      pledgeCard();
       dealCard(!!d);
     });
   }).catch(function () {

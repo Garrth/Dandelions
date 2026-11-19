@@ -121,12 +121,12 @@ Joining means saying three things: this work matters; the way we do things now w
   - Jobs and pay, plus prices for basics like eggs, milk, bread, ground beef, gas and electricity. The prices are regional averages for the West, eggs are the US average.
   - Price changes over a year, layoffs reported through California WARN notices, who lives and works here, and local business categories against the living wage.
   - Live Dandelions totals: pledges, verified businesses, and work-question totals once 10 people answer.
-- Work, /app/work.html : coming soon. Shows how a job will work, the county's three starting numbers, kinds of work with sample projects, and 17 positions members can line up for. Lining up saves interest only.
+- Work, /app/work.html : coming soon. Shows the county's three starting numbers with progress, what opens as the county grows (Sprout, Bloom, Puffball), how a job will work, kinds of work with sample projects, and 17 positions members can line up for. Lining up saves interest only.
 - Wallet, coming. It will show a member business's points, which is 0 for everyone until points turn on.
 
 ## Work, as currently designed (coming soon)
 
-Work opens in a county once it reaches three starting numbers: at least 0.1% of its people (and at least 100) pass the ID check, at least 25 local businesses sign up, and people and businesses pledge how many points a month they'll accept. These are starting numbers members can change. Details may change before then.
+Work opens in a county once it reaches three starting numbers: at least 0.1% of its people (and at least 100) pass the ID check, at least 25 local businesses sign up, and people and businesses pledge at least 20,000 points a month they'll accept, in total. These are starting numbers members can change. People add their monthly pledge on their profile (up to 5,000, private). Business owners add theirs on their directory listing's edit page or their profile business. Only ID-checked people's pledges count, and only the county total is shown, once at least 5 have pledged. Points are extra, never in place of anyone's pay. Details may change before then.
 
 - Bidding: businesses send sealed bids inside Rai's fair price range, and a public formula of price and track record picks the winner, not a person. A business can propose its own idea, and others can bid on it too.
 - Ongoing roles (checking, moderating, member help and the rest) are held by businesses for terms of about 3 months, won by bid, never by a person. Dandelions never hires anyone, picks who does the work, or tells anyone how or when to work.

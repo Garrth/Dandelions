@@ -55,6 +55,14 @@
         <p class="small muted" style="margin-top:10px">Equitide runs ID checks for Dandelions through Plaid. Dandelions gets back only yes or no and the date, never your ID papers.</p>
       </div>
 
+      <h2 class="section-title">Points you'd accept</h2>
+      <form class="card" id="pledge">
+        <p class="small muted" style="margin-bottom:10px">How many points a month would you accept, for things you sell, rent or do? Points aren't on yet. Your county's pledges, added up, set how much work can be paid there each month. Points are extra, never in place of your pay.</p>
+        <label class="field">Points a month <span class="muted">(private)</span><input id="pl-points" type="number" min="0" max="5000" step="50" inputmode="numeric" placeholder="0"></label>
+        <p class="small muted" style="margin:-4px 0 12px">Up to 5,000. Change it any time. Only the county total is shown, and it counts once you pass the ID check.</p>
+        <button class="btn small" type="submit">Save</button>
+      </form>
+
       <div class="spread"><h2 class="section-title">Skills and availability</h2><button class="btn ghost small edit" type="button" data-edit="skills">Edit</button></div>
       <div class="card" id="skills">
         <div class="sk-view"></div>
@@ -103,7 +111,7 @@
         <p class="small muted" style="margin:-4px 0 12px">Never shown in the directory.</p>
         <label class="field">Offer for members <span class="muted">(optional)</span><input id="b-offer" maxlength="120" placeholder="10% off your first visit"></label>
         <label class="field">Most points a month you'll take <span class="muted">(private)</span><input id="b-limit" type="number" min="0" max="1000000" step="50" value="0"></label>
-        <p class="small muted" style="margin:-4px 0 12px">Points aren't on in any county yet. This is your limit for when they are, and you can change it any time.</p>
+        <p class="small muted" style="margin:-4px 0 12px">Points aren't on in any county yet. This is your monthly pledge: it counts toward your county's starting numbers on the <a href="/app/work.html">Work page</a>. Change it any time.</p>
         <label class="check"><input type="checkbox" id="b-attest" required> I confirm this business holds a valid license for the work it does (for example a city business license or a contractor's license).</label>
         <div class="row"><button class="btn small" type="submit" id="b-save">Add my business</button><button class="btn ghost small cancel" type="button">Cancel</button></div>
       </form>
