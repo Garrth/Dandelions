@@ -20,4 +20,5 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Send waiting Talk emails
-        run: curl -sS --max-time 120 -X POST -H "Content-Type: application/json" -d '{}' https://utduohtyjbbcnzxfmutp.supabase.co/functions/v1/talk-mail
+        run: |
+          curl -sS --max-time 120 -X POST -H "Content-Type: application/json" -d '{}' https://utduohtyjbbcnzxfmutp.supabase.co/functions/v1/talk-mail
