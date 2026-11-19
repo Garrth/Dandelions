@@ -355,6 +355,21 @@
     db.auth.signOut().then(function () { location.href = "/"; });
   });
 
+  // ---- Monthly pledge: points a month this person would accept ----
+  function showPledge(r) {
+    if (r && r.error) { $("pledge").hidden = true; return; }
+    $("pl-points").value = r && r.data ? r.data.points : "";
+  }
+  $("pledge").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var n = Math.round(+$("pl-points").value || 0);
+    if (n < 0 || n > 5000) { toast("Pick a number from 0 to 5,000."); return; }
+    db.from("accept_pledges").upsert({ member_id: user.id, county_fips: "", listing_id: "", points: n, updated_at: new Date().toISOString() },
+      { onConflict: "member_id,county_fips,listing_id" }).then(function (r) {
+      toast(r.error ? "Couldn't save. Try again." : n ? "Saved. Thanks for pledging." : "Saved");
+    });
+  });
+
   // ---- Load everything ----
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
@@ -366,7 +381,8 @@
       db.from("work_answers").select("jobs,hours,pay").eq("member_id", user.id).maybeSingle(),
       loadId(),
       fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
-      db.from("businesses").select(BIZ_COLS).eq("owner_id", user.id).maybeSingle()
+      db.from("businesses").select(BIZ_COLS).eq("owner_id", user.id).maybeSingle(),
+      db.from("accept_pledges").select("points").eq("member_id", user.id).eq("listing_id", "").maybeSingle()
     ]).then(function (out) {
       var m = out[0].data || {}, c = m.county_fips && out[4][m.county_fips];
       $("where").textContent = c ? c[0] + ", " + c[1] : m.zip ? "ZIP " + m.zip : "Member";
@@ -375,11 +391,12 @@
       if (!(prof.skills || []).length && (prof.can_do || []).length) prof.skills = prof.can_do.map(function (n) { return { name: n }; });
       loadPhoto().then(showMe); showSkills(); loadPerms();
       showWork(out[2].data);
-      showBiz(out[5].data); loadBusy();
+      showBiz(out[5].data); loadBusy(); showPledge(out[6]);
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
       // Pick up a check that finished while the page was closed.
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
       $("loading").hidden = true; $("app").hidden = false; $("signout").hidden = false;
+      if (location.hash === "#pledge" && !$("pledge").hidden) $("pledge").scrollIntoView();
     });
   });
 })();
