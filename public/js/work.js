@@ -13,7 +13,7 @@
   var FLOW = [
     ["A need is spotted", "From Rai's numbers, an idea in Talk, or a position that needs filling."],
     ["Members set priorities", "People talk it through. Small things go ahead unless enough people object. Bigger ones get a vote."],
-    ["Work opens", "A kind of work opens in the county, inside the points local businesses agreed to accept that month."],
+    ["Work opens", "A kind of work opens in the county, inside half of the points people and businesses pledged to accept that month."],
     ["Businesses bid", "Each bid lists milestones and a price inside Rai's fair range. A public formula of price and track record picks the winner, not a person."],
     ["A checker reviews the plan", "Picked at random, with no ties to the business."],
     ["Points are set aside", "They're held until the work checks out, so nobody gets paid for work that isn't done."],
@@ -46,8 +46,8 @@
 
   var OPENS = {
     early: ["Starts early", "sun"],
-    work: ["When Work opens", ""],
-    chain: ["With the points system", ""],
+    work: ["When Work starts", ""],
+    chain: ["Later", ""],
     trust: ["Trusted people first", ""]
   };
   var GROUPS = [
@@ -87,28 +87,28 @@
   function gate(n, name, text, status, extra) {
     return '<div class="card gate"><div class="spread"><b>' + n + ". " + esc(name) + '</b><span class="chip">' + esc(status) + "</span></div><p class=\"small muted\">" + esc(text) + "</p>" + (extra || "") + "</div>";
   }
-  function drawGates(county, status, lined) {
-    var g3 = county ? (lined ? fmt(lined) + " lined up near you" : "Lining up now") : "Lining up now";
-    var g4 = "Sign in to see", bar = "";
-    if (county) {
-      var target = Math.ceil(county[2] * 0.01), have = status && status.id_checked;
-      g4 = have != null ? fmt(have) + " of " + fmt(target) : "Under 10 so far";
-      var pct = have ? Math.min(100, have / target * 100) : 0;
-      bar = '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div><p class="small muted" style="margin-top:4px">' +
-        esc(county[0]) + " needs " + fmt(target) + " people to pass the ID check.</p>";
-    }
+  function bar(have, target) {
+    var pct = have ? Math.min(100, have / target * 100) : 0;
+    return '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
+  }
+  function drawGates(county, status, claimed) {
+    var people = county ? Math.max(100, Math.ceil(county[2] * 0.001)) : 0, have = status && status.id_checked;
     $("gates").innerHTML =
-      gate(1, "Legal review", "A lawyer who knows this area looks at points, pay rules and how points can become dollars. This comes after fundraising and before any point is paid.", "Not started") +
-      gate(2, "The points system", "The ledger, a daily limit on new points, and the hold that keeps points set aside until checkers release them.", "Being designed") +
-      gate(3, "People ready", "Enough trained checkers, moderators, helpers and code reviewers in each county that opens.", g3) +
-      gate(4, county ? county[0] + " at 1%" : "Your county at 1%", "1% of the people in the county pass the ID check, and local businesses agree to accept points.", g4, bar);
+      gate(1, "ID-checked people", "0.1% of the people in the county pass the ID check, and at least 100." +
+          (county ? " " + county[0] + " needs " + fmt(people) + "." : ""),
+        county ? (have != null ? fmt(have) + " of " + fmt(people) : "Under 10 so far") : "Sign in to see",
+        county ? bar(have, people) : "") +
+      gate(2, "Local businesses", "At least 25 businesses claim their listing in the directory and say how many points a month they'll accept.",
+        county ? fmt(claimed || 0) + " of 25" : "Sign in to see", county ? bar(claimed || 0, 25) : "") +
+      gate(3, "Points pledged each month", "People and businesses say how many points a month they'd accept for what they sell. Up to half of that total can be paid out for work each month. Points are never in place of anyone's pay.",
+        "Pledges open soon");
   }
 
   // ---- Positions and line-up ----
   var mine = {}, counts = {}, signedIn = false, user = null, db = null;
   function drawPositions() {
     $("positions").innerHTML = '<p class="small muted legend">' +
-      '<span class="chip sun">Starts early</span> can begin before Work opens, unpaid.</p>' +
+      '<span class="chip sun">Starts early</span> can begin before Work starts, unpaid.</p>' +
       (signedIn ? "" : '<div class="card signin"><p>Sign in to line up for the positions you want.</p><a class="btn small" href="/app/login.html" data-signin="1" style="margin-top:10px">Sign in</a></div>') +
       GROUPS.map(function (g) {
         return '<h3 class="group">' + esc(g[0]) + '</h3><div class="stack">' + g[1].map(function (p) {
@@ -164,12 +164,13 @@
       var fips = out[0].data && out[0].data.county_fips, county = fips && out[2][fips];
       drawPositions();
       if (!county) return;
-      $("gates-where").textContent = "For " + county[0] + ", " + county[1] + ". All four have to be true before the first point is paid there.";
-      db.rpc("work_county_status", { p_county: fips }).then(function (r) {
-        var s = r.data || {};
+      $("gates-where").textContent = "For " + county[0] + ", " + county[1] + ". Work can start here once all three are reached.";
+      Promise.all([db.rpc("work_county_status", { p_county: fips }), db.rpc("claimed_listings", { fips: fips })]).then(function (r) {
+        var s = r[0].data || {};
         counts = s.lineup || {};
-        drawGates(county, s, s.people || 0);
+        drawGates(county, s, (r[1].data || []).length);
         drawPositions();
+        if (s.people) $("lineup-intro").textContent = fmt(s.people) + (s.people === 1 ? " person has" : " people have") + " lined up in " + county[0] + " so far. Pick the positions you'd like when Work starts. It saves your interest. It isn't a job offer or a promise of work.";
       });
     });
   });
