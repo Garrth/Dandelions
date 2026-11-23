@@ -429,8 +429,20 @@
       // Pick up a check that finished while the page was closed.
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
       $("loading").hidden = true; $("app").hidden = false; $("signout").hidden = false;
+      $("pnav-claimed").hidden = $("claimed").hidden;
       if (location.hash === "#pledge" && !$("pledge").hidden) $("pledge").scrollIntoView();
       if (location.hash === "#password" && $("pwform")) { $("pwform").scrollIntoView(); if ($("newpw")) $("newpw").focus(); }
     });
   });
+})();
+
+// Section menu: the phone button opens and closes the list; picking a section closes it.
+(function () {
+  var nav = document.getElementById("pnav"), btn = document.getElementById("pnav-btn");
+  if (!nav || !btn) return;
+  function set(open) { nav.classList.toggle("open", open); btn.setAttribute("aria-expanded", open ? "true" : "false"); }
+  btn.addEventListener("click", function (e) { e.stopPropagation(); set(!nav.classList.contains("open")); });
+  nav.addEventListener("click", function (e) { if (e.target.tagName === "A") set(false); });
+  document.addEventListener("click", function (e) { if (!nav.contains(e.target)) set(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") set(false); });
 })();
