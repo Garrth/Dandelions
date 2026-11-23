@@ -12,22 +12,24 @@
   <link rel="apple-touch-icon" href="/images/app/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-title" content="Dandelions">
   <link rel="stylesheet" href="/css/app.css">
+<style>.linkish{background:none;border:0;padding:0;font:inherit;color:var(--leaf,#2d7a34);text-decoration:underline;cursor:pointer}</style>
 </head>
 <body>
 <div class="wrap">
   <header class="top"><a class="brand" href="/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/directory/">Directory</a></nav></header>
   <main>
-    <div class="page-head"><div class="eyebrow">Members</div><h1>Log in</h1><p>Use your password, or we'll email you a link.</p></div>
+    <div class="page-head"><div class="eyebrow">Members</div><h1>Log in</h1><p>We'll email you a link, or use your password if you've set one.</p></div>
     <form class="card" id="login" novalidate>
       <label class="field">Email<input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-      <label class="field">Password<input id="pw" type="password" autocomplete="current-password" placeholder="Leave empty to get an email link"></label>
       <div class="botcheck" id="bot"></div>
-      <button class="btn" type="submit" id="send" style="width:100%">Log in</button>
-      <button class="btn ghost" type="button" id="link" style="width:100%;margin-top:10px">Email me a link instead</button>
+      <button class="btn" type="button" id="link" style="width:100%">Email me a link</button>
+      <p class="small muted" style="margin:18px 0 6px;text-align:center">or log in with your password</p>
+      <label class="field">Password<input id="pw" type="password" autocomplete="current-password"></label>
+      <button class="btn ghost" type="submit" id="send" style="width:100%">Log in with password</button>
+      <p class="small" style="margin-top:10px;text-align:center"><button type="button" class="linkish" id="setpw">Forgot password? / Create a password</button></p>
       <p class="small muted" id="msg" style="margin-top:10px" role="status"></p>
     </form>
     <p class="small muted" style="margin-top:12px">Not a member yet? <a href="/#signup">Sign up first</a>, then come back here.</p>
-    <p class="small muted" style="margin-top:6px">Forgot your password? Use the email link, then set a new one on your profile.</p>
   </main>
 </div>
 <script src="/js/vendor/supabase-js-2.118.0.js"></script>

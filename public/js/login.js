@@ -1,4 +1,4 @@
-// Member log-in: a password, or a one-time email link that lands on the member home page.
+// Member log-in: a one-time email link (first), or a password. "Forgot / Create a password" sends the link and then opens the password spot on the profile.
 (function () {
   var cfg = window.DANDELIONS_CONFIG || {};
   var msg = document.getElementById("msg");
@@ -22,7 +22,8 @@
     if (!/^\S+@\S+\.\S+$/.test(v)) { msg.textContent = "Add a real email."; return null; }
     return v;
   }
-  function busy(on) { btn.disabled = linkBtn.disabled = on; }
+  var setBtn = document.getElementById("setpw");
+  function busy(on) { btn.disabled = linkBtn.disabled = setBtn.disabled = on; }
 
   // The bot check. Each answer works once, so it resets after every try.
   var Bot = window.BotCheck, botEl = document.getElementById("bot");
@@ -34,8 +35,10 @@
     return false;
   }
 
-  function sendLink() {
+  function sendLink(forPassword) {
     var e = email(); if (!e) return;
+    // Remember to open the password spot after the link logs them in (works when the link opens in this browser).
+    try { if (forPassword === true) localStorage.setItem("dandelions_setpw", "1"); else localStorage.removeItem("dandelions_setpw"); } catch (x) {}
     busy(true); msg.textContent = "Sending...";
     // shouldCreateUser: false, so log-in never makes a new member. Joining goes through the pledge.
     bot().then(function (t) {
@@ -44,9 +47,11 @@
       .then(function (res) {
         busy(false);
         if (res.error && botFailed(res.error)) return;
-        if (!res.error) { if (Bot) Bot.reset(botEl); msg.textContent = "Check your email for the link. It works once, for about an hour."; return; }
+        if (!res.error) { if (Bot) Bot.reset(botEl); msg.textContent = forPassword === true
+          ? "Check your email for the link. It logs you in, then set your new password on Your profile. The link works once, for about an hour."
+          : "Check your email for the link. It works once, for about an hour."; return; }
         var m = res.error.message || "", wait = m.match(/after (\d+) seconds/);
-        msg.textContent = /signups not allowed|not found/i.test(m) ? "We don't have that email yet. Pledge first, then log in."
+        msg.textContent = /signups not allowed|not found/i.test(m) ? "We don't have that email yet. Sign up first, then log in."
           : wait ? "We just sent you a link. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works."
           : res.error.status === 429 ? "Too many emails sent in the last hour. Try again later, or log in with your password."
           : "That didn't work. Wait a minute and try again.";
@@ -56,7 +61,7 @@
   document.getElementById("login").addEventListener("submit", function (ev) {
     ev.preventDefault();
     var pw = document.getElementById("pw").value;
-    if (!pw) { sendLink(); return; }
+    if (!pw) { sendLink(false); return; }
     var e = email(); if (!e) return;
     busy(true); msg.textContent = "Logging in...";
     bot().then(function (t) {
@@ -66,8 +71,9 @@
       if (res.error && botFailed(res.error)) return;
       if (!res.error) { location.replace(backTo() || "/app/"); return; }
       msg.textContent = res.error.status === 429 ? "Too many tries. Wait a few minutes, or use the email link."
-        : "Email or password doesn't match. No password yet? Use the email link, then set one on your profile.";
+        : "Email or password doesn't match. No password yet? Tap Forgot password / Create a password.";
     });
   });
-  linkBtn.addEventListener("click", sendLink);
+  linkBtn.addEventListener("click", function () { sendLink(false); });
+  setBtn.addEventListener("click", function () { sendLink(true); });
 })();
