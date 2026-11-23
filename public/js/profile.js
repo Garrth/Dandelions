@@ -176,7 +176,7 @@
   // ---- Permissions ----
   var PERMS = [
     ["pledged", "🌱", "Pledged", "You're counted in your county.", "Confirm your pledge from the email we sent."],
-    ["verified", "🪪", "ID checked", "You can see other members' profiles.", "Do the ID check below."],
+    ["verified", "🪪", "ID checked", "You can see other members' profiles, and send and receive points once they're unlocked.", "Do the ID check below."],
     ["business", "🏪", "Business owner", "Your business is in the directory.", "Claim your listing in the directory, or add your business below."],
     ["earn", "⭐", "Can earn points", "", "Coming soon, once your county reaches its starting numbers on the Work page. You need the ID check too."],
     ["vote", "🗳️", "Can vote", "One person, one vote on what gets done.", "Needs the ID check. Voting opens with Work."],
