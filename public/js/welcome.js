@@ -27,7 +27,7 @@
     render("That link didn't work", [
       "It may have expired or already been used. Links only work once and for a short time.",
       "Go back and enter your email again to get a fresh one."
-    ], "Back to the pledge", "/#pledge");
+    ], "Back to sign up", "/#signup");
     return;
   }
 
@@ -41,7 +41,7 @@
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
     if (!session) {
-      render("You're not signed in", ["Use the pledge form to get a confirmation link by email."], "Back to the pledge", "/#pledge");
+      render("You're not signed in", ["Use the sign-up form to get a confirmation link by email."], "Back to sign up", "/#signup");
       return;
     }
 

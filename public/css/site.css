@@ -246,3 +246,30 @@ footer .honest { font-family: var(--display); font-weight: 700; font-size: 20px;
 /* Bot check (Cloudflare Turnstile). Takes no room unless it needs a click. */
 .botcheck:empty { display: none; }
 .botcheck { margin: 8px 0; }
+
+/* Landing page (Nov 2026): small tagline, map up front, then problem, answer, sign up. */
+.landing .top { padding-block: 14px 6px; }
+.landing .top-nav { gap: 14px; }
+.tagline { font-family: var(--display); font-weight: 800; font-size: clamp(22px, 4.5vw, 30px); line-height: 1.1; margin: 4px 0 12px; }
+.tagline .hl { background: linear-gradient(transparent 58%, var(--sun) 58%, var(--sun) 92%, transparent 92%); padding-inline: 3px; }
+.land-map .map-wrap { margin-top: 0; }
+.land-map .area-form { margin-top: 14px; }
+.land-map .area-form input { font-size: 18px; padding: 10px 14px; }
+.land-map .area-form button { min-height: 48px; }
+.area-line { margin-top: 10px; font-size: 16px; }
+.area-line #area-where { font-weight: 700; }
+.area-line #area-stat { color: var(--muted); }
+.land-map .count { margin-top: 6px; }
+.say { margin-top: 36px; max-width: 36em; }
+.say h2 { font-size: 26px; font-weight: 800; margin-top: 20px; }
+.say h2:first-child { margin-top: 0; }
+.say p { font-size: 19px; margin-top: 8px; }
+.landing #signup { margin-top: 36px; }
+.landing .pledge h2 { font-size: clamp(34px, 7vw, 52px); }
+.look { margin-top: 36px; }
+.look h2 { font-size: 26px; font-weight: 800; }
+.look p { margin-top: 8px; font-size: 18px; max-width: 34em; }
+.look-btn { display: inline-block; margin-top: 14px; background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 700; border-radius: 14px; padding: 12px 22px; }
+@media (max-width: 420px) { .landing .top-nav { gap: 10px; } .landing .top-nav a:not(.pill) { font-size: 14px; } .landing .brand { font-size: 19px; } }
+.landing section { padding-block: 0; }
+@media (min-width: 900px) { .landing .wrap.wide { max-width: 900px; } }

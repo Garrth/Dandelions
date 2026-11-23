@@ -15,12 +15,12 @@
 </head>
 <body>
 <div class="wrap">
-  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a class="btn small peach" href="/deals.html">Deals<span class="wide"> of the day</span></a><a class="btn ghost small" href="/app/profile.html"><span class="wide">Your profile</span><span class="narrow">Profile</span></a></nav></header>
+  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks" id="nav-member" hidden><a class="btn small peach" href="/deals.html">Deals<span class="wide"> of the day</span></a><a class="btn ghost small" href="/app/profile.html"><span class="wide">Your profile</span><span class="narrow">Profile</span></a></nav><nav class="navlinks" id="nav-guest" hidden><a class="btn ghost small" href="/app/login.html">Log in</a><a class="btn small" href="/#signup">Sign up</a></nav></header>
   <nav class="tabs" aria-label="Learn more"><a href="/charter.html">Charter</a><a href="/under-the-hood.html">Under the hood</a><a href="/videos.html">Tutorials</a></nav>
   <main>
     <p class="muted" id="loading">Loading...</p>
     <div id="app" hidden>
-      <div class="page-head"><div class="eyebrow" id="where"></div><h1><span class="pre">Be not afraid.</span> There's plenty to do.</h1></div>
+      <div class="page-head"><div class="eyebrow" id="where"></div><h1>There's plenty to do.</h1></div>
 
       <div class="mapcard">
         <svg id="map" viewBox="-10 0 985 620" role="img" aria-label="Map of US counties colored by growth stage"><text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">Loading map...</text></svg>
@@ -37,9 +37,9 @@
 
       <h2 class="section-title">Go to</h2>
       <div class="tiles">
-        <a class="tile main" href="/app/profile.html">Your profile<small id="profile-hint">ID check, your business</small></a>
+        <a class="tile main" href="/app/profile.html" id="tile-profile">Your profile<small id="profile-hint">ID check, your business</small></a><a class="tile main" href="/#signup" id="tile-signup" hidden>Sign up<small>Free. Every sign-up moves your county up the map.</small></a>
         <a class="tile" href="/directory/">Directory<small>Every business near you</small></a>
-        <button class="tile" type="button" id="share">Share your link<small id="share-hint">Help your county grow</small></button>
+        <button class="tile" type="button" id="share" hidden>Share your link<small id="share-hint">Help your county grow</small></button>
         <a class="tile" href="/app/rai.html">Rai's numbers<small>Jobs, pay, prices, layoffs</small></a>
         <a class="tile" href="/app/work.html">Work<small>Coming soon. See how it will work</small></a>
         <a class="tile" href="/app/talk.html">Talk<small>Ideas start here</small></a>
@@ -48,7 +48,7 @@
         <a class="tile" href="/app/install.html">Phone app<small>Put Dandelions on your home screen</small></a>
       </div>
 
-      <nav class="foot"><a href="/?intro">About Dandelions</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><button type="button" id="signout">Sign out</button></nav>
+      <nav class="foot"><a href="/?intro">About Dandelions</a><a href="/terms.html">Terms</a><a href="/privacy.html">Privacy</a><button type="button" id="signout" hidden>Sign out</button></nav>
     </div>
   </main>
 </div>

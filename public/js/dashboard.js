@@ -1,4 +1,4 @@
-// The signed-in home: the county map, the job counts and where to go next.
+// Home: the county map, the job counts and where to go next. Anyone can look; members also get their profile, share link and sign out.
 (function () {
   var cfg = window.DANDELIONS_CONFIG || {};
   function $(id) { return document.getElementById(id); }
@@ -68,9 +68,30 @@
     if (mine) showCounty(mine);
   }
 
+  // Signed out: same page, with Log in and Sign up in place of the member-only parts.
+  function showGuest() {
+    $("nav-guest").hidden = false;
+    $("tile-profile").hidden = true;
+    $("tile-signup").hidden = false;
+    Promise.all([
+      getJSON("/data/counties.json").catch(function () { return {}; }),
+      db.rpc("county_counts"),
+      db.rpc("pledge_total")
+    ]).then(function (out) {
+      counties = out[0] || {};
+      ((out[1] && out[1].data) || []).forEach(function (r) { pledges[r.county_fips] = Number(r.pledges); });
+      var total = out[2] && out[2].data;
+      $("total").innerHTML = total != null ? "<b>" + fmt(total) + "</b> pledged nationwide" : "";
+      $("loading").hidden = true; $("app").hidden = false;
+      getJSON("/data/us-counties.json").then(drawMap).catch(function () {
+        $("map").innerHTML = '<text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">The map couldn\'t load. Try refreshing.</text>';
+      });
+    });
+  }
+
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
-    if (!session) { location.replace("/app/login.html"); return; }
+    if (!session) { showGuest(); return; }
     var ret = null;
     try { ret = localStorage.getItem("dandelions_return"); localStorage.removeItem("dandelions_return"); } catch (e) {}
     if (ret && /^\/(directory\/[a-z]+|app\/(talk|work|baselines))\.html(\?[\w=&%.-]*)?$/.test(ret)) { location.replace(ret); return; }
@@ -93,6 +114,7 @@
       $("total").innerHTML = total != null ? "<b>" + fmt(total) + "</b> pledged nationwide" : "";
       if (!out[2].data || out[2].data.status !== "passed") $("profile-hint").textContent = "Next: check your ID";
       link = location.origin + "/?ref=" + (m.referral_code || "");
+      $("nav-member").hidden = false; $("share").hidden = false; $("signout").hidden = false;
       $("loading").hidden = true; $("app").hidden = false;
       getJSON("/data/us-counties.json").then(drawMap).catch(function () {
         $("map").innerHTML = '<text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">The map couldn\'t load. Try refreshing.</text>';
