@@ -94,6 +94,9 @@
     if (!session) { showGuest(); return; }
     var ret = null;
     try { ret = localStorage.getItem("dandelions_return"); localStorage.removeItem("dandelions_return"); } catch (e) {}
+    var setpw = null;
+    try { setpw = localStorage.getItem("dandelions_setpw"); localStorage.removeItem("dandelions_setpw"); } catch (e) {}
+    if (setpw) { location.replace("/app/profile.html#password"); return; }
     if (ret && /^\/(directory\/[a-z]+|app\/(talk|work|baselines))\.html(\?[\w=&%.-]*)?$/.test(ret)) { location.replace(ret); return; }
     var user = session.user;
     Promise.all([

@@ -430,6 +430,7 @@
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
       $("loading").hidden = true; $("app").hidden = false; $("signout").hidden = false;
       if (location.hash === "#pledge" && !$("pledge").hidden) $("pledge").scrollIntoView();
+      if (location.hash === "#password" && $("pwform")) { $("pwform").scrollIntoView(); if ($("newpw")) $("newpw").focus(); }
     });
   });
 })();
