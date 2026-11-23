@@ -185,7 +185,7 @@
     ["organizer", "📣", "Community organizer", "You help sign up local businesses and run meetups.", "Ask in Talk if you'd like to help in your county."],
     ["moderator", "🛡️", "Talk moderator", "You help keep Talk friendly.", ""],
     ["keeper", "🔑", "Keeper", "You help sign changes to the rules.", "Chosen later, from long-time members."],
-    ["node_operator", "🖥️", "Node operator", "You run part of the Dandelions network.", "Opens when the network launches."]
+    ["node_operator", "🖥️", "Network operator", "You run Dandelions' connection to the Stellar network.", "Opens when points launch."]
   ];
   function showPerms(p) {
     p = p || {}; var roles = p.roles || [];

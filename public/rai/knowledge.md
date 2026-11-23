@@ -46,7 +46,7 @@ The Dandelions Charter (version 2, November 2026, written by Garth, the founder)
 
 How points are meant to work (none of this is on yet):
 1. Three units: points (MOE), the everyday unit; asset tokens (SOV) and stock tokens, both planned for later and only once they can be offered legally.
-2. Points are created only into distribution accounts on the Dandelions blockchain, and only as checked work calls for them. Each account has a low line and a high line set by the code.
+2. Points are created only into distribution accounts on the Stellar network, and only as checked work calls for them. Each account has a low line and a high line set by the code.
 3. At launch, points work alongside the dollar. The only points that come back are fees members agree to, like directory fees once those start. A footprint sales tax, fines, insurance and usage fees are later ideas that need a member vote and the law to allow them.
 4. Points start in a county once at least 0.1% of its people (and at least 100) are ID-checked members, at least 25 local businesses have signed up, and people and businesses have pledged to accept points. After that, each month's new points can be at most half of what verified people, businesses and landlords have pledged to accept that month.
 5. Projects: Rai ranks needs and publishes a fair price range. A verified business proposes a project. Random paid checkers review the proposal (three on big projects) and each milestone, paid the same for a no as a yes, with random re-checks. Points are paid in draws, like a construction loan. The last draw (about 10%) is held 60 days.
@@ -55,18 +55,18 @@ How points are meant to work (none of this is on yet):
 
 Who runs it and who decides:
 - The DAO LLC only publishes the open code. It never sells, buys or trades points and holds no key that can create, move or retire points. Anything that creates points or changes the code or records needs several signers picked at random from an approved list.
-- Validators (5 to 10 named operators at first, growing to about 100) keep the network running. No one group holds a third or more of the voting power.
+- Points live on Stellar, a public network run by independent operators worldwide; Dandelions doesn't run its own blockchain. The account that creates points only acts when enough randomly picked signers sign. Network operators (businesses, more than one, in different places) run Dandelions' own connection to Stellar and the programs that watch payouts; some also look after distribution accounts. Stellar's small network fees are covered so members only ever need points.
 - AI (including Rai) ranks needs, sizes projects, flags fraud and summarizes Talk, always showing its reasoning. Rai's advice has no force. AI never issues points, approves projects or changes rules.
 - Verified members vote, one person one vote. Light votes pass with more than half; heavy votes need 75% yes and 10% turnout; charter changes need 75% yes, 25% turnout, a 30-day wait and keeper sign-off. Talk for 7 days, vote for 3.
-- Before the first point, everything needed to run without the founder must be in place, including at least 3 keepers, 5 independent validators, 7 approved signers, a written legal opinion, a tax plan and an outside security audit. The founder's veto can only stop a change and ends 24 months after the first point.
+- Before the first point, everything needed to run without the founder must be in place, including at least 3 keepers, 2 independent network operators, 7 approved signers, a written legal opinion, a tax plan and an outside security audit. The founder's veto can only stop a change and ends 24 months after the first point.
 
 Principles: serve the mandate; no one person can print points; lean by design; offer, never force; pull, not push; consume less, care more; keep points moving; everything in the open; decide and move; honest with members.
 
 Dandelions will never: pay in points where the law requires dollars; create points without checked work or set any aside for insiders; sell, buy, lend or trade points; set their price or promise their worth; pay for talking or voting; let AI issue points or change rules; hold ID papers or sell member data; promise jobs, income or returns; force anyone to take part.
-- Ties are public: any business tied to the founder, a keeper, a node operator or a checker (including 10spot and Equitide) is on a public list and goes through the same checks as everyone. No one is paid points for work done before points started.
+- Ties are public: any business tied to the founder, a keeper, a network operator or a checker (including 10spot and Equitide) is on a public list and goes through the same checks as everyone. No one is paid points for work done before points started.
 - Dollars: Dandelions has no bank account, takes no dollars and raises no money. The founder pays the few dollar costs.
 
-No one in charge, over time: it starts as open-source code anyone can read (license AGPL-3.0, on GitHub at github.com/Garrth/Dandelions), then a public blockchain run by named operators, then more operators, then full member governance. Every role is handed over part by part once it has run well for 3 months with people in place.
+No one in charge, over time: it starts as open-source code anyone can read (license AGPL-3.0, on GitHub at github.com/Garrth/Dandelions), then points on Stellar with named operators running Dandelions' connection to it, then more operators, then full member governance. Every role is handed over part by part once it has run well for 3 months with people in place.
 
 ## Where things stand today (November 2026)
 
@@ -137,7 +137,7 @@ Work opens in a county once it reaches three starting numbers: at least 0.1% of 
   - Bid on a project, or propose your own idea for others to bid on too. Say what you'll do, the price, the deadlines, and the payment schedule. Each payment is either a milestone or paid by the piece, says what counts as done and how it's checked.
   - Join a project. See projects that are under way and looking for help, and contact the owner. The owner holds the agreement and decides who helps and how they pay them.
 - Categories: spread the word; sign up members; sign up businesses; help businesses spend points; build it (the site, data, guides, artwork). Each category has a group chat with ideas.
-- Roles that run Dandelions: community organizer, Talk moderator, checker, member help, reports, keeper, node operator (runs the ledger, a distribution account and the shared files), code reviewer, site security and site maintainer. Getting a role is a project too. Some need a tutorial and a test, others an interview and approval.
+- Roles that run Dandelions: community organizer, Talk moderator, checker, member help, reports, keeper, network operator (runs Dandelions' connection to Stellar; some look after a distribution account), code reviewer, site security and site maintainer. Getting a role is a project too. Some need a tutorial and a test, others an interview and approval.
 - Checks: a human checker reviews every proposal (does it fit the category, is the price fair, is each payment clear). Checkers are paid by the piece. They never check their own or related projects.
 - Size grows with your record: a first project can be up to about 500 points, and each next one up to twice your biggest finished project, with a ceiling by company size. The first payment is meant to be small and quick, so owners don't have to front much.
 - Stalls: a payment 14 days late marks a project stalled. At 30 days it's cancelled, unpaid points go back to the budget, and it goes on the owner's record. The owner can add what happened or open a dispute, and that note shows too.
