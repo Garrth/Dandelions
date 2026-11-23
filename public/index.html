@@ -67,7 +67,12 @@
         <p class="msg" id="p-msg" role="status" aria-live="polite"></p>
       </form>
       <div class="welcome" id="sent" hidden>
-        <p class="if"><b>Almost there.</b> Check your email for a link to confirm. You're counted once you click it.</p>
+        <p class="if"><b>Almost there.</b> Check your email. Click the link, or type the code below. You're counted once you confirm.</p>
+        <form id="code-form" novalidate style="display:grid;gap:10px;max-width:460px">
+          <label class="field" for="p-code">Opened the email on another device? Type the code here.<input id="p-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456"></label>
+          <button class="go" type="submit" id="p-codebtn">Confirm with code</button>
+          <p class="msg" id="p-codemsg" role="status" aria-live="polite"></p>
+        </form>
         <p class="form-note">Don't see it? Check your spam folder, or <button type="button" class="link-btn" id="p-again">try again</button>.</p>
       </div>
     </div>

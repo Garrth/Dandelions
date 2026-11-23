@@ -192,6 +192,25 @@
     });
   });
 
+  // The confirm email also carries a code, for people who read their email on another device.
+  $("code-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var t = $("p-code").value.replace(/\s/g, ""), cm = $("p-codemsg"), cb = $("p-codebtn");
+    var email = $("p-email").value.trim();
+    if (!/^\d{6,10}$/.test(t)) { cm.textContent = "Type the number from the email."; return; }
+    if (!db) return;
+    cb.disabled = true; cm.textContent = "Checking...";
+    db.auth.verifyOtp({ email: email, token: t, type: "email" }).then(function (res) {
+      if (res.error) return db.auth.verifyOtp({ email: email, token: t, type: "signup" });
+      return res;
+    }).then(function (res) {
+      cb.disabled = false;
+      if (!res.error) { location.replace("/welcome.html"); return; }
+      cm.textContent = res.error.status === 429 ? "Too many tries. Wait a few minutes."
+        : "That code didn't work. Use the newest email, or tap try again for a new one.";
+    });
+  });
+
   $("p-again").addEventListener("click", function () {
     $("sent").hidden = true;
     form.hidden = false;
