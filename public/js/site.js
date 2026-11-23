@@ -22,21 +22,6 @@
   var src = (new URLSearchParams(location.search).get("src") || "").toLowerCase();
   if (/^[a-z0-9_-]{1,40}$/.test(src) && !store("dandelions_src")) store("dandelions_src", src);
 
-  // Floating seeds in the hero
-  var seeds = $("seeds");
-  var seedSvg = '<svg viewBox="0 0 22 30"><path d="M11 29 L11 12" stroke="currentColor" stroke-width="1.2"/><ellipse cx="11" cy="27" rx="2" ry="3" fill="currentColor"/><g stroke="currentColor" stroke-width="1"><path d="M11 12 l-7 -7"/><path d="M11 12 l7 -7"/><path d="M11 12 l0 -10"/><path d="M11 12 l-10 -1"/><path d="M11 12 l10 -1"/></g></svg>';
-  for (var i = 0; i < 9; i++) {
-    var s = document.createElement("div");
-    s.className = "seed";
-    s.style.color = "var(--muted)";
-    s.style.left = (10 + Math.random() * 85) + "%";
-    s.style.top = (35 + Math.random() * 65) + "%";
-    s.style.animationDelay = (-Math.random() * 14) + "s";
-    s.style.animationDuration = (11 + Math.random() * 8) + "s";
-    s.innerHTML = seedSvg;
-    seeds.appendChild(s);
-  }
-
   // Total pledges in the hero, shown once there's a meaningful number
   if (db) {
     db.rpc("pledge_total").then(function (res) {
@@ -47,84 +32,8 @@
     });
   }
 
-  // ---------- The to-do list ----------
-  var FALLBACK_ITEMS = [
-    ["clean-energy", "Run everything on clean energy", "Sun, wind, and storage for the whole country"],
-    ["power-grid", "Rebuild the power grid", "Modern, reliable, and underground"],
-    ["soil", "Grow food that builds the soil back", "No chemical fertilizer, no worn-out fields"],
-    ["water", "Make fresh water where it's running out", "Enough clean power to desalinate for dry places"],
-    ["trees", "Plant a lot more trees", "Shade, clean air, and healthier land"],
-    ["ocean", "Clean up the ocean", "And let fish come back by not overfishing"],
-    ["zero-waste", "Get to zero waste", "Make it, use it, reuse it"],
-    ["old-messes", "Clean up our old messes", "Polluted land and water, fixed for good"],
-    ["healthcare", "Healthcare for everyone", "Including dental, vision, and mental health"],
-    ["job-training", "Paid job training", "Learn the skills the work needs, and get paid to learn"],
-    ["schools", "Better schools", "For kids and for anyone going back"],
-    ["getting-around", "Better ways to get around", "Faster, more convenient, and clean"],
-    ["automation", "Build the machines for automation", "And let them do the heavy lifting"]
-  ];
+  // Picks from the old to-do list, if this browser has any, still go along with the sign-up.
   var picks = store("dandelions_picks") || [];
-  var list = $("todo");
-  var check = '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd21a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>';
-
-  function renderList(items, counts) {
-    list.innerHTML = "";
-    $("total").textContent = items.length;
-    items.forEach(function (it) {
-      var key = it[0], base = counts[key] || 0;
-      var li = document.createElement("li");
-      var b = document.createElement("button");
-      b.type = "button";
-      b.id = "todo-" + key;
-      b.innerHTML = '<span class="box">' + check + '</span><span class="txt"><b></b><span></span></span><span class="n"></span>';
-      b.querySelector(".txt b").textContent = it[1];
-      b.querySelector(".txt span").textContent = it[2];
-      var n = b.querySelector(".n");
-      function paint() {
-        var on = picks.indexOf(key) !== -1;
-        b.setAttribute("aria-pressed", on ? "true" : "false");
-        n.textContent = base > 0 ? fmt(base) + " care" : "";
-      }
-      paint();
-      b.addEventListener("click", function () {
-        var at = picks.indexOf(key);
-        if (at === -1) picks.push(key); else picks.splice(at, 1);
-        store("dandelions_picks", picks);
-        paint();
-        $("picked").textContent = picks.length;
-      });
-      li.appendChild(b);
-      list.appendChild(li);
-    });
-    $("picked").textContent = picks.filter(function (k) { return items.some(function (it) { return it[0] === k; }); }).length;
-  }
-
-  renderList(FALLBACK_ITEMS, {});
-  if (db) {
-    Promise.all([
-      db.from("todo_items").select("key,title,detail").order("sort"),
-      db.rpc("todo_counts")
-    ]).then(function (res) {
-      if (res[0].error || !res[0].data || !res[0].data.length) return;
-      var counts = {};
-      (res[1].data || []).forEach(function (r) { counts[r.item_key] = r.picks; });
-      renderList(res[0].data.map(function (r) { return [r.key, r.title, r.detail]; }), counts);
-    });
-  }
-
-  // ---------- Ideas for the list (saved, not shown) ----------
-  $("add-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var input = $("add-item"), note = $("add-note"), v = input.value.trim();
-    if ($("add-website").value) { input.value = ""; return; }
-    if (v.length < 3) { note.textContent = "Add a few more words so we know what you mean."; return; }
-    if (!db) { note.textContent = "Couldn't save that right now. Please try again later."; return; }
-    db.from("ideas").insert({ idea: v }).then(function (res) {
-      if (res.error) { note.textContent = /ideas_full/.test(res.error.message || "") ? "The ideas box is full for today. Please try again tomorrow." : "Couldn't save that right now. Please try again in a bit."; return; }
-      input.value = "";
-      note.textContent = "Thanks, we saved “" + v + "”. Got another one?";
-    });
-  });
 
   // ---------- County map ----------
   var STAGES = ["No pledges yet", "Seed", "Sprout", "Bloom", "Puffball"];
@@ -146,22 +55,17 @@
     if (selected && paths[selected]) paths[selected].classList.remove("sel");
     selected = fips;
     if (paths[fips]) { paths[fips].classList.add("sel"); paths[fips].parentNode.appendChild(paths[fips]); }
-    $("area-chip").textContent = STAGES[st];
-    $("area-where").textContent = c[0] + ", " + c[1];
-    $("area-stat").textContent = fmt(p) + (p === 1 ? " Dandelion" : " Dandelions") + " out of " + fmt(pop) + " people (" + (p > 0 && pct < 0.0001 ? "under 0.01" : (pct * 100).toFixed(2)) + "%)";
+    $("area-where").textContent = c[0] + ", " + c[1] + ":";
     var next = "";
-    if (p === 0) next = "Be the first. One pledge plants a seed in " + c[0] + ".";
+    if (p === 0) next = "No one yet. Be the first to plant a seed.";
     else {
+      next = STAGES[st] + ", " + fmt(p) + (p === 1 ? " Dandelion" : " Dandelions") + " (" + (pct < 0.0001 ? "under 0.01" : (pct * 100).toFixed(2)) + "%).";
       for (var g = 0; g < GOALS.length; g++) {
         var need = Math.ceil(pop * GOALS[g][0]);
-        if (p < need) { next = fmt(need - p) + " more pledges to reach " + GOALS[g][1] + " (" + fmt(need) + " total)."; break; }
+        if (p < need) { next += " " + fmt(need - p) + " more to reach " + GOALS[g][1] + "."; break; }
       }
-      if (!next) next = c[0] + " is a Puffball. Time to help the counties next door.";
     }
-    $("area-next").textContent = next;
-    var m = $("area-meter");
-    m.style.width = "0";
-    requestAnimationFrame(function () { m.style.width = Math.min(100, pct * 1000) + "%"; });
+    $("area-stat").textContent = next;
     return true;
   }
 
@@ -204,8 +108,6 @@
     b.setAttribute("class", "st");
     b.setAttribute("d", geomPath(topojson.mesh(us, us.objects.states, function (a, c) { return a !== c; })));
     svg.appendChild(b);
-    $("area-chip").textContent = "Your county";
-    $("area-stat").textContent = "Tap the map or enter your ZIP code above.";
     var savedZip = store("dandelions_zip");
     if (savedZip) { $("area-zip").value = savedZip; findZip(savedZip); }
   }).catch(function () {
@@ -221,7 +123,8 @@
     return loadZips().then(function (zips) {
       var fips = zips[zip];
       if (fips && showCounty(fips)) return fips;
-      $("area-next").textContent = "We couldn't find a county for that ZIP code. Try tapping your county on the map.";
+      $("area-where").textContent = "We couldn't find a county for that ZIP code.";
+      $("area-stat").textContent = "Try tapping your county on the map.";
       return null;
     });
   }
@@ -229,8 +132,8 @@
   $("area-form").addEventListener("submit", function (e) {
     e.preventDefault();
     var z = $("area-zip").value.trim();
-    if (!/^\d{5}$/.test(z)) { $("area-next").textContent = "Enter a 5 digit ZIP code."; return; }
-    findZip(z).then(function (f) { if (f) $("area-card").scrollIntoView({ behavior: "smooth", block: "nearest" }); });
+    if (!/^\d{5}$/.test(z)) { $("area-where").textContent = "Enter a 5 digit ZIP code."; $("area-stat").textContent = ""; return; }
+    findZip(z);
   });
 
   // ---------- Pledge ----------
@@ -245,9 +148,9 @@
     if ($("p-website").value) { form.hidden = true; $("sent").hidden = false; return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = "Enter a valid email address."; return; }
     if (!/^\d{5}$/.test(zip)) { msg.textContent = "Enter a 5 digit ZIP code."; return; }
-    if (!$("p-age").checked) { msg.textContent = "You need to be 18 or older to pledge."; return; }
-    if (!$("p-agree").checked) { msg.textContent = "Check the pledge box to continue."; return; }
-    if (!db) { msg.textContent = "Pledges aren't working right now. Please try again later."; return; }
+    if (!$("p-age").checked) { msg.textContent = "You need to be 18 or older to sign up."; return; }
+    if (!$("p-agree").checked) { msg.textContent = "Check the \u201cI'm in\u201d box to continue."; return; }
+    if (!db) { msg.textContent = "Sign-ups aren't working right now. Please try again later."; return; }
 
     go.disabled = true;
     msg.textContent = "Sending...";
@@ -277,7 +180,7 @@
         if (Bot && Bot.failed(res.error)) { msg.textContent = "We couldn't confirm you're a person. Refresh the page and try again."; return; }
         var wait = (res.error.message || "").match(/after (\d+) seconds/);
         msg.textContent = wait
-          ? "We just sent you an email. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works. Already a member? Use Sign in at the top of the page."
+          ? "We just sent you an email. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works. Already signed up? Use Log in at the top of the page."
           : res.error.status === 429
           ? "Too many emails sent in the last hour. Please try again later."
           : "Something went wrong on our end. Please try again in a bit.";

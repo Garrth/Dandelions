@@ -140,7 +140,7 @@
   function joinPrompt(what) {
     try { localStorage.setItem("dandelions_return", location.pathname + location.search); } catch (e) {}
     return '<div class="card"><p>Log in to ' + (what || "post, comment and follow people") + '. Anyone can read.</p>' +
-      '<div class="row" style="margin-top:10px"><a class="btn small" href="/app/login.html">Log in</a><a class="btn ghost small" href="/#pledge">New here? Pledge first</a></div></div>';
+      '<div class="row" style="margin-top:10px"><a class="btn small" href="/app/login.html">Log in</a><a class="btn ghost small" href="/#signup">New here? Sign up first</a></div></div>';
   }
 
   // The rules, once, before a member's first post. Calls then() after they agree.

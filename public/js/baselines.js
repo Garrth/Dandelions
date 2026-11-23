@@ -52,7 +52,7 @@
     var f = $("pbox");
     if (!user) {
       try { localStorage.setItem("dandelions_return", location.pathname + location.search); } catch (e) {}
-      f.innerHTML = '<p class="note">Log in to propose a change. Anyone can read.</p><div class="row" style="margin-top:8px"><a class="btn small" href="/app/login.html">Log in</a><a class="btn ghost small" href="/#pledge">New here? Pledge first</a></div>';
+      f.innerHTML = '<p class="note">Log in to propose a change. Anyone can read.</p><div class="row" style="margin-top:8px"><a class="btn small" href="/app/login.html">Log in</a><a class="btn ghost small" href="/#signup">New here? Sign up first</a></div>';
       return;
     }
     var s = board.settings;

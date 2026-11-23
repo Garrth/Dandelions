@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="/js/home-redirect.js"></script>
   <title>Dandelions</title>
-  <meta name="description" content="AI is going to change a lot of jobs. Dandelions has a plan, and it runs on people taking part. The goal: useful work for anyone who wants it.">
-  <meta property="og:title" content="Dandelions: useful work for anyone who wants it">
-  <meta property="og:description" content="AI is going to change a lot of jobs. Dandelions has a plan, and it runs on people taking part.">
+  <meta name="description" content="AI is taking more of the work, and there's no real plan for what comes next. Dandelions puts local people and businesses to work on what's waiting, one county at a time. Sign up free.">
+  <meta property="og:title" content="Dandelions: there's plenty to do">
+  <meta property="og:description" content="The work we need most is waiting. Dandelions is a new way to get it done, one county at a time.">
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
@@ -17,135 +17,52 @@
   <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/css/site.css">
 </head>
-<body>
+<body class="landing">
 <div class="wrap wide">
   <header class="top">
-    <a class="brand" href="#top" id="top">
+    <a class="brand" href="/" id="top">
       <svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 34 C31 44 33 52 32 62" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><g fill="#ffd21a" stroke="#15210f" stroke-width="1.5"><circle cx="32" cy="9" r="7"/><circle cx="32" cy="35" r="7"/><circle cx="19" cy="22" r="7"/><circle cx="45" cy="22" r="7"/><circle cx="23" cy="13" r="7"/><circle cx="41" cy="13" r="7"/><circle cx="23" cy="31" r="7"/><circle cx="41" cy="31" r="7"/></g><circle cx="32" cy="22" r="8" fill="#15210f"/></svg>
       Dandelions
     </a>
-    <nav class="top-nav"><a href="/app/login.html">Sign in</a><a class="pill" href="#pledge">Join</a></nav>
+    <nav class="top-nav"><a href="/app/">Home</a><a href="/app/login.html">Log in</a><a class="pill" href="#signup">Sign up</a></nav>
   </header>
-  <nav class="tabs" aria-label="Learn more"><a href="/charter.html">Charter</a><a href="/under-the-hood.html">Under the hood</a></nav>
 
-  <div class="hero">
-    <div class="seeds" id="seeds" aria-hidden="true"></div>
-    <div class="hero-grid">
-    <div>
-    <h1><span class="pre">Be not afraid.</span> There's <span class="hl">plenty</span> to do.</h1>
-    <p class="goal">The goal: <span class="hl">useful work for anyone who wants it.</span></p>
-    <p class="sub">AI is going to change a lot of jobs. So who has a plan for what comes next? The market isn't paid to solve it. Government doesn't have the tools. <strong>Dandelions has a plan, and it runs on one thing: people taking part.</strong></p>
-    <div class="doors">
-      <a class="btn" href="#list">I'm here for me<small>See what there is to do</small></a>
-      <a class="btn alt" href="/business.html">I run a business<small>Get found, post a deal</small></a>
-    </div>
-    <div class="cta-row" style="margin-top:14px">
-      <a class="mini-link" href="/deals.html">Deals of the day ›</a>
-      <span class="count" id="hero-count-wrap" hidden><b id="hero-count"></b> Dandelions so far</span>
-    </div>
-    </div>
-    <div class="hero-art">
-      <img class="char andy" src="/images/andy.webp" width="555" height="720" alt="Andy, a yellow dandelion, cheering">
-      <img class="char dandy" src="/images/dandy.webp" width="503" height="720" alt="Dandy, a dandelion puffball in glasses, waving">
-    </div>
-    </div>
-  </div>
-</div>
+  <p class="tagline">There's <span class="hl">plenty</span> to do.</p>
 
-<div class="wrap wide">
-  <section id="list">
-    <div class="eyebrow">The to-do list</div>
-    <h2 class="sec-title">What would you prioritize?</h2>
-    <p class="sec-lead">Check the ones you like.</p>
-    <ul class="todo" id="todo"></ul>
-    <p class="add-note" id="todo-note">Your checks count once you confirm your pledge.</p>
-    <div class="todo-foot"><span>You picked <b id="picked">0</b> of <span id="total">0</span></span><span>And the list goes on.</span></div>
-    <form class="add-form" id="add-form">
-      <label for="add-item">What's missing from the list?</label>
-      <div class="hp" aria-hidden="true"><label for="add-website">Leave this empty</label><input id="add-website" type="text" tabindex="-1" autocomplete="off"></div>
-      <div class="add-row">
-        <input id="add-item" type="text" minlength="3" maxlength="200" placeholder="Something that needs doing">
-        <button type="submit">Add it</button>
-      </div>
-      <p class="add-note" id="add-note">Your idea gets saved along with everyone else's.</p>
-    </form>
-  </section>
-
-  <section>
-    <div class="missing">
-      <h2>The work is there. The system isn't.</h2>
-      <p>The people are here. The materials are here. The work is right there on the list. What's missing is a system that puts them together.</p>
-      <p>Today, work mostly gets done when it pays back fast. Most of this list pays back slowly, or in ways nobody can send a bill for, like cleaner water or healthier soil. So it waits, no matter how many people are ready to do it.</p>
-      <p class="big">Dandelions is testing a different way to decide what gets done. The more people take part, the closer we get.</p>
-      <p class="links"><a href="#how">See how it grows</a><a href="/directory/">Find a local business</a><a href="/under-the-hood.html">Look under the hood</a></p>
-    </div>
-  </section>
-
-  <section id="how">
-    <div class="eyebrow">How it grows</div>
-    <h2 class="sec-title">One county at a time.</h2>
-    <div class="stages">
-      <div class="stage">
-        <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="74" rx="22" ry="5" fill="#8a6a3c"/><ellipse cx="32" cy="66" rx="5" ry="7" fill="#15210f"/><path d="M32 59 L32 34" stroke="#56624f" stroke-width="1.5"/><g stroke="#56624f" stroke-width="1.2"><path d="M32 34 l-9 -8"/><path d="M32 34 l9 -8"/><path d="M32 34 l0 -12"/><path d="M32 34 l-12 -2"/><path d="M32 34 l12 -2"/></g></svg>
-        <h3>Seed</h3>
-        <p>The first pledge plants your county on the map.</p>
-      </div>
-      <div class="stage">
-        <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="74" rx="22" ry="5" fill="#8a6a3c"/><path d="M32 72 C32 60 32 52 32 44" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M32 54 C22 52 16 44 16 36 C25 37 31 44 32 54Z" fill="#2d7a34"/><path d="M32 48 C42 46 48 38 48 30 C39 31 33 38 32 48Z" fill="#3f9a45"/></svg>
-        <h3>Sprout</h3>
-        <p>1% of the county has pledged. More kinds of work open as members vote them in.</p>
-      </div>
-      <div class="stage">
-        <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="76" rx="22" ry="5" fill="#8a6a3c"/><path d="M32 74 C31 60 33 48 32 34" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M32 62 C22 60 17 53 17 46 C25 47 31 53 32 62Z" fill="#2d7a34"/><g fill="#ffd21a" stroke="#15210f" stroke-width="1.2"><circle cx="32" cy="10" r="7"/><circle cx="32" cy="36" r="7"/><circle cx="19" cy="23" r="7"/><circle cx="45" cy="23" r="7"/><circle cx="23" cy="14" r="7"/><circle cx="41" cy="14" r="7"/><circle cx="23" cy="32" r="7"/><circle cx="41" cy="32" r="7"/></g><circle cx="32" cy="23" r="8" fill="#e0a800"/></svg>
-        <h3>Bloom</h3>
-        <p>5% have pledged. The county is ready for the next step.</p>
-      </div>
-      <div class="stage">
-        <svg viewBox="0 0 64 84" aria-hidden="true"><ellipse cx="32" cy="76" rx="22" ry="5" fill="#8a6a3c"/><path d="M32 74 C31 60 33 48 32 36" stroke="#2d7a34" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="32" cy="24" r="16" fill="none" stroke="#a9b59f" stroke-width="1"/><g stroke="#56624f" stroke-width="1.2"><path d="M32 24 l0 -16"/><path d="M32 24 l11 -11"/><path d="M32 24 l16 0"/><path d="M32 24 l11 11"/><path d="M32 24 l-11 11"/><path d="M32 24 l-16 0"/><path d="M32 24 l-11 -11"/></g><g fill="#56624f"><circle cx="32" cy="8" r="2"/><circle cx="43" cy="13" r="2"/><circle cx="48" cy="24" r="2"/><circle cx="43" cy="35" r="2"/><circle cx="21" cy="35" r="2"/><circle cx="16" cy="24" r="2"/><circle cx="21" cy="13" r="2"/></g><g fill="#56624f"><circle cx="56" cy="6" r="1.6"/><circle cx="60" cy="14" r="1.6"/></g></svg>
-        <h3>Puffball</h3>
-        <p>10% of the county. It sends seeds to the counties next door.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="area">
-    <div class="eyebrow">The map</div>
-    <h2 class="sec-title">How close is your county?</h2>
-    <p class="sec-lead">Tap a county, or enter a ZIP code to find yours.</p>
-    <form class="area-form" id="area-form">
-      <input id="area-zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="ZIP code" aria-label="ZIP code" autocomplete="postal-code">
-      <button type="submit">Find my county</button>
-    </form>
-    <div class="map-wrap"><svg id="map" viewBox="-10 0 985 620" role="img" aria-label="Map of US counties colored by growth stage"><text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">Loading map...</text></svg></div>
+  <section class="land-map" id="area" aria-label="Dandelions across the US">
+    <div class="map-wrap"><svg id="map" viewBox="-10 0 985 620" role="img" aria-label="Map of US counties colored by how many people have signed up"><text x="480" y="310" text-anchor="middle" fill="currentColor" font-size="20">Loading map...</text></svg></div>
     <div class="legend">
-      <span><i style="background:var(--s0)"></i>No pledges yet</span>
+      <span><i style="background:var(--s0)"></i>No one yet</span>
       <span><i style="background:var(--s1)"></i>Seed</span>
       <span><i style="background:var(--s2)"></i>Sprout 1%</span>
       <span><i style="background:var(--s3)"></i>Bloom 5%</span>
       <span><i style="background:var(--s4)"></i>Puffball 10%</span>
     </div>
-    <div class="area-card" id="area-card">
-      <div class="stage-chip" id="area-chip">Loading</div>
-      <div class="where" id="area-where">Pick a county</div>
-      <div class="stat" id="area-stat"></div>
-      <div class="meter"><i id="area-meter"></i><b class="tick" style="left:10%"></b><b class="tick" style="left:50%"></b></div>
-      <div class="meter-labels"><span>Seed</span><span>Sprout 1%</span><span>Bloom 5%</span><span>Puffball 10%</span></div>
-      <p class="next" id="area-next"></p>
-      <p class="example">Population from U.S. Census Bureau estimates. Pledges count once they're confirmed by email.</p>
-    </div>
+    <form class="area-form" id="area-form">
+      <input id="area-zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="Your ZIP" aria-label="ZIP code" autocomplete="postal-code">
+      <button type="submit">Find my county</button>
+    </form>
+    <p class="area-line" id="area-line" role="status" aria-live="polite"><span id="area-where">Tap a county or enter your ZIP.</span> <span id="area-stat"></span></p>
+    <p class="count" id="hero-count-wrap" hidden><b id="hero-count"></b> Dandelions so far</p>
   </section>
 
-  <section id="pledge">
+  <section class="say">
+    <h2>The problem</h2>
+    <p>AI is taking over more of the work people do, and nobody has a real plan for what comes next. Meanwhile the work we need most, like clean energy, real food, healthcare and job training, keeps waiting on one question: who will pay for it?</p>
+    <h2>Our answer</h2>
+    <p>Dandelions is a new way to answer that question. County by county, members match local people and businesses with the work that's waiting.</p>
+  </section>
+
+  <section id="signup">
     <div class="pledge">
-      <h2>Be a Dandelion.</h2>
-      <p class="if">By joining, you're saying:</p>
+      <h2>Sign up. It's free.</h2>
+      <p class="if">Signing up means you agree:</p>
       <ul class="agree">
         <li>This work matters.</li>
         <li>The way we do things now won't get it done.</li>
         <li>I'm ready to try something new.</li>
       </ul>
-      <p class="if">That's it. No money, nothing to buy, and you can leave any time.</p>
-
+      <p class="if">No money, nothing to buy, and you can leave any time. Every sign-up moves your county up the map.</p>
       <form id="pledge-form" novalidate>
         <label class="field" for="p-email">Email<input id="p-email" type="email" autocomplete="email" placeholder="you@example.com"></label>
         <label class="field" for="p-zip">ZIP code<input id="p-zip" type="text" inputmode="numeric" maxlength="5" autocomplete="postal-code" placeholder="95814"></label>
@@ -153,20 +70,24 @@
         <label class="check" for="p-agree"><input id="p-agree" type="checkbox"><span>I'm in. I know this is a pledge, not a purchase, and there's nothing with cash value today. I've read the <a href="/privacy.html">privacy policy</a>.</span></label>
         <div class="hp" aria-hidden="true"><label for="p-website">Leave this empty</label><input id="p-website" type="text" tabindex="-1" autocomplete="off"></div>
         <div class="botcheck" id="p-bot"></div>
-        <button class="go" type="submit">Count me in</button>
+        <button class="go" type="submit">Sign up</button>
         <p class="msg" id="p-msg" role="status" aria-live="polite"></p>
       </form>
-
       <div class="welcome" id="sent" hidden>
-        <p class="if"><b>Almost there.</b> Check your email for a link to confirm your pledge. Your pledge counts once you click it.</p>
+        <p class="if"><b>Almost there.</b> Check your email for a link to confirm. You're counted once you click it.</p>
         <p class="form-note">Don't see it? Check your spam folder, or <button type="button" class="link-btn" id="p-again">try again</button>.</p>
       </div>
     </div>
   </section>
 
+  <section class="look">
+    <h2>Want to look around first?</h2>
+    <p>The Home page has everything else: how it works, the charter, the local business directory, Talk and more. No account needed.</p>
+    <a class="look-btn" href="/app/">Go to Home</a>
+  </section>
+
   <footer>
-    <p class="honest">No tokens. Nothing to buy. Just a pledge.</p>
-    <p>Dandelions doesn't depend on one leader. The rules are public and the code is open. <a href="/directory/">Directory</a> · <a href="/app/install.html">Phone app</a> · <a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
+    <p><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · <a href="https://github.com/Garrth/Dandelions">Code</a></p>
   </footer>
 </div>
 

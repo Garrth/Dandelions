@@ -90,7 +90,7 @@
     try { localStorage.setItem("dandelions_return", "/directory/add.html?add=1&name=" + encodeURIComponent(asked.name) + "&zip=" + encodeURIComponent(asked.zip)); } catch (e) {}
     shell('<div class="card"><p>To add a business, log in first. It\'s free.</p><div class="stack" style="margin-top:12px">' +
       '<a class="btn" href="/app/login.html" style="width:100%;text-align:center">Log in</a>' +
-      '<a class="btn ghost" href="/#pledge" style="width:100%;text-align:center">New here? Pledge first</a></div>' +
+      '<a class="btn ghost" href="/#signup" style="width:100%;text-align:center">New here? Sign up first</a></div>' +
       '<p class="small muted" style="margin-top:10px">After you log in, you\'ll come back here.</p></div>');
   }
 
