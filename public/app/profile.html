@@ -20,6 +20,21 @@
     <p class="muted" id="loading">Loading your profile...</p>
 
     <div id="app" hidden>
+      <nav class="pnav" id="pnav" aria-label="Profile sections">
+        <button type="button" class="pnav-btn" id="pnav-btn" aria-expanded="false" aria-controls="pnav-list">&#9776; Sections</button>
+        <div class="pnav-list" id="pnav-list">
+          <a href="#me">About you</a>
+          <a href="#s-perms">Permissions</a>
+          <a href="#s-id">ID check</a>
+          <a href="#s-points">Points</a>
+          <a href="#s-skills">Skills</a>
+          <a href="#s-work">Work</a>
+          <a href="#claimed" id="pnav-claimed" hidden>Claimed businesses</a>
+          <a href="#s-biz">Your business</a>
+          <a href="#password">Password</a>
+          <a href="#s-link">Your link</a>
+        </div>
+      </nav>
       <div class="page-head"><div class="eyebrow" id="where"></div><h1 id="hello">Your profile</h1><p id="email"></p><p class="small muted" style="margin-top:6px">Your permissions, skills and availability. Other members see only what you choose to show.</p></div>
 
       <div class="card" id="me">
@@ -46,10 +61,10 @@
         </form>
       </div>
 
-      <h2 class="section-title">Your permissions</h2>
+      <h2 class="section-title" id="s-perms">Your permissions</h2>
       <div class="card" id="perms"><p class="small muted">Loading...</p></div>
 
-      <h2 class="section-title">ID check</h2>
+      <h2 class="section-title" id="s-id">ID check</h2>
       <div class="card" id="idcard">
         <div class="spread"><b id="idtitle"></b><span class="chip" id="idchip"></span></div>
         <p class="small muted" id="idtext" style="margin-top:6px"></p>
@@ -58,7 +73,7 @@
         <p class="small muted" style="margin-top:10px">Equitide runs ID checks for Dandelions through Plaid. Dandelions gets back only yes or no and the date, never your ID papers.</p>
       </div>
 
-      <h2 class="section-title">Points you'd accept</h2>
+      <h2 class="section-title" id="s-points">Points you'd accept</h2>
       <form class="card" id="pledge">
         <p class="small muted" style="margin-bottom:10px">How many points a month would you accept, for things you sell, rent or do? Points aren't on yet. Your county's pledges, added up, set how much work can be paid there each month. Points are extra, never in place of your pay.</p>
         <label class="field">Points a month <span class="muted">(private)</span><input id="pl-points" type="number" min="0" max="5000" step="50" inputmode="numeric" placeholder="0"></label>
@@ -66,7 +81,7 @@
         <button class="btn small" type="submit">Save</button>
       </form>
 
-      <div class="spread"><h2 class="section-title">Skills and availability</h2><button class="btn ghost small edit" type="button" data-edit="skills">Edit</button></div>
+      <div class="spread" id="s-skills"><h2 class="section-title">Skills and availability</h2><button class="btn ghost small edit" type="button" data-edit="skills">Edit</button></div>
       <div class="card" id="skills">
         <div class="sk-view"></div>
         <form class="sk-form" hidden>
@@ -81,7 +96,7 @@
         </form>
       </div>
 
-      <div class="spread"><h2 class="section-title">Your work, private</h2><button class="btn ghost small edit" type="button" data-edit="work">Edit</button></div>
+      <div class="spread" id="s-work"><h2 class="section-title">Your work, private</h2><button class="btn ghost small edit" type="button" data-edit="work">Edit</button></div>
       <div class="card" id="work">
         <p class="small muted" style="margin-bottom:10px">Optional. Only you see your answers. Rai only shows county totals, and only once at least 10 people in the county have answered.</p>
         <div class="w-view"></div>
@@ -101,7 +116,7 @@
         <div id="claimlist"></div>
       </div>
 
-      <div class="spread"><h2 class="section-title">Your business</h2><button class="btn ghost small edit" type="button" data-edit="biz" id="b-edit" hidden>Edit</button></div>
+      <div class="spread" id="s-biz"><h2 class="section-title">Your business</h2><button class="btn ghost small edit" type="button" data-edit="biz" id="b-edit" hidden>Edit</button></div>
       <div class="card" id="bizcard">
         <div class="b-view">
           <div class="spread" id="b-head" hidden><b id="b-title"></b><span class="chip" id="b-chip"></span></div>
@@ -133,14 +148,14 @@
         <button class="btn small" type="submit">Save</button>
       </form>
 
-      <h2 class="section-title">Password</h2>
+      <h2 class="section-title" id="password">Password</h2>
       <form class="card" id="pwform">
         <p class="small">Set a password so you can log in without waiting for an email. The email link still works too.</p>
         <label class="field" style="margin-top:8px">New password<input id="newpw" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters"></label>
         <button class="btn small" type="submit">Save password</button>
       </form>
 
-      <h2 class="section-title">Your link</h2>
+      <h2 class="section-title" id="s-link">Your link</h2>
       <div class="card"><p class="small">Share it to help your county grow. It only shows who brought who in, and has no cash value.</p><p style="margin-top:8px"><code id="reflink"></code></p></div>
     </div>
   </main>
