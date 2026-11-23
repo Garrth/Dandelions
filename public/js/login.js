@@ -47,9 +47,9 @@
       .then(function (res) {
         busy(false);
         if (res.error && botFailed(res.error)) return;
-        if (!res.error) { if (Bot) Bot.reset(botEl); msg.textContent = forPassword === true
-          ? "Check your email for the link. It logs you in, then set your new password on Your profile. The link works once, for about an hour."
-          : "Check your email for the link. It works once, for about an hour."; return; }
+        if (!res.error) { if (Bot) Bot.reset(botEl); showCode(e); msg.textContent = forPassword === true
+          ? "Check your email. The link (or the code below) logs you in, then set your new password on Your profile. It works once, for about an hour."
+          : "Check your email. Click the link, or type the code below. It works once, for about an hour."; return; }
         var m = res.error.message || "", wait = m.match(/after (\d+) seconds/);
         msg.textContent = /signups not allowed|not found/i.test(m) ? "We don't have that email yet. Sign up first, then log in."
           : wait ? "We just sent you a link. You can ask for another in " + wait[1] + " seconds. The newest link is the one that works."
@@ -74,6 +74,27 @@
         : "Email or password doesn't match. No password yet? Tap Forgot password / Create a password.";
     });
   });
+  // The same email carries a code, for people who read their email on a different device.
+  var codeForm = document.getElementById("codeform"), codeMsg = document.getElementById("codemsg"), codeEmail = "";
+  function showCode(e) { codeEmail = e; codeForm.hidden = false; codeMsg.textContent = ""; }
+  function afterLogin() {
+    var setpw = null;
+    try { setpw = localStorage.getItem("dandelions_setpw"); localStorage.removeItem("dandelions_setpw"); } catch (x) {}
+    location.replace(setpw ? "/app/profile.html#password" : (backTo() || "/app/"));
+  }
+  codeForm.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var t = document.getElementById("code").value.replace(/\s/g, "");
+    if (!/^\d{6,10}$/.test(t)) { codeMsg.textContent = "Type the number from the email."; return; }
+    document.getElementById("codebtn").disabled = true; codeMsg.textContent = "Checking...";
+    db.auth.verifyOtp({ email: codeEmail, token: t, type: "email" }).then(function (res) {
+      document.getElementById("codebtn").disabled = false;
+      if (!res.error) { afterLogin(); return; }
+      codeMsg.textContent = res.error.status === 429 ? "Too many tries. Wait a few minutes."
+        : "That code didn't work. It may be old or already used. Use the newest email, or send a new one.";
+    });
+  });
+
   linkBtn.addEventListener("click", function () { sendLink(false); });
   setBtn.addEventListener("click", function () { sendLink(true); });
 })();
