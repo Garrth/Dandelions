@@ -426,6 +426,12 @@
       showBiz(out[5].data); loadBusy(); showPledge(out[6]);
       showClaimed(out[7].data, out[8].data);
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
+      db.rpc("my_referral_count").then(function (r) {
+        if (r.error || typeof r.data !== "number") return;
+        var n = r.data;
+        $("refcount").textContent = n === 0 ? "No one has signed up with your link yet." : n === 1 ? "1 person has signed up with your link." : n + " people have signed up with your link.";
+        $("refcount").hidden = false;
+      });
       // Pick up a check that finished while the page was closed.
       if (out[3] && (out[3].status === "started" || out[3].status === "review")) checkNow();
       $("loading").hidden = true; $("app").hidden = false; $("signout").hidden = false;
