@@ -426,6 +426,12 @@
       showBiz(out[5].data); loadBusy(); showPledge(out[6]);
       showClaimed(out[7].data, out[8].data);
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
+      $("refcopy").addEventListener("click", function () {
+        var link = "https://" + $("reflink").textContent;
+        function done() { $("refcopied").hidden = false; setTimeout(function () { $("refcopied").hidden = true; }, 2500); }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, function () { window.prompt("Copy your link:", link); });
+        else window.prompt("Copy your link:", link);
+      });
       db.rpc("my_referral_count").then(function (r) {
         if (r.error || typeof r.data !== "number") return;
         var n = r.data;
