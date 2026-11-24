@@ -29,6 +29,20 @@
   function tile(label, big, line, wide) {
     return '<div class="rai-tile' + (wide ? " wide" : "") + '"><div class="lbl">' + label + '</div><div class="big">' + big + "</div>" + (line ? "<p>" + line + "</p>" : "") + "</div>";
   }
+  // A small line of the price over time. history = [["Oct 2021", 2.1], ...], oldest first.
+  function spark(history, d2) {
+    if (!history || history.length < 6) return "";
+    var W = 300, H = 44, P = 4, vals = history.map(function (r) { return r[1]; });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), span = hi - lo || 1;
+    var pts = vals.map(function (v, i) {
+      return (P + i * (W - 2 * P) / (vals.length - 1)).toFixed(1) + "," + (P + (hi - v) * (H - 2 * P) / span).toFixed(1);
+    });
+    return '<span class="spark"><svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" role="img" aria-label="Price from ' +
+      esc(history[0][0]) + " to " + esc(history[history.length - 1][0]) + ", low " + money(lo, d2) + ", high " + money(hi, d2) + '">' +
+      '<polyline points="' + pts.join(" ") + '" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '</svg>' +
+      '<span class="spark-ends"><span>' + esc(history[0][0]) + "</span><span>low " + money(lo, d2) + ", high " + money(hi, d2) + "</span><span>" + esc(history[history.length - 1][0]) + "</span></span></span>";
+  }
   function when(part) { return part && part.pulled ? '<p class="rai-when">' + esc(part.source || "") + ". Checked " + esc(day(part.pulled)) + ".</p>" : ""; }
 
   var db = window.supabase && cfg.supabaseUrl ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey) : null;
@@ -103,8 +117,13 @@
       if (basket.length) {
         h += '<h3 style="margin:18px 0 8px;font-size:17px">What things cost</h3><div class="rai-rows">' + basket.map(function (x) {
           var d2 = x.price < 1 ? 3 : 2;
-          return '<div class="rai-row"><span>' + esc(x.name) + '</span><b>' + money(x.price, d2) + "<span class=\"small muted\"> a " + esc(x.unit) + "</span>" + trend(x.price, x.yearAgo, false) + "</b>" +
-            '<span class="sub">' + esc(x.area) + ", " + esc(x.month) + (x.yearAgo ? ". A year ago " + money(x.yearAgo, d2) + "." : ".") + "</span></div>";
+          var back = [];
+          if (x.yearAgo) back.push("A year ago " + money(x.yearAgo, d2) + trend(x.price, x.yearAgo, false));
+          if (x.fiveYearsAgo) back.push("5 years ago " + money(x.fiveYearsAgo, d2) + trend(x.price, x.fiveYearsAgo, false));
+          return '<div class="rai-row"><span>' + esc(x.name) + '</span><b>' + money(x.price, d2) + "<span class=\"small muted\"> a " + esc(x.unit) + "</span></b>" +
+            (back.length ? '<span class="sub then">' + back.join('<span class="dot"> · </span>') + "</span>" : "") +
+            spark(x.history, d2) +
+            '<span class="sub">' + esc(x.area) + ", " + esc(x.month) + ".</span></div>";
         }).join("") + "</div>" + when(d.basket);
       }
     }
