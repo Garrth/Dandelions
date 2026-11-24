@@ -55,7 +55,8 @@ CPI = [  # (name, series)
 
 def bls(series):
     """{series: [(year, month, value), ...] newest first}. Raises on failure."""
-    body = {'seriesid': series, 'startyear': str(TODAY.year - 2), 'endyear': str(TODAY.year)}
+    # Six calendar years, so prices can show a five-year trend.
+    body = {'seriesid': series, 'startyear': str(TODAY.year - 5), 'endyear': str(TODAY.year)}
     if os.environ.get('BLS_API_KEY'):
         body['registrationkey'] = os.environ['BLS_API_KEY']
     d = json.loads(get('https://api.bls.gov/publicAPI/v2/timeseries/data/', json.dumps(body).encode(), {'Content-Type': 'application/json'}))
@@ -81,13 +82,21 @@ def month_name(y, m):
     return datetime.date(y, m, 1).strftime('%b %Y')
 
 
-def year_ago(rows):
-    """The value 12 months before the newest one, or None."""
+def years_ago(rows, n):
+    """The value n years before the newest one, or None. BLS skipped some months
+    (October 2025, during the government shutdown), so a month either side will do."""
     y, m, _ = rows[0]
-    for yy, mm, v in rows:
-        if yy == y - 1 and mm == m:
-            return v
+    have = {(yy, mm): v for yy, mm, v in rows}
+    base = (y - n) * 12 + (m - 1)
+    for k in (0, -1, 1):
+        t = base + k
+        if (t // 12, t % 12 + 1) in have:
+            return have[(t // 12, t % 12 + 1)]
     return None
+
+
+def year_ago(rows):
+    return years_ago(rows, 1)
 
 
 def series_block(rows, keep=25):
@@ -117,8 +126,10 @@ def pull_bls(c):
     for n, u, s, a in basket:
         if s in data:
             rows = data[s]
-            items.append({'name': n, 'unit': u, 'price': rows[0][2], 'yearAgo': year_ago(rows), 'month': month_name(*rows[0][:2]),
-                          'area': 'US average' if a == 'US' else c['regionName'] + ' average'})
+            items.append({'name': n, 'unit': u, 'price': rows[0][2], 'yearAgo': year_ago(rows), 'fiveYearsAgo': years_ago(rows, 5),
+                          'month': month_name(*rows[0][:2]),
+                          'area': 'US average' if a == 'US' else c['regionName'] + ' average',
+                          'history': [[month_name(y, m), v] for y, m, v in rows[:61]][::-1]})
     if items:
         out['basket'] = {'items': items, 'source': 'BLS Average Price Data'}
     changes = []

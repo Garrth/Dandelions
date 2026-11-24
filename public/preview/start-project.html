@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Start a project (preview) | Dandelions</title>
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .sp textarea { min-height: 60px; margin-top: 4px; font-weight: 400; }
+    .sp .field small { display: block; font-weight: 400; color: var(--muted); margin-top: 2px; }
+    .sp .step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--sun); color: var(--sun-ink); font-weight: 800; margin-right: 8px; flex: none; }
+    .sp h2.section-title { display: flex; align-items: center; }
+    .sp .lines { display: grid; gap: 10px; }
+    .sp .line { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--soft); }
+    .sp .line .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .sp .line .grid .field { margin-bottom: 0; }
+    .sp .line .field { margin-bottom: 8px; }
+    .sp .line .foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; font-size: 13px; }
+    .sp .x { background: none; border: 0; color: var(--warn); font-weight: 700; cursor: pointer; padding: 4px; }
+    .sp .range { color: var(--muted); }
+    .sp .range.out { color: var(--warn); font-weight: 700; }
+    .sp .tot { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-variant-numeric: tabular-nums; }
+    .sp .tot .big { font-size: 20px; font-weight: 800; border-top: 1px solid var(--line); padding-top: 8px; }
+    .sp .tier { border-left: 6px solid var(--sun); }
+    .sp .tier.over { border-left-color: var(--warn); }
+    .sp .count { font-weight: 400; color: var(--muted); font-size: 12px; float: right; }
+    .sp .seen h3 { margin-bottom: 4px; }
+    .sp .seen .ms { margin: 8px 0 0 18px; }
+    .sp .seen .ms li { margin-bottom: 4px; }
+    .sp .vote { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    @media (max-width: 480px) { .sp .line .grid { grid-template-columns: 1fr 1fr; } .sp .line .grid .wide { grid-column: 1 / -1; } }
+  </style>
+</head>
+<body>
+<div class="wrap sp">
+  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/work.html">Work</a></nav></header>
+  <main>
+    <div class="page-head">
+      <div class="eyebrow">Preview · nothing is saved or sent</div>
+      <h1>Start a project</h1>
+      <p>Say what will be different when you're done, how anyone can check it, and what it costs. Everything you enter here is open book.</p>
+    </div>
+
+    <h2 class="section-title"><span class="step">1</span>What kind of work</h2>
+    <div class="card">
+      <label class="field">Kind of work
+        <select id="kind"></select>
+        <small id="kind-note"></small>
+      </label>
+      <button class="btn small ghost" type="button" id="fill">Start from the sample project</button>
+      <label class="field" style="margin-top:12px">Project name
+        <input id="name" maxlength="80" placeholder="Short and plain, like: Fix-it day flyers around Petaluma">
+      </label>
+      <label class="field">Where
+        <select id="where">
+          <option value="local">In my area</option>
+          <option value="anywhere">From anywhere (online)</option>
+        </select>
+      </label>
+      <label class="field" id="town-wrap">Town or neighborhood
+        <input id="town" maxlength="60" placeholder="Petaluma">
+      </label>
+    </div>
+
+    <h2 class="section-title"><span class="step">2</span>The outcome</h2>
+    <div class="card">
+      <label class="field">What will be different when it's done? <span class="count" id="outcome-n">0/280</span>
+        <textarea id="outcome" maxlength="280" placeholder="One or two sentences. Not the work you'll do, the result."></textarea>
+      </label>
+      <div class="note" id="measure-note" style="margin-bottom:12px"></div>
+      <div id="measure"></div>
+    </div>
+
+    <h2 class="section-title"><span class="step">3</span>Milestones</h2>
+    <p class="small muted" style="margin:-4px 0 10px">Points are paid per milestone, only after it checks out. Miss a date by more than 7 days, or miss the measure, and the project stops on its own. Unpaid points go back.</p>
+    <div class="lines" id="ms"></div>
+    <button class="btn small ghost" type="button" id="add-ms" style="margin-top:10px">Add a milestone</button>
+    <p class="small" id="ms-sum" style="margin-top:8px"></p>
+
+    <h2 class="section-title"><span class="step">4</span>Open-book bid</h2>
+    <p class="small muted" style="margin:-4px 0 10px">Rates are your business's cost estimate. Dandelions pays your business the bid price per milestone, and your business pays its own people. If you find a smarter way and spend less, you keep the difference.</p>
+    <h3 style="font-size:17px;margin-bottom:8px">People and time</h3>
+    <div class="lines" id="labor"></div>
+    <button class="btn small ghost" type="button" id="add-labor" style="margin-top:10px">Add a line</button>
+    <h3 style="font-size:17px;margin:18px 0 8px">Materials and costs</h3>
+    <div class="lines" id="mat"></div>
+    <button class="btn small ghost" type="button" id="add-mat" style="margin-top:10px">Add a line</button>
+    <div class="card" style="margin-top:16px">
+      <label class="field">Your margin, %
+        <input id="margin" type="number" min="0" max="30" step="1" value="10">
+        <small>Covers your business's overhead and profit. Shown to everyone.</small>
+      </label>
+      <div class="tot" id="tot"></div>
+    </div>
+
+    <h2 class="section-title"><span class="step">5</span>Size check</h2>
+    <div class="card">
+      <label class="field">Your track record (sample)
+        <select id="record">
+          <option value="0">New project owner</option>
+          <option value="800">Finished 1 project, biggest 800 points</option>
+          <option value="3000">Finished 4 projects, biggest 3,000 points</option>
+        </select>
+      </label>
+      <label class="field">Points pledged each month in this area (sample)
+        <select id="pledges">
+          <option value="20000">20,000 (just started)</option>
+          <option value="60000">60,000</option>
+          <option value="250000">250,000</option>
+        </select>
+      </label>
+      <div class="card tier" id="tier"></div>
+    </div>
+
+    <h2 class="section-title"><span class="step">6</span>Note to checkers</h2>
+    <div class="card">
+      <label class="field">Anything a checker should know? <span class="count" id="note-n">0/144</span>
+        <input id="note" maxlength="144" placeholder="Optional. 144 characters, no uploads.">
+      </label>
+      <button class="btn" type="button" id="go">See what members will see</button>
+      <p class="small muted" style="margin-top:8px">Preview only. Nothing is sent.</p>
+    </div>
+
+    <div id="seen" hidden>
+      <h2 class="section-title">What members and checkers see</h2>
+      <div class="card seen" id="seen-card"></div>
+    </div>
+    <p class="small muted" style="margin:28px 0">Sample ranges and numbers on this page are made up for testing the form.</p>
+  </main>
+</div>
+<script src="/preview/start-project.js"></script>
+</body>
+</html>
