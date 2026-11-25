@@ -18,10 +18,12 @@
 <div class="wrap">
   <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/">Home</a><a href="/app/talk.html">Talk</a></nav></header>
   <main id="work">
+   <div id="v-main">
     <div class="page-head">
       <div class="eyebrow">Work · coming soon</div>
       <h1>There's plenty to do.</h1>
       <p>Work is where local businesses take on projects that make life better here, and get paid in points once the work is checked. It's coming soon, county by county. Nothing here pays yet, and nothing is promised.</p>
+      <div class="row" style="margin-top:14px"><a class="btn" href="#dandelions">Start a project</a><button class="btn ghost" type="button" disabled>Join a project</button><span class="small muted">Join a project is coming soon.</span></div>
     </div>
 
     <h2 class="section-title">What it takes to start in your county</h2>
@@ -33,10 +35,10 @@
     <div class="card">
       <ol class="ms-list grow">
         <li><b>Now</b><span class="muted small">The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid.</span></li>
-        <li><b>Starting numbers reached</b><span class="muted small">The first kinds of work open. Businesses take on projects at set prices and get paid in points once the work is checked.</span></li>
-        <li><b>Sprout, 1% pledged</b><span class="muted small">More kinds of work open as members vote them in, like caregiving, social events and training.</span></li>
-        <li><b>Bloom, 5% pledged</b><span class="muted small">Bigger local projects, more roles and more checkers.</span></li>
-        <li><b>Puffball, 10% pledged</b><span class="muted small">The county is ready for its biggest projects, and helps nearby counties grow.</span></li>
+        <li><b>Starting numbers reached</b><span class="muted small">Dandelions projects open. Businesses take on projects at set prices and get paid in points once the work is checked.</span></li>
+        <li><b>Sprout, 1% pledged</b><span class="muted small">Education opens. Automation, Health and care, and Agriculture follow at 2%, 3% and 4%.</span></li>
+        <li><b>Bloom, 5% pledged</b><span class="muted small">Infrastructure opens, then Environmental cleanup and planet care at 7%.</span></li>
+        <li><b>Puffball, 10% pledged</b><span class="muted small">Research and development opens. The county is ready for its biggest projects, and helps nearby counties grow.</span></li>
       </ol>
       <p class="small muted">At every step, the more people and businesses pledge, the more work can be paid each month.</p>
     </div>
@@ -45,13 +47,10 @@
     <ol class="flow" id="flow"></ol>
     <p class="muted small" style="margin-top:8px">A disagreement about a check goes to a random panel of members.</p>
 
-    <h2 class="section-title">Kinds of work</h2>
-    <p class="muted small">These open first. Tap one to see a sample project. Members vote in more kinds as the network grows.</p>
-    <div class="stack" id="types"></div>
-
-    <h2 class="section-title">Line up for a position</h2>
-    <p class="muted small" id="lineup-intro">Pick the positions you'd like when Work starts. It saves your interest. It isn't a job offer or a promise of work.</p>
-    <div id="positions"></div>
+    <h2 class="section-title">Approved projects</h2>
+    <p class="muted small">Eight broad kinds of work, for the things the market doesn't pay for. They unlock one at a time as your county grows.</p>
+    <div class="cats" id="cats"></div>
+    <p class="muted small" style="margin-top:8px">The unlock points are starting numbers. Members can change them by vote. Categories rarely change. Projects inside them are added or removed by vote.</p>
 
     <h2 class="section-title">Dandelions doesn't hire anyone</h2>
     <div class="card">
@@ -70,6 +69,30 @@
     </div>
 
     <p class="note" style="margin-top:24px">Questions or ideas about Work? Bring them to <a href="/app/talk.html">Talk</a> or ask Rai.</p>
+   </div>
+
+   <div id="v-dandelions" hidden>
+    <a class="back" href="#">← Work</a>
+    <div class="page-head">
+      <div class="eyebrow">Opens first</div>
+      <h1>Dandelions: build and maintain</h1>
+      <p class="purpose">Grow the network and keep it running: more members, more businesses accepting points, more places to spend them, and the site and tools everyone uses.</p>
+      <p class="small muted">Only work the market doesn't already pay for. When for-profit businesses need the workers, projects step back.</p>
+    </div>
+
+    <h2 class="section-title">Projects</h2>
+    <div class="filters">
+      <select id="f-where" aria-label="In person or online"><option value="">In person or online</option><option>In person</option><option>Online</option></select>
+      <select id="f-pay" aria-label="How it pays"><option value="">Any pay</option><option>Weekly piecework</option><option>Milestones</option></select>
+    </div>
+    <div class="stack" id="plist"></div>
+
+    <h2 class="section-title">Roles that keep it running</h2>
+    <p class="muted small" id="lineup-intro">Tap a group to see its roles, and line up for the ones you want. It saves your interest. It isn't a job offer or a promise of work.</p>
+    <div id="positions"></div>
+
+    <p class="note" style="margin-top:24px">Questions or ideas? Bring them to <a href="/app/talk.html">Talk</a> or ask Rai.</p>
+   </div>
   </main>
 </div>
 <script src="/js/vendor/supabase-js-2.118.0.js"></script>

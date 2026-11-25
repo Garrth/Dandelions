@@ -49,9 +49,7 @@
     trust: ["Trusted people first", ""]
   };
   var GROUPS = [
-    ["Doing the work", [
-      ["owner", "Project owner", "A local business that starts a project at set prices, does it or brings in help, and shows each milestone.", "work"],
-      ["crew", "Crew", "Helps a business with its project. The business pays you, not Dandelions.", "work"],
+    ["Growing it", [
       ["organizer", "Community organizer", "Signs up businesses, helps owners claim their listing, and runs meetups and events.", "early"],
       ["marketer", "Marketer", "Spreads the word on social media, local news, radio and podcasts. Paid posts always say they're paid.", "early"]]],
     ["Checking the work", [
@@ -75,12 +73,51 @@
 
   // ---- Static parts ----
   $("flow").innerHTML = FLOW.map(function (f) { return "<li><b>" + esc(f[0]) + "</b><span>" + esc(f[1]) + "</span></li>"; }).join("");
-  $("types").innerHTML = TYPES.map(function (t, i) {
-    return '<details class="card type"><summary><b>' + esc(t.name) + '</b><span class="muted small">' + esc(t.note) + "</span></summary>" +
-      '<div class="sample"><div class="eyebrow">Sample project</div><h3>' + esc(t.sample) + "</h3><p>" + esc(t.what) + "</p>" +
-      '<ol class="ms-list">' + t.steps.map(function (s) { return "<li>" + esc(s[0]) + '<span class="muted small">' + esc(s[1]) + "</span></li>"; }).join("") + "</ol>" +
-      '<p class="muted small">Every kind of work will have a template like this, so a business can copy it and start a project in a few minutes.</p></div></details>';
-  }).join("") + '<p class="muted small">Next, as members vote them in: caregiving, social events and training. Later: home upkeep and building.</p>';
+  var LOCK = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
+  var CATS = [
+    ["dandelions", "Dandelions: build and maintain", "Opens first, when a county reaches its starting numbers"],
+    ["", "Education", "Unlocks at 1% pledged"],
+    ["", "Automation", "Unlocks at 2% pledged"],
+    ["", "Health and care", "Unlocks at 3% pledged"],
+    ["", "Agriculture", "Unlocks at 4% pledged"],
+    ["", "Infrastructure", "Unlocks at 5% pledged (Bloom)"],
+    ["", "Environmental cleanup and planet care", "Unlocks at 7% pledged"],
+    ["", "Research and development", "Unlocks at 10% pledged (Puffball)"]
+  ];
+  $("cats").innerHTML = CATS.map(function (c, i) {
+    var inner = '<span class="n">' + (i + 1) + "</span><b>" + esc(c[1]) + "</b>" +
+      (c[0] ? '<span class="chip sun">Opens first</span>' : '<span class="lock">' + LOCK + " Locked</span>") + '<span class="sub">' + esc(c[2]) + "</span>";
+    return c[0] ? '<a class="cat open" href="#' + c[0] + '">' + inner + "</a>" : '<div class="cat">' + inner + "</div>";
+  }).join("");
+
+  var PROJECTS = [
+    ["Spread the word", "Posts, videos, articles and local news that bring people to the site. Paid per site visit and per sign-up.", "Online", "Weekly piecework"],
+    ["Sign up members", "Tables at markets and events, and welcoming new people. Paid per sign-up.", "In person", "Weekly piecework"],
+    ["Sign up businesses", "Visits, calls and directory checks, so local businesses claim their listing.", "In person", "Weekly piecework"],
+    ["Help businesses and landlords accept points", "Find places for a business to spend points, so it can accept more.", "In person", "Weekly piecework"],
+    ["Events and meetups", "Gatherings that bring members and local businesses together.", "In person", "Milestones"],
+    ["Site and tools", "The site, data, guides and artwork.", "Online", "Milestones"]
+  ];
+  function drawProjects() {
+    var w = $("f-where").value, p = $("f-pay").value;
+    var list = PROJECTS.filter(function (x) { return (!w || x[2] === w) && (!p || x[3] === p); });
+    $("plist").innerHTML = list.length ? list.map(function (x) {
+      return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small">' + esc(x[1]) + '</p><div class="tags"><span class="chip">' + esc(x[2]) + '</span><span class="chip">No license needed</span><span class="chip">' + esc(x[3]) + "</span></div>" +
+        '<div class="row" style="margin-top:10px"><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
+    }).join("") : '<p class="muted">No projects match. Try another filter.</p>';
+  }
+  $("f-where").addEventListener("change", drawProjects);
+  $("f-pay").addEventListener("change", drawProjects);
+  drawProjects();
+
+  function route() {
+    var cat = location.hash === "#dandelions";
+    $("v-main").hidden = cat; $("v-dandelions").hidden = !cat;
+    if (cat || route.ran) window.scrollTo(0, 0);
+    route.ran = true;
+  }
+  window.addEventListener("hashchange", route);
+  route();
 
   function gate(n, name, text, status, extra) {
     return '<div class="card gate"><div class="spread"><b>' + n + ". " + esc(name) + '</b><span class="chip">' + esc(status) + "</span></div><p class=\"small muted\">" + esc(text) + "</p>" + (extra || "") + "</div>";
@@ -112,15 +149,15 @@
       '<span class="chip sun">Starts early</span> can begin before Work starts, unpaid.</p>' +
       (signedIn ? "" : '<div class="card signin"><p>Sign in to line up for the positions you want.</p><a class="btn small" href="/app/login.html" data-signin="1" style="margin-top:10px">Sign in</a></div>') +
       GROUPS.map(function (g) {
-        return '<h3 class="group">' + esc(g[0]) + '</h3><div class="stack">' + g[1].map(function (p) {
-          var o = OPENS[p[3]], on = !!mine[p[0]], c = counts[p[0]] || 0;
+        return '<details class="card pgroup"><summary>' + esc(g[0]) + ' <span class="small muted">' + g[1].length + ' roles</span></summary><div class="stack" style="margin-top:10px">' + g[1].map(function (p) {
+          var o = OPENS[p[3]], on = !!mine[p[0]];
           var btn = signedIn
             ? '<button class="btn small ' + (on ? "" : "ghost") + '" type="button" data-pos="' + p[0] + '" aria-pressed="' + on + '">' + (on ? "Lined up ✓" : "Line up") + "</button>"
             : "";
           return '<div class="card pos"><div class="spread"><b>' + esc(p[1]) + '</b><span class="chip ' + o[1] + '">' + esc(o[0]) + "</span></div>" +
             '<p class="small">' + esc(p[2]) + "</p>" + (signedIn ? '<div class="spread pos-foot">' + btn +
-            '<span class="small muted">' + (c ? fmt(c) + " lined up near you" : "") + "</span></div>" : "") + "</div>";
-        }).join("") + "</div>";
+            "</div>" : "") + "</div>";
+        }).join("") + "</div></details>";
       }).join("");
     $("positions").querySelectorAll("[data-signin]").forEach(function (a) {
       a.addEventListener("click", function () { try { localStorage.setItem("dandelions_return", "/app/work.html"); } catch (e) {} });
@@ -171,7 +208,6 @@
         counts = s.lineup || {};
         drawGates(county, s);
         drawPositions();
-        if (s.people) $("lineup-intro").textContent = fmt(s.people) + (s.people === 1 ? " person has" : " people have") + " lined up in " + county[0] + " so far. Pick the positions you'd like when Work starts. It saves your interest. It isn't a job offer or a promise of work.";
       });
     });
   });
