@@ -11,14 +11,12 @@
   }
 
   var FLOW = [
-    ["A need is spotted", "From Rai's numbers, an idea in Talk, or a position that needs filling."],
-    ["Members set priorities", "People talk it through. Small things go ahead unless enough people object. Bigger ones get a vote."],
-    ["Work opens", "A kind of work opens in the county, inside half of the points people and businesses pledged to accept that month."],
-    ["Businesses bid", "Each bid lists milestones and a price inside Rai's fair range. A public formula of price and track record picks the winner, not a person."],
-    ["A checker reviews the plan", "Picked at random, with no ties to the business."],
-    ["Points are set aside", "They're held until the work checks out, so nobody gets paid for work that isn't done."],
-    ["The work gets done and checked", "The business shows each milestone with photos, counts or a link. Random checkers confirm it. A disagreement goes to a random panel of members."],
-    ["Points are paid", "To the business, which pays its own people. Its track record grows, and so does the size of job it can take on."]
+    ["Qualify as a project owner", "Verify your business, and add any licenses and insurance to your profile."],
+    ["Pick a kind of work you qualify for", "Each kind says what it pays for and what license it needs."],
+    ["Fill out the project form", "Say what you'll do, your goal, and the tasks from the set price list."],
+    ["Get approved and start", "A random checker reviews the form. Once it's approved, the points are set aside, so they're there when the work is done."],
+    ["Get paid as you go", "Piecework is tallied and paid each week. Projects with milestones are paid as each one is verified. A deadline missed by more than 7 days stops the project on its own."],
+    ["Sign off when it's done", "The project closes, and your track record grows, so you can take on bigger ones."]
   ];
 
   var TYPES = [
@@ -52,7 +50,7 @@
   };
   var GROUPS = [
     ["Doing the work", [
-      ["owner", "Project owner", "A local business that bids on a project, does it or brings in help, and shows each milestone.", "work"],
+      ["owner", "Project owner", "A local business that starts a project at set prices, does it or brings in help, and shows each milestone.", "work"],
       ["crew", "Crew", "Helps a business with its project. The business pays you, not Dandelions.", "work"],
       ["organizer", "Community organizer", "Signs up businesses, helps owners claim their listing, and runs meetups and events.", "early"],
       ["marketer", "Marketer", "Spreads the word on social media, local news, radio and podcasts. Paid posts always say they're paid.", "early"]]],
@@ -81,7 +79,7 @@
     return '<details class="card type"><summary><b>' + esc(t.name) + '</b><span class="muted small">' + esc(t.note) + "</span></summary>" +
       '<div class="sample"><div class="eyebrow">Sample project</div><h3>' + esc(t.sample) + "</h3><p>" + esc(t.what) + "</p>" +
       '<ol class="ms-list">' + t.steps.map(function (s) { return "<li>" + esc(s[0]) + '<span class="muted small">' + esc(s[1]) + "</span></li>"; }).join("") + "</ol>" +
-      '<p class="muted small">Every kind of work will have a template like this, so a business can copy it and bid in a few minutes.</p></div></details>';
+      '<p class="muted small">Every kind of work will have a template like this, so a business can copy it and start a project in a few minutes.</p></div></details>';
   }).join("") + '<p class="muted small">Next, as members vote them in: caregiving, social events and training. Later: home upkeep and building.</p>';
 
   function gate(n, name, text, status, extra) {
