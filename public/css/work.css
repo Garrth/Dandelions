@@ -24,3 +24,23 @@
 .rules li:last-child { margin-bottom: 0; }
 .gate .spread { gap: 8px; align-items: flex-start; }
 .gate p { margin-top: 4px; }
+
+/* Approved projects: categories and the Dandelions page */
+.cats { display: grid; gap: 10px; }
+.cat { display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 12px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); text-decoration: none; }
+a.cat:hover { border-color: var(--ink); }
+.cat .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-family: var(--display); background: var(--soft); border: 1px solid var(--line); }
+.cat.open .n { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+.cat b { font-size: 17px; }
+.cat .sub { grid-column: 2 / -1; color: var(--muted); font-size: 14px; }
+.lock { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.lock svg { width: 13px; height: 13px; }
+.back { display: inline-block; color: var(--leaf); font-weight: 700; text-decoration: none; margin-bottom: 8px; }
+.purpose { font-size: 18px; color: var(--ink) !important; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.filters select { padding: 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+.proj .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.proj p { margin-top: 4px; }
+details.pgroup { margin-top: 10px; }
+details.pgroup > summary { cursor: pointer; font-weight: 800; }
+details.pgroup > summary span { font-weight: 400; }
