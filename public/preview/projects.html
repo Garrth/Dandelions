@@ -2,18 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <title>Project board (preview)</title>
+  <title>Approved projects (preview) | Dandelions</title>
   <meta name="theme-color" content="#ffd21a">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="/fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/preview/preview.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <style>
+    .cats { display: grid; gap: 10px; }
+    .cat { display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 12px; align-items: center; text-align: left; width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: var(--ink); font: inherit; cursor: pointer; }
+    .cat:hover { border-color: var(--ink); }
+    .cat .n { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-family: var(--display); background: var(--soft); border: 1px solid var(--line); }
+    .cat.open .n { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); }
+    .cat b { font-size: 17px; }
+    .cat .sub { grid-column: 2 / -1; color: var(--muted); font-size: 14px; }
+    .lock { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .lock svg { width: 13px; height: 13px; }
+    .back { background: none; border: 0; color: var(--leaf); font: inherit; font-weight: 700; cursor: pointer; padding: 0; margin-bottom: 8px; }
+    .purpose { font-size: 18px; margin: 6px 0 4px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .filters select { padding: 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+    .proj { display: grid; gap: 6px; }
+    .proj .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty { color: var(--muted); }
+  </style>
 </head>
-<body data-page="projects">
-<main class="wrap" id="main"></main>
-<script src="/preview/data.js"></script>
-<script src="/preview/app.js"></script>
+<body>
+<div class="wrap">
+  <header class="top"><a class="brand" href="/app/"><img src="/favicon.svg" alt="" width="26" height="26"> Dandelions</a><nav class="navlinks"><a href="/app/work.html">Work</a></nav></header>
+  <main id="app"></main>
+</div>
+<script src="/preview/projects.js"></script>
 </body>
 </html>
