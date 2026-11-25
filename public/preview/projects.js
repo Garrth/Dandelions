@@ -34,6 +34,38 @@
       purpose: "Fund the research and new ideas that make everything else work better.",
       examples: "Local research projects, open designs shared across counties" }
   ];
+  // Roles that keep Dandelions running. [name, what it does, locked until]
+  var ROLES = [
+    ["Checking the work", [
+      ["Checker", "Reviews project forms and checks finished work, picked at random. Paid the same for yes or no."],
+      ["Dispute panelist", "Sits on a random panel of 5 that settles a disagreement about a check."],
+      ["Data analyst", "Reads Rai's numbers and writes up what should change, for members to vote on."]]],
+    ["Growing it", [
+      ["Community organizer", "Signs up businesses, helps owners claim their listing, and runs meetups and events."],
+      ["Marketer", "Spreads the word on social media, local news, radio and podcasts. Paid posts always say they're paid."]]],
+    ["Keeping it running", [
+      ["Talk moderator", "Keeps Talk kind and useful. Wears a badge so everyone knows."],
+      ["Member help", "Answers the questions Rai can't, and sorts out wrong numbers and listing reports."],
+      ["Service operator", "A business that runs one piece of the system, like hosting, ID checks or the directory.", "Unlocks when points go live"],
+      ["Site security", "Watches for attacks, checks who has access, and fixes weak spots.", "Trusted people first"]]],
+    ["Improving it", [
+      ["Tester", "Tries each change on a real phone before it goes live, and reports what breaks."],
+      ["Course maker", "Writes the how-to and short test for each role, and the help videos."],
+      ["Code reviewer", "Reads every change to the site's code before it goes live.", "Trusted people first"],
+      ["Site maintainer", "Puts reviewed changes live and keeps the site running.", "Trusted people first"]]],
+    ["Guarding the rules", [
+      ["Signer", "Picked at random to co-sign anything that creates points or changes the rules.", "Unlocks when points go live"],
+      ["Keeper", "Signs off on charter changes after a vote, and can pause something to stop harm. Never creates points.", "Trusted people first"]]]
+  ];
+  function rolesHTML() {
+    return '<h2 class="section-title">Roles that keep it running</h2><p class="small muted" style="margin:-4px 0 10px">Tap a group to see its roles, and line up for the ones you want. Paid per piece once points go live.</p>' +
+      ROLES.map(function (g) {
+        return '<details class="card" style="margin-top:10px"><summary style="cursor:pointer"><b>' + esc(g[0]) + '</b> <span class="small muted">' + g[1].length + ' roles</span></summary><div class="stack" style="margin-top:10px">' + g[1].map(function (r) {
+          return '<div class="card proj"><div class="spread"><b>' + esc(r[0]) + "</b>" + (r[2] ? '<span class="lock">' + LOCK + " " + esc(r[2]) + "</span>" : "") + '</div><span class="small">' + esc(r[1]) + "</span>" +
+            (r[2] ? "" : '<div><button class="btn small ghost" type="button" disabled>Line up</button></div>') + "</div>";
+        }).join("") + "</div></details>";
+      }).join("");
+  }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   var app = document.getElementById("app");
 
@@ -54,10 +86,10 @@
       '<p class="purpose">' + esc(c.purpose) + "</p>" +
       '<p class="small muted">Only work the market doesn\'t already pay for. When for-profit businesses need the workers, projects step back.</p></div>';
     if (c.projects) {
-      h += '<div class="filters"><select id="f-where" aria-label="In person or online"><option value="">In person or online</option><option>In person</option><option>Online</option></select>' +
+      h += '<h2 class="section-title">Projects</h2><div class="filters"><select id="f-where" aria-label="In person or online"><option value="">In person or online</option><option>In person</option><option>Online</option></select>' +
         '<select id="f-lic" aria-label="License"><option value="">Any license</option><option>No license</option><option>License needed</option></select>' +
         '<select id="f-pay" aria-label="How it pays"><option value="">Any pay</option><option>Weekly piecework</option><option>Milestones</option></select></div>' +
-        '<div class="stack" id="plist"></div>';
+        '<div class="stack" id="plist"></div>' + rolesHTML();
     } else {
       h += '<div class="card"><span class="lock">' + LOCK + " Locked</span><p style=\"margin-top:8px\">" + esc(c.opens) + ".</p>" +
         '<p class="small muted" style="margin-top:8px">Projects that might fit here, once it opens and members approve them: ' + esc(c.examples) + ".</p></div>";
