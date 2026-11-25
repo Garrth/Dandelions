@@ -50,7 +50,7 @@
   };
   var GROUPS = [
     ["Doing the work", [
-      ["owner", "Project owner", "A local business that bids on a project, does it or brings in help, and shows each milestone.", "work"],
+      ["owner", "Project owner", "A local business that starts a project at set prices, does it or brings in help, and shows each milestone.", "work"],
       ["crew", "Crew", "Helps a business with its project. The business pays you, not Dandelions.", "work"],
       ["organizer", "Community organizer", "Signs up businesses, helps owners claim their listing, and runs meetups and events.", "early"],
       ["marketer", "Marketer", "Spreads the word on social media, local news, radio and podcasts. Paid posts always say they're paid.", "early"]]],
@@ -79,7 +79,7 @@
     return '<details class="card type"><summary><b>' + esc(t.name) + '</b><span class="muted small">' + esc(t.note) + "</span></summary>" +
       '<div class="sample"><div class="eyebrow">Sample project</div><h3>' + esc(t.sample) + "</h3><p>" + esc(t.what) + "</p>" +
       '<ol class="ms-list">' + t.steps.map(function (s) { return "<li>" + esc(s[0]) + '<span class="muted small">' + esc(s[1]) + "</span></li>"; }).join("") + "</ol>" +
-      '<p class="muted small">Every kind of work will have a template like this, so a business can copy it and bid in a few minutes.</p></div></details>';
+      '<p class="muted small">Every kind of work will have a template like this, so a business can copy it and start a project in a few minutes.</p></div></details>';
   }).join("") + '<p class="muted small">Next, as members vote them in: caregiving, social events and training. Later: home upkeep and building.</p>';
 
   function gate(n, name, text, status, extra) {
