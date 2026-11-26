@@ -76,13 +76,13 @@
   var LOCK = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="8" rx="1.5" fill="currentColor"/><path d="M5 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>';
   var CATS = [
     ["dandelions", "Dandelions: build and maintain", "Opens first, when a county reaches its starting numbers"],
-    ["", "Education", "Unlocks at 1% pledged"],
-    ["", "Automation", "Unlocks at 2% pledged"],
-    ["", "Health and care", "Unlocks at 3% pledged"],
-    ["", "Agriculture", "Unlocks at 4% pledged"],
-    ["", "Infrastructure", "Unlocks at 5% pledged (Bloom)"],
-    ["", "Environmental cleanup and planet care", "Unlocks at 7% pledged"],
-    ["", "Research and development", "Unlocks at 10% pledged (Puffball)"]
+    ["", "Education", "Unlocks at 1 point a month pledged per resident"],
+    ["", "Automation", "Unlocks at 2 points a month pledged per resident"],
+    ["", "Health and care", "Unlocks at 3 points a month pledged per resident"],
+    ["", "Agriculture", "Unlocks at 4 points a month pledged per resident"],
+    ["", "Infrastructure", "Unlocks at 5 points a month pledged per resident"],
+    ["", "Environmental cleanup and planet care", "Unlocks at 7 points a month pledged per resident"],
+    ["", "Research and development", "Unlocks at 10 points a month pledged per resident"]
   ];
   $("cats").innerHTML = CATS.map(function (c, i) {
     var inner = '<span class="n">' + (i + 1) + "</span><b>" + esc(c[1]) + "</b>" +
@@ -126,6 +126,18 @@
     var pct = have ? Math.min(100, have / target * 100) : 0;
     return '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
   }
+  function drawGrow(county) {
+    var pop = county ? county[2] : 0;
+    function need(n) { return pop ? " In " + county[0] + ", that's about " + fmt(Math.round(pop * n)) + " a month." : ""; }
+    var G = [
+      ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid."],
+      ["Starting numbers reached", "Dandelions projects open. Businesses take on projects at set prices and get paid in points once the work is checked. Pay for signing up new pledges comes first, since each pledge opens room for more work."],
+      ["1 point a month pledged per resident", "Education opens." + need(1) + " Automation, Health and care, and Agriculture follow at 2, 3 and 4 points per resident."],
+      ["5 points a month pledged per resident", "Infrastructure opens." + need(5) + " Environmental cleanup and planet care follows at 7."],
+      ["10 points a month pledged per resident", "Research and development opens." + need(10) + " The county is ready for its biggest projects, and helps nearby counties grow."]
+    ];
+    $("grow").innerHTML = G.map(function (g) { return "<li><b>" + esc(g[0]) + '</b><span class="muted small">' + esc(g[1]) + "</span></li>"; }).join("");
+  }
   function drawGates(county, status) {
     var people = county ? Math.max(100, Math.ceil(county[2] * 0.001)) : 0, have = status && status.id_checked;
     var biz = (status && status.businesses_pledged) || 0, pledged = status && status.pledged, pledgers = (status && status.pledgers) || 0;
@@ -136,10 +148,10 @@
         county ? bar(have, people) : "") +
       gate(2, "Local businesses", "At least 25 businesses in the directory say how many points a month they'll accept.",
         county ? fmt(biz) + " of 25" : "Sign in to see", county ? bar(biz, 25) : "") +
-      gate(3, "Points pledged each month", "People and businesses say how many points a month they'd accept. The county needs 20,000 a month pledged to start. Up to half of all pledges can be paid out for work each month. Points are extra, never in place of anyone's pay.",
-        county ? (pledged != null ? fmt(pledged) + " of 20,000" : pledgers ? "Under 5 pledges so far" : "None yet") : "Sign in to see",
-        (county ? bar(pledged || 0, 20000) : "") +
+      gate(3, "Points pledged each month", "People and businesses say how many points a month they'd accept: at least 100 for members and 500 for businesses. Up to 25% of member pledges and 50% of business pledges can be made as new points for work each month. Points are extra, never in place of anyone's pay.",
+        county ? (pledged != null ? fmt(pledged) + " a month" : pledgers ? "Under 5 pledges so far" : "None yet") : "Sign in to see",
         '<p class="small" style="margin-top:8px"><a href="/app/profile.html#pledge">Add your pledge</a> on your profile. Business owners add theirs when they edit their listing.</p>');
+    drawGrow(county);
   }
 
   // ---- Positions and line-up ----
