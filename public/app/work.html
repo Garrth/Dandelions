@@ -23,7 +23,7 @@
       <div class="eyebrow">Work</div>
       <h1>There's plenty to do.</h1>
       <p>Work happens when businesses start projects from the approved project list. Projects are rewarded with points.</p>
-      <div class="row" style="margin-top:14px"><a class="btn" href="#dandelions">Start a project</a><button class="btn ghost" type="button" disabled>Join a project</button><span class="small muted">Join a project is coming soon.</span></div>
+      <div class="row" style="margin-top:14px"><a class="btn" href="#dandelions">Projects</a><button class="btn ghost" type="button" disabled>Join a project</button><span class="small muted">Join a project is coming soon.</span></div>
     </div>
 
     <h2 class="section-title">What it takes</h2>
@@ -72,15 +72,28 @@
     </div>
 
     <h2 class="section-title">Projects</h2>
-    <div class="filters">
-      <select id="f-where" aria-label="In person or online"><option value="">In person or online</option><option>In person</option><option>Online</option></select>
-      <select id="f-pay" aria-label="How it pays"><option value="">Any pay</option><option>Weekly piecework</option><option>Milestones</option></select>
-    </div>
-    <div class="stack" id="plist"></div>
+    <div class="cats" id="plist"></div>
 
-    <h2 class="section-title">Roles that keep it running</h2>
-    <p class="muted small" id="lineup-intro">Tap a group to see its roles, and line up for the ones you want. It saves your interest. It isn't a job offer or a promise of work.</p>
-    <div id="positions"></div>
+    <p class="note" style="margin-top:24px">Questions or ideas? Bring them to <a href="/app/talk.html">Talk</a> or ask Rai.</p>
+   </div>
+
+   <div id="v-proj" hidden>
+    <a class="back" href="#dandelions">← Dandelions</a>
+    <div class="page-head">
+      <div class="eyebrow">Dandelions: build and maintain</div>
+      <h1 id="pj-title"></h1>
+      <p class="purpose" id="pj-desc"></p>
+      <p class="small"><b>Intended outcome:</b> <span id="pj-outcome"></span></p>
+    </div>
+
+    <h2 class="section-title">Available projects</h2>
+    <div class="stack" id="pj-list"></div>
+
+    <div id="pj-roles" hidden>
+      <h2 class="section-title">Roles that keep it running</h2>
+      <p class="muted small" id="lineup-intro">Tap a group to see its roles, and line up for the ones you want. It saves your interest. It isn't a job offer or a promise of work.</p>
+      <div id="positions"></div>
+    </div>
 
     <p class="note" style="margin-top:24px">Questions or ideas? Bring them to <a href="/app/talk.html">Talk</a> or ask Rai.</p>
    </div>
