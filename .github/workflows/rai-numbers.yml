@@ -29,6 +29,8 @@ jobs:
         env:
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
         run: python3 tools/rai_numbers.py
+      - name: Count businesses in each county
+        run: python3 tools/county_businesses.py
       # main only takes changes through a pull request, so this opens one and merges it right away.
       # Needs Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
       - name: Save what changed
