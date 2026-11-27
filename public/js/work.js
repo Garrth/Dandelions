@@ -90,27 +90,50 @@
     return c[0] ? '<a class="cat open" href="#' + c[0] + '">' + inner + "</a>" : '<div class="cat">' + inner + "</div>";
   }).join("");
 
-  var PROJECTS = [
-    ["Spread the word", "Bring in new members and local businesses any honest way you like: posts, videos, articles, local news, tables at events, visits or calls. Paid per site visit and per verified sign-up who pledges.", "Online or in person", "Weekly piecework"],
-    ["Community organizer", "Boots on the ground: help local businesses use and accept more points, and put on meetups and events. Paid per member at your events and for pledge raises.", "In person", "Weekly piecework"],
-    ["Site and tools", "The site, data, guides and artwork.", "Online", "Milestones"]
-  ];
-  function drawProjects() {
-    var w = $("f-where").value, p = $("f-pay").value;
-    var list = PROJECTS.filter(function (x) { return (!w || x[2].indexOf(w) >= 0) && (!p || x[3] === p); });
-    $("plist").innerHTML = list.length ? list.map(function (x) {
-      return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small">' + esc(x[1]) + '</p><div class="tags"><span class="chip">' + esc(x[2]) + '</span><span class="chip">No license needed</span><span class="chip">' + esc(x[3]) + "</span></div>" +
-        '<div class="row" style="margin-top:10px"><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
-    }).join("") : '<p class="muted">No projects match. Try another filter.</p>';
+  var PROJ = {
+    spread: { title: "Spread the word", sub: "Online or in person",
+      desc: "Bring new members and local businesses to Dandelions, any honest way you like.",
+      outcome: "New ID-checked members who pledge at least 100 points a month, and verified local businesses that pledge at least 500.",
+      items: [["Spread the word", "Posts, videos, articles, local news, ads or a sign-up table. You choose where and how. Each visit and sign-up is tracked by your own share link. Price: 0.1 point per site visit, 10 points per ID-checked member who pledges 100 or more, and 50 points per verified business that pledges 500 or more. Tallied and paid weekly."]] },
+    organizer: { title: "Community organizer", sub: "In person",
+      desc: "Be the boots on the ground in your community. Help local businesses use and accept more points, and bring people together.",
+      outcome: "Local businesses spend the points they take in and raise their pledges, and Dandelions is visible in town.",
+      items: [
+        ["Meetup", "A small, regular get-together where members and local business owners meet, talk and find out where points can be used. Coffee, a walk, a game night, a work session: whatever brings people back. Price: 5 points per member who checks in, paid at the end of each meetup."],
+        ["Event", "A bigger one-time gathering, or a booth at someone else's, like a farmers market, fair, food truck night or college event. You front the costs, like a promoter. Price: 5 points per member who checks in, paid at the end."],
+        ["Business outreach", "Check in with local businesses that accept points, in person when you can. Help them find places to spend more, like vendors, employees and other local businesses. Be helpful, not pushy. No cold calls. Price: 25 points per verified meeting, paid weekly, plus 5 points for every 100 a month a business adds to its pledge."]
+      ] },
+    site: { title: "Dandelions site, tools, admin", sub: "Online, plus the roles that keep it running",
+      desc: "Build and run what everyone uses: the site, data, guides and artwork, plus the roles that keep Dandelions fair and running without a boss.",
+      outcome: "A site and tools that work well for members and businesses, and a network that runs itself.",
+      items: [["Site and tools", "Design, code, writing, data, guides and artwork. Paid by milestone at set prices."]], roles: true }
+  };
+  $("plist").innerHTML = Object.keys(PROJ).map(function (k) {
+    var p = PROJ[k];
+    return '<a class="cat open pcard" href="#dandelions/' + k + '"><b>' + esc(p.title) + '</b><span class="go" aria-hidden="true">›</span><span class="sub">' + esc(p.sub) + "</span></a>";
+  }).join("");
+  function drawProj(k) {
+    var p = PROJ[k];
+    $("pj-title").textContent = p.title; $("pj-desc").textContent = p.desc; $("pj-outcome").textContent = p.outcome;
+    $("pj-list").innerHTML = p.items.map(function (x) {
+      return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small" hidden>' + esc(x[1]) + "</p>" +
+        '<div class="row" style="margin-top:10px"><button class="btn small ghost" type="button" data-desc="1" aria-expanded="false">Description</button><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
+    }).join("");
+    $("pj-roles").hidden = !p.roles;
   }
-  $("f-where").addEventListener("change", drawProjects);
-  $("f-pay").addEventListener("change", drawProjects);
-  drawProjects();
+  $("pj-list").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-desc]"); if (!b) return;
+    var t = b.closest(".proj").querySelector("p"), open = t.hidden;
+    t.hidden = !open; b.setAttribute("aria-expanded", String(open));
+  });
 
   function route() {
-    var cat = location.hash === "#dandelions";
-    $("v-main").hidden = cat; $("v-dandelions").hidden = !cat;
-    if (cat || route.ran) window.scrollTo(0, 0);
+    var h = location.hash, m = h.match(/^#dandelions\/(\w+)$/), pk = m && PROJ[m[1]] ? m[1] : "";
+    $("v-main").hidden = h === "#dandelions" || !!pk;
+    $("v-dandelions").hidden = h !== "#dandelions";
+    $("v-proj").hidden = !pk;
+    if (pk) drawProj(pk);
+    if ($("v-main").hidden || route.ran) window.scrollTo(0, 0);
     route.ran = true;
   }
   window.addEventListener("hashchange", route);
