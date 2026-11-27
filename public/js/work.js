@@ -92,8 +92,7 @@
 
   var PROJECTS = [
     ["Spread the word", "Bring in new members and local businesses any honest way you like: posts, videos, articles, local news, tables at events, visits or calls. Paid per site visit and per verified sign-up who pledges.", "Online or in person", "Weekly piecework"],
-    ["Help businesses and landlords accept points", "Find places for a business to spend points, so it can accept more.", "In person", "Weekly piecework"],
-    ["Events and meetups", "Gatherings that bring members and local businesses together.", "In person", "Milestones"],
+    ["Community organizer", "Boots on the ground: help local businesses use and accept more points, and put on meetups and events. Paid per member at your events and for pledge raises.", "In person", "Weekly piecework"],
     ["Site and tools", "The site, data, guides and artwork.", "Online", "Milestones"]
   ];
   function drawProjects() {
