@@ -134,7 +134,7 @@
       box("Sign-ups (seeds)", fmt(st.signups || 0), "") +
       box("People pledged", fmt(st.person_pledgers || 0), "Goal " + fmt(people)) +
       box("Businesses pledged", fmt(st.businesses_pledged || 0), bizNeed ? "Goal " + fmt(bizNeed) : "") +
-      box("Points a month", fmt(st.available_now || 0), "");
+      box("Available points per month", fmt(st.available_now || 0), "");
     $("wboxes").hidden = false;
   }
 
