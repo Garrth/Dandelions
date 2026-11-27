@@ -42,34 +42,25 @@
       steps: [["Working version on a test page", "Checked online"], ["Live on the site after testing on 3 phones", "Checked online"]] }
   ];
 
-  var OPENS = {
-    early: ["Starts early", "sun"],
-    work: ["When Work starts", ""],
-    chain: ["Later", ""],
-    trust: ["Trusted people first", ""]
-  };
-  var GROUPS = [
-    ["Growing it", [
-      ["organizer", "Community organizer", "Signs up businesses, helps owners claim their listing, and runs meetups and events.", "early"],
-      ["marketer", "Marketer", "Spreads the word on social media, local news, radio and podcasts. Paid posts always say they're paid.", "early"]]],
-    ["Checking the work", [
-      ["checker", "Checker", "Reviews project plans and checks finished milestones, picked at random. Paid the same for yes or no.", "work"],
-      ["panelist", "Dispute panelist", "Sits on a random panel of 5 that settles a disagreement about a check.", "work"],
-      ["analyst", "Data analyst", "Reads Rai's numbers and writes up what should change, for members to vote on.", "early"]]],
-    ["Keeping it running", [
-      ["moderator", "Talk moderator", "Keeps Talk kind and useful. Wears a badge so everyone knows.", "early"],
-      ["help", "Member help", "Answers the questions Rai can't, and sorts out wrong numbers and listing reports.", "early"],
-      ["operator", "Service operator", "A business that runs one piece of the system, like hosting, ID checks or the directory.", "chain"],
-      ["security", "Site security", "Watches for attacks, checks who has access, and fixes weak spots.", "trust"]]],
-    ["Improving it", [
-      ["tester", "Tester", "Tries each change on a real phone before it goes live, and reports what breaks.", "early"],
-      ["course", "Course maker", "Writes the how-to and short test for each position, and the help videos.", "early"],
-      ["reviewer", "Code reviewer", "Reads every change to the site's code before it goes live.", "trust"],
-      ["maintainer", "Site maintainer", "Puts reviewed changes live and keeps the site running.", "trust"]]],
-    ["Guarding the rules", [
-      ["signer", "Signer", "Picked at random to co-sign anything that creates points or changes the rules on the ledger.", "chain"],
-      ["keeper", "Keeper", "Signs off on charter changes after a vote, and can pause something to stop harm. Never creates points.", "trust"]]]
+  var ROLES = [
+    ["Host", "Keeps a full copy of the charter and the site online, plus Dandelions' connection to the blockchain. Several hosts in different places, so no one can shut it down."],
+    ["Keeper", "Puts voting results into effect: updates the charter and site after a vote passes, archives the old version, and pushes the new one to every host. Never creates points."],
+    ["Signer", "Picked at random from an approved list to co-sign anything that creates points or changes the rules."],
+    ["Moderator", "Keeps Talk kind and useful, and joins the conversation. Wears a badge so everyone knows."],
+    ["Checker", "Checks project plans and progress, picked at random. Paid the same for yes or no, and never checks their own or related projects."],
+    ["Bounty hunter", "Finds bugs and security holes and reports them. Paid per confirmed find."],
+    ["Coder", "Works on the site and the blockchain code, and watches for security problems and breaches. Every change is reviewed by a different coder before it goes live."],
+    ["Jury", "Vetted members picked at random to settle disputes. Paid the same whatever the ruling."],
+    ["Support", "Helps members with what Rai can't, like stuck ID checks, account problems and wrong phone numbers."],
+    ["Auditor", "An outside business that checks, on a schedule, that points created match verified work, and that the code does what the charter says."],
+    ["Course maker", "Writes the how-to and short test each role needs before someone can take it on."],
+    ["Filings", "Keeps the Dandelions DAO LLC in good standing: registered agent, state filings and taxes."]
   ];
+  function card(x) {
+    return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small" hidden>' + esc(x[1]) + "</p>" +
+      '<div class="row" style="margin-top:10px"><button class="btn small ghost" type="button" data-desc="1" aria-expanded="false">Description</button><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
+  }
+
 
   // ---- Static parts ----
   $("flow").innerHTML = FLOW.map(function (f) { return "<li><b>" + esc(f[0]) + "</b><span>" + esc(f[1]) + "</span></li>"; }).join("");
@@ -115,13 +106,11 @@
   function drawProj(k) {
     var p = PROJ[k];
     $("pj-title").textContent = p.title; $("pj-desc").textContent = p.desc; $("pj-outcome").textContent = p.outcome;
-    $("pj-list").innerHTML = p.items.map(function (x) {
-      return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small" hidden>' + esc(x[1]) + "</p>" +
-        '<div class="row" style="margin-top:10px"><button class="btn small ghost" type="button" data-desc="1" aria-expanded="false">Description</button><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
-    }).join("");
+    $("pj-list").innerHTML = p.items.map(card).join("");
+    $("positions").innerHTML = p.roles ? ROLES.map(card).join("") : "";
     $("pj-roles").hidden = !p.roles;
   }
-  $("pj-list").addEventListener("click", function (e) {
+  $("v-proj").addEventListener("click", function (e) {
     var b = e.target.closest("[data-desc]"); if (!b) return;
     var t = b.closest(".proj").querySelector("p"), open = t.hidden;
     t.hidden = !open; b.setAttribute("aria-expanded", String(open));
@@ -144,7 +133,7 @@
   }
   function drawGates(county, status, bizCounts) {
     var G = [
-      ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid."],
+      ["Now", "The directory, Talk and Rai are open."],
       ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow."],
       ["Points available each month", "Worked out from 25% of personal pledges plus 50% of business pledges. Each new pledge adds more."]
     ];
@@ -160,75 +149,28 @@
     $("wboxes").hidden = false;
   }
 
-  // ---- Positions and line-up ----
-  var mine = {}, counts = {}, signedIn = false, user = null, db = null;
-  function drawPositions() {
-    $("positions").innerHTML = '<p class="small muted legend">' +
-      '<span class="chip sun">Starts early</span> can begin before Work starts, unpaid.</p>' +
-      (signedIn ? "" : '<div class="card signin"><p>Sign in to line up for the positions you want.</p><a class="btn small" href="/app/login.html" data-signin="1" style="margin-top:10px">Sign in</a></div>') +
-      GROUPS.map(function (g) {
-        return '<details class="card pgroup"><summary>' + esc(g[0]) + ' <span class="small muted">' + g[1].length + ' roles</span></summary><div class="stack" style="margin-top:10px">' + g[1].map(function (p) {
-          var o = OPENS[p[3]], on = !!mine[p[0]];
-          var btn = signedIn
-            ? '<button class="btn small ' + (on ? "" : "ghost") + '" type="button" data-pos="' + p[0] + '" aria-pressed="' + on + '">' + (on ? "Lined up ✓" : "Line up") + "</button>"
-            : "";
-          return '<div class="card pos"><div class="spread"><b>' + esc(p[1]) + '</b><span class="chip ' + o[1] + '">' + esc(o[0]) + "</span></div>" +
-            '<p class="small">' + esc(p[2]) + "</p>" + (signedIn ? '<div class="spread pos-foot">' + btn +
-            "</div>" : "") + "</div>";
-        }).join("") + "</div></details>";
-      }).join("");
-    $("positions").querySelectorAll("[data-signin]").forEach(function (a) {
-      a.addEventListener("click", function () { try { localStorage.setItem("dandelions_return", "/app/work.html"); } catch (e) {} });
-    });
-    $("positions").querySelectorAll("[data-pos]").forEach(function (b) {
-      b.addEventListener("click", function () { toggle(b.getAttribute("data-pos"), b); });
-    });
-  }
-  function toggle(pos, b) {
-    b.disabled = true;
-    var on = !!mine[pos];
-    var q = on
-      ? db.from("work_lineup").delete().eq("member_id", user.id).eq("position", pos)
-      : db.from("work_lineup").insert({ member_id: user.id, position: pos });
-    q.then(function (r) {
-      b.disabled = false;
-      if (r.error && !/duplicate/i.test(r.error.message || "")) {
-        toast(/members/.test(r.error.message || "") ? "Pledge first, then you can line up." : "That didn't save. Please try again.");
-        return;
-      }
-      if (on) { delete mine[pos]; counts[pos] = Math.max(0, (counts[pos] || 1) - 1); toast("Taken off the line-up"); }
-      else { mine[pos] = true; counts[pos] = (counts[pos] || 0) + 1; toast("You're lined up."); }
-      drawPositions();
-    });
-  }
-
+  var db = null;
   drawGates(null, null);
-  drawPositions();
   if (!window.supabase) return;
   db = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
   db.auth.getSession().then(function (res) {
     var session = res.data && res.data.session;
     if (!session) return;
     try { localStorage.removeItem("dandelions_return"); } catch (e) {}
-    user = session.user; signedIn = true;
+    var user = session.user;
     Promise.all([
       db.from("members").select("county_fips").eq("id", user.id).maybeSingle(),
-      db.from("work_lineup").select("position").eq("member_id", user.id),
       fetch("/data/counties.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
       fetch("/data/rai/county-businesses.json").then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; })
     ]).then(function (out) {
-      (out[1].data || []).forEach(function (r) { mine[r.position] = true; });
-      var fips = out[0].data && out[0].data.county_fips, county = fips && out[2][fips], bizCounts = (out[3] && out[3].counts) || {};
+      var fips = out[0].data && out[0].data.county_fips, county = fips && out[1][fips], bizCounts = (out[2] && out[2].counts) || {};
       if (county) county.fips = fips;
-      drawPositions();
       if (!county) return;
       $("gates-where").textContent = "Numbers for " + county[0] + ", " + county[1] + ".";
       $("gates-where").hidden = false;
       db.rpc("work_county_status", { p_county: fips }).then(function (r) {
         var s = r.data || {};
-        counts = s.lineup || {};
         drawGates(county, s, bizCounts);
-        drawPositions();
       });
     });
   });
