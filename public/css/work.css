@@ -44,3 +44,5 @@ a.cat:hover { border-color: var(--ink); }
 details.pgroup { margin-top: 10px; }
 details.pgroup > summary { cursor: pointer; font-weight: 800; }
 details.pgroup > summary span { font-weight: 400; }
+.grow .gline { margin-top: 8px; }
+.grow .gline .bar { margin-top: 6px; }
