@@ -127,7 +127,8 @@
   function drawGrow(county) {
     var G = [
       ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid."],
-      ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow."]
+      ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow."],
+      ["Points available each month", "Worked out from 25% of personal pledges plus 50% of business pledges. Each new pledge adds more."]
     ];
     $("grow").innerHTML = G.map(function (g) { return "<li><b>" + esc(g[0]) + '</b><span class="muted small">' + esc(g[1]) + "</span></li>"; }).join("");
   }
