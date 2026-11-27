@@ -91,16 +91,14 @@
   }).join("");
 
   var PROJECTS = [
-    ["Spread the word", "Posts, videos, articles and local news that bring people to the site. Paid per site visit and per sign-up.", "Online", "Weekly piecework"],
-    ["Sign up members", "Tables at markets and events, and welcoming new people. Paid per sign-up.", "In person", "Weekly piecework"],
-    ["Sign up businesses", "Visits, calls and directory checks, so local businesses claim their listing.", "In person", "Weekly piecework"],
+    ["Spread the word", "Bring in new members and local businesses any honest way you like: posts, videos, articles, local news, tables at events, visits or calls. Paid per site visit and per verified sign-up who pledges.", "Online or in person", "Weekly piecework"],
     ["Help businesses and landlords accept points", "Find places for a business to spend points, so it can accept more.", "In person", "Weekly piecework"],
     ["Events and meetups", "Gatherings that bring members and local businesses together.", "In person", "Milestones"],
     ["Site and tools", "The site, data, guides and artwork.", "Online", "Milestones"]
   ];
   function drawProjects() {
     var w = $("f-where").value, p = $("f-pay").value;
-    var list = PROJECTS.filter(function (x) { return (!w || x[2] === w) && (!p || x[3] === p); });
+    var list = PROJECTS.filter(function (x) { return (!w || x[2].indexOf(w) >= 0) && (!p || x[3] === p); });
     $("plist").innerHTML = list.length ? list.map(function (x) {
       return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small">' + esc(x[1]) + '</p><div class="tags"><span class="chip">' + esc(x[2]) + '</span><span class="chip">No license needed</span><span class="chip">' + esc(x[3]) + "</span></div>" +
         '<div class="row" style="margin-top:10px"><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
