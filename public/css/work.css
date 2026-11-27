@@ -44,5 +44,7 @@ a.cat:hover { border-color: var(--ink); }
 details.pgroup { margin-top: 10px; }
 details.pgroup > summary { cursor: pointer; font-weight: 800; }
 details.pgroup > summary span { font-weight: 400; }
-.grow .gline { margin-top: 8px; }
-.grow .gline .bar { margin-top: 6px; }
+.wboxes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.wbox { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--soft); display: flex; flex-direction: column; gap: 2px; }
+.wbox b { font-size: 22px; font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) { .wboxes { grid-template-columns: 1fr 1fr; } }

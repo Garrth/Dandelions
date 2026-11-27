@@ -117,31 +117,25 @@
   window.addEventListener("hashchange", route);
   route();
 
-  function bar(have, target) {
-    var pct = have ? Math.min(100, have / target * 100) : 0;
-    return '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
-  }
-  function line(label, value, b) {
-    return '<div class="gline"><div class="spread"><span class="small">' + esc(label) + '</span><span class="chip">' + esc(value) + "</span></div>" + (b || "") + "</div>";
+  function box(label, value, goal) {
+    return '<div class="wbox"><span class="small muted">' + esc(label) + '</span><b>' + esc(value) + "</b>" + (goal ? '<span class="small muted">' + esc(goal) + "</span>" : "") + "</div>";
   }
   function drawGates(county, status, bizCounts) {
-    var people = county ? Math.max(100, Math.ceil(county[2] * 0.001)) : 0, have = status && status.id_checked;
-    var est = county && bizCounts && bizCounts[county.fips];
-    var bizNeed = est ? Math.max(5, Math.ceil(est * 0.001)) : 0, biz = (status && status.businesses_pledged) || 0;
-    var avail = status && status.available, pledgers = (status && status.pledgers) || 0;
-    var two = "", three = "";
-    if (county) {
-      two = line("People", (have != null ? fmt(have) : "Under 10") + " of " + fmt(people), bar(have, people)) +
-        (bizNeed ? line("Businesses", fmt(biz) + " of " + fmt(bizNeed), bar(biz, bizNeed)) : line("Businesses", fmt(biz) + " so far"));
-      three = line("Available in " + county[0], avail != null ? fmt(avail) + " a month" : pledgers ? "Under 5 pledges so far" : "None yet");
-    }
     var G = [
-      ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid.", ""],
-      ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow.", two],
-      ["Points available each month", "Worked out from 25% of personal pledges plus 50% of business pledges. Each new pledge adds more.",
-        three + '<p class="small" style="margin-top:8px"><a href="/app/profile.html#pledge">Add your pledge</a> on your profile. Business owners add theirs when they edit their listing.</p>']
+      ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid."],
+      ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow."],
+      ["Points available each month", "Worked out from 25% of personal pledges plus 50% of business pledges. Each new pledge adds more."]
     ];
-    $("grow").innerHTML = G.map(function (g) { return "<li><b>" + esc(g[0]) + '</b><span class="muted small">' + esc(g[1]) + "</span>" + g[2] + "</li>"; }).join("");
+    $("grow").innerHTML = G.map(function (g) { return "<li><b>" + esc(g[0]) + '</b><span class="muted small">' + esc(g[1]) + "</span></li>"; }).join("");
+    if (!county) { $("wboxes").hidden = true; return; }
+    var st = status || {}, people = Math.max(100, Math.ceil(county[2] * 0.001));
+    var est = bizCounts && bizCounts[county.fips], bizNeed = est ? Math.max(5, Math.ceil(est * 0.001)) : 0;
+    $("wboxes").innerHTML =
+      box("Sign-ups (seeds)", fmt(st.signups || 0), "") +
+      box("People pledged", fmt(st.person_pledgers || 0), "Goal " + fmt(people)) +
+      box("Businesses pledged", fmt(st.businesses_pledged || 0), bizNeed ? "Goal " + fmt(bizNeed) : "") +
+      box("Available points per month", fmt(st.available_now || 0), "");
+    $("wboxes").hidden = false;
   }
 
   // ---- Positions and line-up ----
