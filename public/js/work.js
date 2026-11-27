@@ -125,14 +125,10 @@
     return '<div class="bar" style="margin-top:8px"><span style="width:' + pct.toFixed(1) + '%"></span></div>';
   }
   function drawGrow(county) {
-    var pop = county ? county[2] : 0;
-    function need(n) { return pop ? " In " + county[0] + ", that's about " + fmt(Math.round(pop * n)) + " a month." : ""; }
     var G = [
       ["Now", "The directory, Talk and Rai are open. You can line up for positions, and a few can start early, unpaid."],
-      ["Starting numbers reached", "Dandelions projects open. Businesses take on projects at set prices and get paid in points once the work is checked. Pay for signing up new pledges comes first, since each pledge opens room for more work."],
-      ["1 point a month pledged per resident", "Education opens." + need(1) + " Automation, Health and care, and Agriculture follow at 2, 3 and 4 points per resident."],
-      ["5 points a month pledged per resident", "Infrastructure opens." + need(5) + " Environmental cleanup and planet care follows at 7."],
-      ["10 points a month pledged per resident", "Research and development opens." + need(10) + " The county is ready for its biggest projects, and helps nearby counties grow."]
+      ["0.1% of people and businesses agree to use points", "Points open, and Dandelions projects start. The other categories unlock as pledges grow."],
+      ["Points available each month", "Worked out from 25% of personal pledges plus 50% of business pledges. Each new pledge adds more."]
     ];
     $("grow").innerHTML = G.map(function (g) { return "<li><b>" + esc(g[0]) + '</b><span class="muted small">' + esc(g[1]) + "</span></li>"; }).join("");
   }
