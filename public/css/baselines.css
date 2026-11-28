@@ -55,3 +55,20 @@ a.bl-prop:hover { border-color: var(--leaf); }
 .bl-form { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
 .bl-form h3 { font-size: 18px; margin-bottom: 4px; }
 .bl-form .field input { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
+/* Quality of life: living-wage costs and the self-check */
+.qol-box { margin-top: 14px; }
+.qol-box h3 { font-size: 17px; margin-bottom: 4px; }
+.qol-table table { min-width: 0; margin-top: 8px; }
+.qol-table td:nth-child(n+2), .qol-table th:nth-child(n+2) { text-align: right; white-space: nowrap; }
+.qol-total td { border-bottom: 0; }
+@media (max-width: 600px) {
+  .qol-table table { display: table; }
+  .qol-table thead { display: table-header-group; }
+  .qol-table tbody { display: table-row-group; }
+  .qol-table tr { display: table-row; padding: 0; }
+  .qol-table td { display: table-cell; border-bottom: 1px solid var(--line); padding: 8px 4px; }
+  .qol-table td:first-child { font-weight: 400; }
+  .qol-table td:nth-child(3) { color: inherit; font-size: inherit; }
+  .qol-table td:nth-child(3)::before { content: none; }
+  .qol-table td:nth-child(n+2), .qol-table th:nth-child(n+2) { white-space: normal; }
+}

@@ -27,7 +27,18 @@
    "twoWorkingTwoKids": 36.41,
    "minimum": 16.9,
    "yearly": 65100,
-   "updated": "Feb 2026"
+   "updated": "Feb 2026",
+   "monthly": {
+    "housing": 1959,
+    "food": 444,
+    "other": 739,
+    "phone": 124,
+    "transport": 838,
+    "health": 318,
+    "taxes": 1003,
+    "total": 5425,
+    "note": "MIT Living Wage Calculator, one adult with no children, Sonoma County, Feb 2026. Housing includes utilities. Other is clothing, personal care, household items and civic life."
+   }
   },
   "categories": [
    {
