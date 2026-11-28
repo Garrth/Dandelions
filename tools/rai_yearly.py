@@ -111,12 +111,15 @@ def businesses(fips):
     cbp = json.load(open(os.path.join(ROOT, 'public', 'data', 'rai', 'county-businesses.json')))
     out = {'withStaff': cbp['counts'][fips], 'year': cbp['year'], 'asOf': TODAY.isoformat()}
     if KEY:
-        try:
-            year, r = latest('%d/nonemp', {'get': 'NESTAB', 'for': 'county:' + fips[2:], 'in': 'state:' + fips[:2], 'NAICS2017': '00'})
-            out['onePerson'] = int(r['NESTAB'])
-            out['onePersonYear'] = year
-        except Exception as e:
-            log(fips, 'nonemployer count failed:', e)
+        # 2022 on uses NAICS2022 for the all-industries code; older years use NAICS2017.
+        for naics in ('NAICS2022', 'NAICS2017'):
+            try:
+                year, r = latest('%d/nonemp', {'get': 'NESTAB', 'for': 'county:' + fips[2:], 'in': 'state:' + fips[:2], naics: '00'})
+                out['onePerson'] = int(r['NESTAB'])
+                out['onePersonYear'] = year
+                break
+            except Exception as e:
+                log(fips, 'nonemployer count failed with', naics, e)
     return out, ['Census County Business Patterns and Nonemployer Statistics', 'https://www.census.gov/programs-surveys/cbp.html']
 
 
@@ -251,7 +254,9 @@ def main():
         fips, changed = c['fips'], False
         parts = [('livingWage', mit, True), ('people', people, bool(KEY)), ('businesses', businesses, True)]
         for name, fn, can in parts:
-            if not can or not due(y.get(name)):
+            # Also pull businesses again when the one-person count is missing and there's a key.
+            late = name == 'businesses' and KEY and 'onePerson' not in (y.get(name) or {})
+            if not can or not (due(y.get(name)) or late):
                 continue
             try:
                 val, src = fn(fips)
