@@ -41,15 +41,18 @@ window.QOL = (function () {
 
   // Draws both tables into el and wires up Save. o: { db, user, county, zip }.
   function mount(el, o) {
-    var county = o.county || "06097", zip = o.zip || "", mine = null, rai = null, rents = null, totals = null;
+    var county = o.county || "06097", zip = o.zip || "", mine = null, rai = null, rents = null, totals = null, myPlace = "";
     el.innerHTML = '<p class="small muted">Loading the numbers...</p>';
     Promise.all([
+      // Rai's living-wage numbers are only in for some counties so far. Elsewhere this borrows Sonoma County's and says so.
       getJSON("/data/rai/" + county + ".json").catch(function () { return county === "06097" ? null : getJSON("/data/rai/06097.json").catch(function () { return null; }); }),
-      getJSON("/data/rai/rent-" + county + ".json").catch(function () { return null; }),
+      getJSON("/data/rai/rent-" + county.slice(0, 2) + ".json").catch(function () { return null; }),
       o.db.rpc("qol_county", { p_county: county }).then(function (r) { return r.error ? null : r.data; }, function () { return null; }),
+      county === "06097" ? null : getJSON("/data/counties.json").then(function (c) { return c[county] ? c[county][0] : null; }, function () { return null; }),
       o.user ? o.db.from("qol_checks").select(COLS.join(",") + ",updated_at").eq("member_id", o.user.id).maybeSingle().then(function (r) { return r.error ? null : r.data; }, function () { return null; }) : null
     ]).then(function (out) {
-      rai = out[0]; rents = out[1]; totals = out[2]; mine = out[3];
+      rai = out[0]; rents = out[1]; totals = out[2]; mine = out[4];
+      myPlace = out[3] || (rai && rai.place && rai.fips === county ? rai.place.replace(/, [A-Z]{2}$/, "") : null) || "Sonoma County";
       draw();
       if (location.hash === "#qolbox") el.scrollIntoView();
     });
@@ -67,7 +70,8 @@ window.QOL = (function () {
     }
 
     function draw() {
-      var R = raiNumbers(), m = R.m, costs = (totals && totals.costs) || {}, can = !!o.user, place = rai && rai.place;
+      var R = raiNumbers(), m = R.m, costs = (totals && totals.costs) || {}, can = !!o.user;
+      var borrowed = !!(rai && rai.fips !== county), raiPlace = rai && rai.place ? rai.place.replace(/, [A-Z]{2}$/, "") : "Sonoma County";
       var dis = can ? "" : " disabled";
       var costRows = ITEMS.map(function (it) {
         var r = m[it[1]] != null ? money(m[it[1]]) : '<span class="muted">Not found yet</span>';
@@ -88,8 +92,9 @@ window.QOL = (function () {
       el.innerHTML = '<form class="qf" id="qolform" autocomplete="off">' +
         "<h2>Cost of living, a month</h2>" +
         '<div class="qf-boxes">' +
-          '<div class="qf-box auto"><span class="l">Where</span><span class="v">' + esc(place || "Your county") + (zip ? ", ZIP " + esc(zip) : "") + "</span>" +
-            "<small>" + (m.zipRent ? "Living space is for your ZIP. The rest is for the county." : zip ? "No rent number for your ZIP yet, so living space is for the county." : "Log in to see rent for your ZIP.") + "</small></div>" +
+          '<div class="qf-box auto"><span class="l">Where</span><span class="v">' + esc(myPlace) + (zip ? ", ZIP " + esc(zip) : "") + "</span>" +
+            "<small>" + (m.zipRent ? "Living space is for your ZIP. " : zip ? "No rent number for your ZIP yet, so living space is for " + esc(raiPlace) + ". " : "Log in to see rent for your ZIP. ") +
+            (borrowed ? "Rai doesn't have " + esc(myPlace) + "'s other numbers yet, so the rest is for " + esc(raiPlace) + " for now." : "The rest is for the county.") + "</small></div>" +
           '<div class="qf-box"><label for="qol-people">How many people your costs cover</label><select id="qol-people"' + dis + ">" +
             [1, 2, 3, 4, 5, 6].map(function (n) { return '<option value="' + n + '">' + (n === 1 ? "Just me" : n === 6 ? "6 or more" : n + " people") + "</option>"; }).join("") + "</select></div>" +
         "</div>" +
@@ -97,7 +102,7 @@ window.QOL = (function () {
         (m.total != null ? '<tfoot><tr><td>Total a month</td><td class="r">' + money(m.total) + '</td><td></td><td class="r" id="qol-mytotal"></td></tr></tfoot>' : "") + "</table></div>" +
         '<p class="qf-note">Rai found is for one adult, from the MIT Living Wage Calculator' + (R.lw.updated ? " (" + esc(R.lw.updated) + ")" : "") +
           (m.zipRent ? ", with living space from the Census (median " + esc(m.zipRent) + " rent with utilities in your ZIP)" : "") + "." +
-          (R.lw.oneAdult ? " For the county, that's a living wage of $" + R.lw.oneAdult.toFixed(2) + " an hour working full time." : "") +
+          (R.lw.oneAdult ? " For " + esc(raiPlace) + ", that's a living wage of $" + R.lw.oneAdult.toFixed(2) + " an hour working full time." : "") +
           " Members say is the middle answer per person from members here, once 10 fill in a line. It's what people typed, so take it with a grain of salt.</p>" +
         "<h2>The self-check, private</h2>" +
         '<div class="qf-tbl"><table class="qf-q"><thead><tr><th>Question</th><th>Your answer</th></tr></thead><tbody>' + qRows + "</tbody></table></div>" +
