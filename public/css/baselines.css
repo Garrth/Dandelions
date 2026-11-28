@@ -98,3 +98,9 @@ a.bl-prop:hover { border-color: var(--leaf); }
   .qf-cost td.r { white-space: normal; }
   .qf-cost .muted { font-size: 12px; }
 }
+/* Personal EI# check */
+.qf .ei-s { font-weight: 800; }
+.qf .ei-s.down { color: var(--warn); }
+.qf .ei-s.up { color: var(--leaf); }
+.qf .qf-box[hidden] { display: none; }
+.qf-boxes > .qf-box:nth-child(2n) { border-right: 0; }
