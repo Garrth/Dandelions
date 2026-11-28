@@ -43,22 +43,22 @@
   ];
 
   var ROLES = [
-    ["Host", "Keeps a full copy of the charter and the site online, plus Dandelions' connection to the blockchain. Several hosts in different places, so no one can shut it down."],
-    ["Keeper", "Puts voting results into effect: updates the charter and site after a vote passes, archives the old version, and pushes the new one to every host. Never creates points."],
-    ["Signer", "Picked at random from an approved list to co-sign anything that creates points or changes the rules."],
-    ["Moderator", "Keeps Talk kind and useful, and joins the conversation. Wears a badge so everyone knows."],
-    ["Checker", "Checks project plans and progress, picked at random. Paid the same for yes or no, and never checks their own or related projects."],
-    ["Bounty hunter", "Finds bugs and security holes and reports them. Paid per confirmed find."],
-    ["Coder", "Works on the site and the blockchain code, and watches for security problems and breaches. Every change is reviewed by a different coder before it goes live."],
-    ["Jury", "Vetted members picked at random to settle disputes. Paid the same whatever the ruling."],
-    ["Support", "Helps members with what Rai can't, like stuck ID checks, account problems and wrong phone numbers."],
-    ["Auditor", "An outside business that checks, on a schedule, that points created match verified work, and that the code does what the charter says."],
-    ["Course maker", "Writes the how-to and short test each role needs before someone can take it on."],
-    ["Filings", "Keeps the Dandelions DAO LLC in good standing: registered agent, state filings and taxes."]
+    ["Host", "Keeps a full copy of the charter and the site online, plus Dandelions' connection to the blockchain. Several hosts in different places, so no one can shut it down.", "/app/forms/standing.html?kind=Host"],
+    ["Keeper", "Puts voting results into effect: updates the charter and site after a vote passes, archives the old version, and pushes the new one to every host. Never creates points.", "/app/forms/standing.html?kind=Keeper"],
+    ["Signer", "Picked at random from an approved list to co-sign anything that creates points or changes the rules.", "/app/forms/pool.html?kind=Signer"],
+    ["Moderator", "Keeps Talk kind and useful, and joins the conversation. Wears a badge so everyone knows.", "/app/forms/pool.html?kind=Moderator"],
+    ["Checker", "Checks project plans and progress online, picked at random. A site visit only when a red flag goes off. Paid the same for yes or no, and never checks their own or related projects.", "/app/forms/pool.html?kind=Checker"],
+    ["Bounty hunter", "Finds bugs and security holes and reports them. Paid per confirmed find.", "/app/forms/bounty.html"],
+    ["Coder", "Works on the site and the blockchain code, and watches for security problems and breaches. Every change is reviewed by a different coder before it goes live.", "/app/forms/coder.html"],
+    ["Jury", "Vetted members picked at random to settle disputes. Paid the same whatever the ruling.", "/app/forms/pool.html?kind=Jury"],
+    ["Support", "Live chat with members who want a person instead of Rai, like stuck ID checks, account problems and wrong phone numbers. Ranked by know-how and access.", "/app/forms/pool.html?kind=Support"],
+    ["Auditor", "An outside business that checks, on a schedule, that points created match verified work, and that the code does what the charter says.", "/app/forms/standing.html?kind=Auditor"],
+    ["Course maker", "Builds the course and test each role needs before someone can take it on. Must know the job well first.", "/app/forms/course.html"],
+    ["Filings", "Keeps the Dandelions DAO LLC in good standing: registered agent, state filings and taxes.", "/app/forms/standing.html?kind=Filings"]
   ];
   function card(x) {
     return '<div class="card proj"><b>' + esc(x[0]) + '</b><p class="small" hidden>' + esc(x[1]) + "</p>" +
-      '<div class="row" style="margin-top:10px"><button class="btn small ghost" type="button" data-desc="1" aria-expanded="false">Description</button><button class="btn small" type="button" disabled>Start this project</button><span class="small muted">Coming soon</span></div></div>';
+      '<div class="row" style="margin-top:10px"><button class="btn small ghost" type="button" data-desc="1" aria-expanded="false">Description</button><a class="btn small" href="' + esc(x[2]) + '">Start this project</a></div></div>';
   }
 
 
@@ -85,19 +85,19 @@
     spread: { title: "Spread the word", sub: "Online or in person",
       desc: "Bring new members and local businesses to Dandelions, any honest way you like.",
       outcome: "New ID-checked members who pledge at least 100 points a month, and verified local businesses that pledge at least 500.",
-      items: [["Spread the word", "Posts, videos, articles, local news, ads or a sign-up table. You choose where and how. Each visit and sign-up is tracked by your own share link. Price: 0.1 point per site visit, 10 points per ID-checked member who pledges 100 or more, and 50 points per verified business that pledges 500 or more. Tallied and paid weekly."]] },
+      items: [["Spread the word", "Posts, videos, articles, local news, ads or a sign-up table. You choose where and how. Each visit and sign-up is tracked by your own share link. Price: 0.1 point per site visit, 10 points per ID-checked member who pledges 100 or more, and 50 points per verified business that pledges 500 or more. Tallied and paid weekly.", "/app/forms/spread.html"]] },
     organizer: { title: "Community organizer", sub: "In person",
       desc: "Be the boots on the ground in your community. Help local businesses use and accept more points, and bring people together.",
       outcome: "Local businesses spend the points they take in and raise their pledges, and Dandelions is visible in town.",
       items: [
-        ["Meetup", "A small, regular get-together where members and local business owners meet, talk and find out where points can be used. Coffee, a walk, a game night, a work session: whatever brings people back. Price: 5 points per member who checks in, paid at the end of each meetup."],
-        ["Event", "A bigger one-time gathering, or a booth at someone else's, like a farmers market, fair, food truck night or college event. You front the costs, like a promoter. Price: 5 points per member who checks in, paid at the end."],
-        ["Business outreach", "Check in with local businesses that accept points, in person when you can. Help them find places to spend more, like vendors, employees and other local businesses. Be helpful, not pushy. No cold calls. Price: 25 points per verified meeting, paid weekly, plus 5 points for every 100 a month a business adds to its pledge."]
+        ["Meetup", "A small, regular get-together where members and local business owners meet, talk and find out where points can be used. Coffee, a walk, a game night, a work session: whatever brings people back. Price: 5 points per member who checks in, paid at the end of each meetup.", "/app/forms/organizer.html?kind=Meetup"],
+        ["Event", "A bigger one-time gathering, or a booth at someone else's, like a farmers market, fair, food truck night or college event. You front the costs, like a promoter. Price: 5 points per member who checks in, paid at the end.", "/app/forms/organizer.html?kind=Event"],
+        ["Business outreach", "Check in with local businesses that accept points, in person when you can. Help them find places to spend more, like vendors, employees and other local businesses. Be helpful, not pushy. No cold calls. Price: 25 points per verified meeting, paid weekly, plus 5 points for every 100 a month a business adds to its pledge.", "/app/forms/organizer.html?kind=Business%20outreach"]
       ] },
     site: { title: "Dandelions site, tools, admin", sub: "Online, plus the roles that keep it running",
       desc: "Build and run what everyone uses: the site, data, guides and artwork, plus the roles that keep Dandelions fair and running without a boss.",
       outcome: "A site and tools that work well for members and businesses, and a network that runs itself.",
-      items: [["Site and tools", "Design, code, writing, data, guides and artwork. Paid by milestone at set prices."]], roles: true }
+      items: [], roles: true }
   };
   $("plist").innerHTML = Object.keys(PROJ).map(function (k) {
     var p = PROJ[k];
@@ -107,6 +107,7 @@
     var p = PROJ[k];
     $("pj-title").textContent = p.title; $("pj-desc").textContent = p.desc; $("pj-outcome").textContent = p.outcome;
     $("pj-list").innerHTML = p.items.map(card).join("");
+    $("pj-avail").hidden = !p.items.length;
     $("positions").innerHTML = p.roles ? ROLES.map(card).join("") : "";
     $("pj-roles").hidden = !p.roles;
   }
