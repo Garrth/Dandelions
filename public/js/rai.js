@@ -86,6 +86,8 @@
       tile("People who pledged", '<span id="lv-pledges">...</span>', '<span id="lv-share"></span>') +
       tile("Businesses verified", '<span id="lv-claimed">...</span>', "Owners who claimed their listing in the directory.") +
       tile("Work two jobs or more", '<span id="lv-two">...</span>', '<span id="lv-two-line">From the private work questions in your profile. Totals only.</span>', true) +
+      tile("Basic needs met", '<span id="lv-qol">...</span>', '<span id="lv-qol-line">From the private Quality of life check on the Baselines page.</span>') +
+      tile("Personal EI#", '<span id="lv-ei">...</span>', '<span id="lv-ei-line">From the private EI# check on the Baselines page.</span>') +
       "</div>";
 
     // Work and pay.
@@ -196,7 +198,25 @@
   function live(fips, people) {
     function set(id, html) { var el = $(id); if (el) el.innerHTML = html; }
     var few = '<small>fewer than 10</small>';
-    if (!db) { ["lv-pledges", "lv-claimed", "lv-two"].forEach(function (id) { set(id, "-"); }); return; }
+    if (!db) { ["lv-pledges", "lv-claimed", "lv-two", "lv-qol", "lv-ei"].forEach(function (id) { set(id, "-"); }); return; }
+    // Baselines results: each shows once 10 people in the county do the check.
+    var MISSED = { pay: "pay for the basics", like: "liking their work", body: "care for the body", mind: "care for the mind", secure: "feeling secure" };
+    db.rpc("qol_county", { p_county: fips }).then(function (r) {
+      var t = r.data;
+      if (r.error || !t || !t.answered) { set("lv-qol", few); set("lv-qol-line", 'Shows once 10 people here do the private <a href="/app/baselines.html?b=quality#qolbox">Quality of life check</a>.'); return; }
+      var worst = Object.keys(t.missed || {}).sort(function (a, b) { return t.missed[b] - t.missed[a]; })[0];
+      set("lv-qol", Math.round(t.all_met * 100) + "%");
+      set("lv-qol-line", "Of " + fmt(t.answered) + " people who did the Quality of life check, all five needs met." +
+        (worst && t.missed[worst] ? " Missed most often: " + MISSED[worst] + "." : ""));
+    }, function () { set("lv-qol", "-"); });
+    db.rpc("ei_county", { p_county: fips }).then(function (r) {
+      var t = r.data;
+      if (r.error || !t || !t.answered) { set("lv-ei", few); set("lv-ei-line", 'Shows once 10 people here do the private <a href="/app/baselines.html?b=ei#eibox">EI# check</a>.'); return; }
+      var lines = [["Living space", t.space], ["Home energy", t.energy], ["Water", t.water], ["Getting around", t.travel]]
+        .filter(function (x) { return x[1] != null; }).map(function (x) { return x[0] + " " + (x[1] > 0 ? "+" : "") + x[1]; });
+      set("lv-ei", (t.total > 0 ? "+" : "") + t.total);
+      set("lv-ei-line", "The middle score of " + fmt(t.answered) + " people, from -100 to +100. 0 is living within what can be sustained." + (lines.length ? " " + lines.join(", ") + "." : ""));
+    }, function () { set("lv-ei", "-"); });
     Promise.all([db.rpc("county_counts"), getJSON("/data/counties.json").catch(function () { return {}; })]).then(function (r) {
       var row = (r[0].data || []).filter(function (x) { return x.county_fips === fips; })[0];
       var n = row ? Number(row.pledges) : 0, c = r[1][fips], pop = (c && c[2]) || (people && people.total);
