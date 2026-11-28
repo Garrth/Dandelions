@@ -17,12 +17,12 @@
     "https://livingwage.mit.edu/counties/06085"
    ],
    [
-    "Census County Business Patterns and Nonemployer Statistics",
-    "https://www.census.gov/programs-surveys/cbp.html"
-   ],
-   [
     "Census American Community Survey, 2020-2024",
     "https://data.census.gov/"
+   ],
+   [
+    "Census County Business Patterns and Nonemployer Statistics",
+    "https://www.census.gov/programs-surveys/cbp.html"
    ]
   ],
   "livingWage": {
@@ -48,7 +48,9 @@
   "businesses": {
    "withStaff": 49154,
    "year": 2023,
-   "asOf": "2026-11-28"
+   "asOf": "2026-11-28",
+   "onePerson": 151197,
+   "onePersonYear": 2024
   },
   "people": {
    "total": 1902047,
@@ -56,6 +58,247 @@
    "renters": 0.449,
    "medianRent": 2857,
    "year": "2020-2024 survey",
+   "asOf": "2026-11-28"
+  },
+  "categories": [
+   {
+    "name": "Home improvement and repair",
+    "note": "Plumbing, electrical, roofing, painting, remodeling",
+    "estab": 3021,
+    "workers": 38474,
+    "pay": 100.5,
+    "workersChange": 0,
+    "payChange": 13
+   },
+   {
+    "name": "Landscaping and gardening",
+    "note": "",
+    "estab": 508,
+    "workers": 6005,
+    "pay": 57.6,
+    "workersChange": 5,
+    "payChange": 26
+   },
+   {
+    "name": "Automotive",
+    "note": "General car repair",
+    "estab": 482,
+    "workers": 1877,
+    "pay": 62.8,
+    "workersChange": 6,
+    "payChange": 26
+   },
+   {
+    "name": "Restaurants and cafes",
+    "note": "Sit-down and counter service",
+    "estab": 4104,
+    "workers": 69473,
+    "pay": 32.0,
+    "workersChange": -5,
+    "payChange": 20
+   },
+   {
+    "name": "Catering and events",
+    "note": "",
+    "estab": 586,
+    "workers": 9298,
+    "pay": 44.5,
+    "workersChange": -22,
+    "payChange": 34
+   },
+   {
+    "name": "Groceries and markets",
+    "note": "",
+    "estab": 460,
+    "workers": 15840,
+    "pay": 41.6,
+    "workersChange": 2,
+    "payChange": 21
+   },
+   {
+    "name": "Farming and farm services",
+    "note": "Farm service businesses only. Farms themselves aren't in this count",
+    "estab": 28,
+    "workers": 406,
+    "pay": 62.3,
+    "workersChange": 86,
+    "payChange": 30
+   },
+   {
+    "name": "Wine and beverages",
+    "note": "Wineries",
+    "estab": 34,
+    "workers": 604,
+    "pay": 56.7,
+    "workersChange": -7,
+    "payChange": 16
+   },
+   {
+    "name": "Lodging and tourism",
+    "note": "Hotels and motels",
+    "estab": 260,
+    "workers": 6375,
+    "pay": 48.9,
+    "workersChange": -28,
+    "payChange": 24
+   },
+   {
+    "name": "Dental",
+    "note": "",
+    "estab": 1548,
+    "workers": 9648,
+    "pay": 63.2,
+    "workersChange": -1,
+    "payChange": 15
+   },
+   {
+    "name": "Health care",
+    "note": "Doctors' offices",
+    "estab": 1210,
+    "workers": 10852,
+    "pay": 137.4,
+    "workersChange": 2,
+    "payChange": 15
+   },
+   {
+    "name": "Mental health and counseling",
+    "note": "",
+    "estab": 281,
+    "workers": 3340,
+    "pay": 57.1,
+    "workersChange": 51,
+    "payChange": 27
+   },
+   {
+    "name": "Home care and elder care",
+    "note": "Home health, senior services, nursing homes",
+    "estab": 394,
+    "workers": 15807,
+    "pay": 48.5,
+    "workersChange": -1,
+    "payChange": 9
+   },
+   {
+    "name": "Child care",
+    "note": "",
+    "estab": 803,
+    "workers": 5812,
+    "pay": 44.8,
+    "workersChange": -5,
+    "payChange": 30
+   },
+   {
+    "name": "Legal",
+    "note": "",
+    "estab": 931,
+    "workers": 7893,
+    "pay": 180.5,
+    "workersChange": -3,
+    "payChange": 16
+   },
+   {
+    "name": "Accounting and tax",
+    "note": "CPA offices",
+    "estab": 363,
+    "workers": 7360,
+    "pay": 132.5,
+    "workersChange": 10,
+    "payChange": 24
+   },
+   {
+    "name": "Beauty and personal care",
+    "note": "Hair, nails, barbers",
+    "estab": 987,
+    "workers": 4295,
+    "pay": 30.2,
+    "workersChange": -16,
+    "payChange": 35
+   },
+   {
+    "name": "Fitness and wellness",
+    "note": "",
+    "estab": 309,
+    "workers": 5797,
+    "pay": 24.8,
+    "workersChange": -19,
+    "payChange": 26
+   },
+   {
+    "name": "Pets and vets",
+    "note": "",
+    "estab": 217,
+    "workers": 2392,
+    "pay": 58.9,
+    "workersChange": 0,
+    "payChange": 12
+   },
+   {
+    "name": "Cleaning",
+    "note": "Janitorial services",
+    "estab": 418,
+    "workers": 8794,
+    "pay": 40.4,
+    "workersChange": -29,
+    "payChange": 24
+   },
+   {
+    "name": "Moving and hauling",
+    "note": "",
+    "estab": 58,
+    "workers": 637,
+    "pay": 49.7,
+    "workersChange": -7,
+    "payChange": 8
+   },
+   {
+    "name": "Rentals and property management",
+    "note": "",
+    "estab": 1786,
+    "workers": 8897,
+    "pay": 90.0,
+    "workersChange": -6,
+    "payChange": 12
+   },
+   {
+    "name": "Retail shops",
+    "note": "All stores",
+    "estab": 4260,
+    "workers": 78955,
+    "pay": 55.1,
+    "workersChange": -4,
+    "payChange": 29
+   },
+   {
+    "name": "Manufacturing",
+    "note": "",
+    "estab": 1984,
+    "workers": 93489,
+    "pay": 148.3,
+    "workersChange": 10,
+    "payChange": 22
+   },
+   {
+    "name": "Printing and signs",
+    "note": "",
+    "estab": 125,
+    "workers": 1463,
+    "pay": 62.5,
+    "workersChange": -6,
+    "payChange": 16
+   },
+   {
+    "name": "Tech and computer repair",
+    "note": "",
+    "estab": 2850,
+    "workers": 82924,
+    "pay": 201.8,
+    "workersChange": 14,
+    "payChange": 20
+   }
+  ],
+  "categoriesFrom": {
+   "year": 2023,
+   "since": 2019,
    "asOf": "2026-11-28"
   }
  }
