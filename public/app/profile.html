@@ -29,6 +29,7 @@
           <a href="#s-points">Points</a>
           <a href="#s-skills">Skills</a>
           <a href="#s-work">Work</a>
+          <a href="#s-qol">Quality of life</a>
           <a href="#claimed" id="pnav-claimed" hidden>Claimed businesses</a>
           <a href="#s-biz">Your business</a>
           <a href="#password">Password</a>
@@ -111,6 +112,22 @@
         </form>
       </div>
 
+      <div class="spread" id="s-qol"><h2 class="section-title">Quality of life check, private</h2><button class="btn ghost small edit" type="button" data-edit="qol">Edit</button></div>
+      <div class="card" id="qol">
+        <p class="small muted" style="margin-bottom:10px">Optional, about a minute. Only you see your answers. Rai only shows county totals on the <a href="/app/baselines.html?b=quality">Quality of life baseline</a>, and only once at least 10 people in the county have answered.</p>
+        <div class="qol-view"></div>
+        <form class="qol-form" hidden>
+          <div id="qol-qs"></div>
+          <h3 style="font-size:16px;margin:4px 0 2px">What you really pay a month</h3>
+          <p class="small muted" style="margin:0 0 8px">Leave any line blank. Rai's number for one adult here is shown for comparison.</p>
+          <label class="field">How many people do these costs cover?
+            <select id="qol-people"><option value="1">Just me</option><option value="2">2 people</option><option value="3">3 people</option><option value="4">4 people</option><option value="5">5 people</option><option value="6">6 or more</option></select></label>
+          <div class="qol-costs" id="qol-costs"></div>
+          <label class="field">Paid days off a year <span class="muted">(holidays, vacation and sick days)</span><input id="qol-days" type="number" min="0" max="365" inputmode="numeric"></label>
+          <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small cancel" type="button">Cancel</button><button class="btn ghost small" type="button" id="qol-clear" hidden>Remove my answers</button></div>
+        </form>
+      </div>
+
       <div id="claimed" hidden>
         <h2 class="section-title">Businesses you've claimed</h2>
         <div id="claimlist"></div>
@@ -162,6 +179,7 @@
 </div>
 <script src="/js/vendor/supabase-js-2.118.0.js"></script>
 <script src="/js/config.js"></script>
+<script src="/js/qol.js"></script>
 <script src="/js/profile.js"></script>
 <script src="/js/rai-chat.js"></script>
 <script src="/js/tutorial.js" data-tut="profile"></script>

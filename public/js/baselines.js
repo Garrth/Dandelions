@@ -22,12 +22,13 @@
     var open = board.proposals.filter(function (p) { return p.baseline_key === b.key && K.isOpen(p); });
     box.innerHTML =
       '<div class="page-head"><div class="eyebrow">Baselines</div><h1>Where we\'re starting from.</h1>' +
-      '<p class="muted" style="margin-top:8px">Baselines are the shared starting points Dandelions measures itself against. Members change them together in Talk, and Rai reads them when it answers questions and looks at projects.</p></div>' +
+      '<p class="muted" style="margin-top:8px">Baselines are the shared starting points Dandelions measures itself against. Members change them together in Talk, and Rai reads them when he answers questions and looks at projects.</p></div>' +
       '<div class="bl-tabs" role="tablist">' + board.baselines.map(function (x) {
         return '<a role="tab" href="?b=' + x.key + '" data-key="' + x.key + '"' + (x.key === b.key ? ' aria-selected="true"' : "") + ">" + esc(x.title.replace(/ \(.*\)$/, "")) + "</a>";
       }).join("") + "</div>" +
       '<article class="card bl-base"><h2>' + esc(b.title) + "</h2>" +
       '<p class="small muted">Version ' + b.version + " · updated " + day(b.updated_at) + "</p>" + md(b.body) +
+      (b.key === "quality" && window.QOL ? '<div id="qolbox"></div>' : "") +
       (b.topic_id ? '<div class="bl-talk"><p><b>Want to change it?</b> Propose new wording. It goes to Talk for discussion and a vote by members.</p>' +
         (open.length ? '<p class="small">' + (open.length === 1 ? "1 change is" : open.length + " changes are") + " in progress: " +
           open.map(function (p) { return '<a href="/app/talk.html?p=' + p.talk_post_id + '">' + esc(p.summary) + "</a>"; }).join(", ") + "</p>" : "") +
@@ -39,6 +40,7 @@
           (after && after.talk_post_id ? ' · <a href="/app/talk.html?p=' + after.talk_post_id + '">the change that made it</a>' : "") + "</p>" + md(v.body) + "</div>";
       }).join("") + "</details>" : "") +
       "</article>" + '<div style="margin-top:20px">' + K.howItWorks(board.settings) + "</div>";
+    if (document.getElementById("qolbox")) showQol();
     if (document.getElementById("propose")) document.getElementById("propose").addEventListener("click", function () { proposeForm(b); });
     Array.prototype.forEach.call(box.querySelectorAll(".bl-tabs a"), function (a) {
       a.addEventListener("click", function (e) {
@@ -48,6 +50,26 @@
     });
   }
   function $(id) { return document.getElementById(id); }
+  // Quality of life: what each living-wage item costs here (Rai's numbers) next to what members say they pay,
+  // plus the county results of the private self-check. Uses the member's county, or Sonoma County.
+  var county = "06097", qol = null;
+  function getJSON(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
+  function showQol() {
+    var el = $("qolbox"), Q = window.QOL;
+    function draw() {
+      if (!$("qolbox")) return;
+      $("qolbox").innerHTML = Q.table(qol.rai && qol.rai.yearly && qol.rai.yearly.livingWage, qol.totals, qol.rai && qol.rai.place) +
+        '<div class="card qol-box"><h3>The self-check</h3>' + Q.results(qol.totals) +
+        '<div class="row" style="margin-top:10px"><a class="btn small" href="' + (user ? "/app/profile.html#s-qol" : "/app/login.html") + '">' +
+        (user ? "Do your check" : "Log in to do your check") + '</a></div><p class="small muted" style="margin-top:8px">It takes about a minute. Only you see your answers.</p></div>';
+    }
+    if (qol) return draw();
+    el.innerHTML = '<p class="small muted">Loading the numbers...</p>';
+    Promise.all([
+      getJSON("/data/rai/" + county + ".json").catch(function () { return county === "06097" ? null : getJSON("/data/rai/06097.json").catch(function () { return null; }); }),
+      db.rpc("qol_county", { p_county: county }).then(function (r) { return r.error ? null : r.data; }, function () { return null; })
+    ]).then(function (out) { qol = { rai: out[0], totals: out[1] }; draw(); });
+  }
   function proposeForm(b) {
     var f = $("pbox");
     if (!user) {
@@ -89,6 +111,9 @@
   db.auth.getSession().then(function (r) {
     user = r.data && r.data.session ? r.data.session.user : null;
     if (user) try { localStorage.removeItem("dandelions_return"); } catch (e) {}
+    if (user) db.from("members").select("county_fips").eq("id", user.id).maybeSingle().then(function (m) {
+      if (m.data && m.data.county_fips && m.data.county_fips !== county) { county = m.data.county_fips; qol = null; if ($("qolbox")) showQol(); }
+    });
     return user ? db.from("talk_agreements").select("version").eq("member_id", user.id).maybeSingle().then(function (a) { agreed = !!a.data; }) : null;
   }).then(function () { return K.load(db); }).then(function (b) { board = b; show(); }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t load the baselines. Try refreshing.</p>';
