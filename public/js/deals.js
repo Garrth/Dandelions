@@ -9,11 +9,14 @@ window.Deals = (function () {
   function card(d) {
     var href = d.link || bizLink(d);
     var price = d.price_now ? '<p class="dl-price">' + (d.price_was ? "<s>" + esc(d.price_was) + "</s> " : "") + "<b>" + esc(d.price_now) + "</b></p>" : "";
-    return '<li class="dl-card' + (d.kind === "offer" ? " offer" : "") + '">' +
-      '<p class="dl-from">' + esc(d.name) + (d.town ? " · " + esc(d.town) : d.area === "all" ? " · online" : "") + "</p>" +
+    var spot = /^https:\/\/(www\.)?10spot\.shop(\/|$)/i.test(d.link || "");
+    var go = d.link ? (spot ? "Get it on 10spot" : "Get the deal") : "See the business";
+    return '<li class="dl-card' + (d.kind === "offer" ? " offer" : "") + (d.image ? " has-pic" : "") + '">' +
+      (d.image ? '<img class="dl-pic" src="' + esc(d.image) + '" alt="" loading="lazy">' : "") +
+      '<p class="dl-from">' + esc(d.name) + (d.town ? " · " + esc(d.town) : d.area === "all" && !d.listing_id ? " · online" : "") + "</p>" +
       '<h3 class="dl-title">' + esc(d.title) + "</h3>" + price +
       (d.details ? '<p class="dl-details">' + esc(d.details) + "</p>" : "") +
-      (href ? '<a class="dl-go" href="' + esc(href) + '"' + (d.link ? ' target="_blank" rel="noopener"' : "") + ">" + (d.link ? "Get the deal" : "See the business") + "</a>" : "") +
+      (href ? '<a class="dl-go" href="' + esc(href) + '"' + (d.link ? ' target="_blank" rel="noopener"' : "") + ">" + go + "</a>" : "") +
       "</li>";
   }
   function empty() {

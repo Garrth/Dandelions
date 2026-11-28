@@ -12,3 +12,5 @@
 .dl-zip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; font-size: 15px; color: var(--muted); }
 .dl-zip input { width: 7em; padding: 8px 10px; border: 2px solid var(--line); border-radius: 10px; font: inherit; background: var(--card); color: var(--ink); }
 .dl-zip button { padding: 8px 14px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); font-weight: 700; cursor: pointer; }
+.dl-card.has-pic { overflow: hidden; }
+.dl-pic { display: block; align-self: stretch; width: auto; max-width: none; margin: -16px -18px 4px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 14px 14px 0 0; border-bottom: 2px solid var(--ink); background: var(--line); }
