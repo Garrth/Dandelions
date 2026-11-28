@@ -266,16 +266,3 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
   #app [id] { scroll-margin-top: 8px; }
 }
 
-/* Profile: the private check */
-.qol-q { border: 0; padding: 0; margin: 0 0 14px; }
-.qol-q legend { font-size: 14px; font-weight: 700; margin-bottom: 6px; padding: 0; }
-.qol-opts { display: flex; flex-wrap: wrap; gap: 6px; }
-.qol-opts label { position: relative; }
-.qol-opts input { position: absolute; opacity: 0; inset: 0; }
-.qol-opts span { display: inline-block; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 14px; cursor: pointer; }
-.qol-opts input:checked + span { background: var(--sun); color: var(--sun-ink); border-color: var(--sun); font-weight: 700; }
-.qol-opts input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
-.qol-costs { display: grid; gap: 8px; margin: 6px 0 14px; }
-.qol-cost { display: grid; grid-template-columns: 1fr 110px; gap: 8px; align-items: center; font-size: 14px; }
-.qol-cost small { display: block; color: var(--muted); font-size: 12px; }
-.qol-cost input { width: 100%; padding: 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; text-align: right; }

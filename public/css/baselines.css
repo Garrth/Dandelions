@@ -55,20 +55,46 @@ a.bl-prop:hover { border-color: var(--leaf); }
 .bl-form { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
 .bl-form h3 { font-size: 18px; margin-bottom: 4px; }
 .bl-form .field input { display: block; width: 100%; margin-top: 4px; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-weight: 400; }
-/* Quality of life: living-wage costs and the self-check */
-.qol-box { margin-top: 14px; }
-.qol-box h3 { font-size: 17px; margin-bottom: 4px; }
-.qol-table table { min-width: 0; margin-top: 8px; }
-.qol-table td:nth-child(n+2), .qol-table th:nth-child(n+2) { text-align: right; white-space: nowrap; }
-.qol-total td { border-bottom: 0; }
+/* Quality of life: cost of living and the self-check, in the same square paper look as the project forms. */
+.qf { --paper: #ffffff; --field: #fbfcf6; --auto: #e9f3e4; --fline: #b9c0a6;
+  margin-top: 16px; border: 2px solid var(--ink); background: var(--paper); font-size: 15px; line-height: 1.45; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .qf { --paper: #172113; --field: #131c10; --auto: #1d2e19; --fline: #3d4a35; } }
+:root[data-theme="dark"] .qf { --paper: #172113; --field: #131c10; --auto: #1d2e19; --fline: #3d4a35; }
+.qf * { border-radius: 0; }
+.qf h2 { font-family: var(--display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--bg); padding: 6px 10px; margin: 0; line-height: 1.1; }
+.qf-boxes { display: grid; grid-template-columns: 1fr 1fr; }
+.qf-box { border-right: 1px solid var(--fline); border-bottom: 1px solid var(--fline); padding: 7px 9px 9px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.qf-box:last-child { border-right: 0; }
+.qf-box > label, .qf-box > .l { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.qf-box .v { font-weight: 700; }
+.qf-box small, .qf td small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.qf .auto { background: var(--auto); }
+.qf input, .qf select { width: 100%; border: 1px solid var(--fline); background: var(--field); color: var(--ink); padding: 7px 8px; font: inherit; font-weight: 600; }
+.qf input:disabled, .qf select:disabled { opacity: .6; }
+.qf-tbl { overflow-x: auto; border-bottom: 1px solid var(--fline); }
+.qf table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.qf th, .qf td { border-bottom: 1px solid var(--fline); border-right: 1px solid var(--fline); padding: 6px; text-align: left; vertical-align: middle; }
+.qf th:last-child, .qf td:last-child { border-right: 0; }
+.qf tbody tr:last-child td { border-bottom: 0; }
+.qf th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: transparent; font-weight: 700; }
+.qf td.r, .qf th.r { text-align: right; white-space: nowrap; }
+.qf td.in { padding: 0; width: 96px; }
+.qf td.in input, .qf td.in select { border: 0; background: var(--field); padding: 9px 8px; height: 100%; }
+.qf td.in input { text-align: right; }
+.qf-q td.in { width: 44%; }
+.qf tfoot td { font-weight: 800; border-top: 2px solid var(--ink); border-bottom: 0; }
+.qf-note { margin: 0; padding: 8px 10px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--fline); }
+.qf-note b { color: var(--ink); }
+.qf-foot { padding: 10px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.qf .btn { border-radius: 0; }
 @media (max-width: 600px) {
-  .qol-table table { display: table; }
-  .qol-table thead { display: table-header-group; }
-  .qol-table tbody { display: table-row-group; }
-  .qol-table tr { display: table-row; padding: 0; }
-  .qol-table td { display: table-cell; border-bottom: 1px solid var(--line); padding: 8px 4px; }
-  .qol-table td:first-child { font-weight: 400; }
-  .qol-table td:nth-child(3) { color: inherit; font-size: inherit; }
-  .qol-table td:nth-child(3)::before { content: none; }
-  .qol-table td:nth-child(n+2), .qol-table th:nth-child(n+2) { white-space: normal; }
+  .qf-boxes { grid-template-columns: 1fr; }
+  .qf-box { border-right: 0; }
+  .qf th, .qf td { padding: 5px 4px; font-size: 13px; }
+  .qf td.in { width: 72px; }
+  .qf-q td.in { width: 46%; }
+  .qf-cost td small { display: none; }
+  .qf-cost th { font-size: 10px; letter-spacing: .03em; white-space: normal; }
+  .qf-cost td.r { white-space: normal; }
+  .qf-cost .muted { font-size: 12px; }
 }

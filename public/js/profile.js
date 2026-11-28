@@ -88,7 +88,7 @@
 
   // ---- View and edit modes ----
   // Each part shows as plain text. Edit opens its form; Save and Cancel close it again.
-  var EDIT = { me: ["#me .me-view", "#me .me-form"], skills: ["#skills .sk-view", "#skills .sk-form"], work: ["#work .w-view", "#work .w-form"], qol: ["#qol .qol-view", "#qol .qol-form"], biz: ["#bizcard .b-view", "#biz"] };
+  var EDIT = { me: ["#me .me-view", "#me .me-form"], skills: ["#skills .sk-view", "#skills .sk-form"], work: ["#work .w-view", "#work .w-form"], biz: ["#bizcard .b-view", "#biz"] };
   var redraw = {};
   function q(sel) { return document.querySelector(sel); }
   function editing(part, on) {
@@ -276,70 +276,11 @@
     });
   });
 
-  // ---- Quality of life check (private) ----
-  var qolRow = null, qolRai = {};
-  var Q = window.QOL;
-  var QCOLS = Q.QUESTIONS.map(function (x) { return x[0]; }).concat(Q.ITEMS.map(function (x) { return x[0]; }), ["people", "days_off"]);
-  $("qol-qs").innerHTML = Q.QUESTIONS.map(function (x, i) {
-    var opts = Q.ANSWERS.map(function (a, v) { return [v, a]; });
-    if (x[0] === "q_pay") opts.push([-1, "Doesn't apply"]);
-    return '<fieldset class="qol-q"><legend>' + (i + 1) + ". " + esc(x[2]) + '</legend><div class="qol-opts">' + opts.map(function (o) {
-      return '<label><input type="radio" name="' + x[0] + '" value="' + o[0] + '"><span>' + esc(o[1]) + "</span></label>";
-    }).join("") + "</div>" + (x[0] === "q_pay" ? '<p class="small muted" style="margin:4px 0 0">Doesn\'t apply: retired, caregiving or in school.</p>' : "") + "</fieldset>";
-  }).join("");
-  function drawCosts() {
-    $("qol-costs").innerHTML = Q.ITEMS.map(function (it) {
-      return '<label class="qol-cost"><span>' + esc(it[2]) + "<small>" + esc(it[5] || "") + '<span class="qol-rai" data-k="' + (it[3] || "") + '"></span></small></span>' +
-        '<input type="number" min="0" max="50000" step="1" inputmode="numeric" placeholder="$" id="qol-' + it[0] + '" aria-label="' + esc(it[2]) + ', dollars a month"></label>';
-    }).join("");
+  // ---- Quality of life check (private). Filled in on the Quality of life baseline; this shows a summary. ----
+  function showQol(w) {
+    $("qol-sum").textContent = window.QOL.summary(w);
+    $("qol-go").textContent = w ? "Update it" : "Do your check";
   }
-  drawCosts();
-  function raiHints() {
-    document.querySelectorAll("#qol .qol-rai").forEach(function (el) {
-      var k = el.getAttribute("data-k"), v = k && qolRai[k] != null ? "Rai: " + Q.money(qolRai[k]) : "";
-      el.textContent = v ? (el.parentNode.firstChild && el.parentNode.firstChild.nodeType === 3 && el.parentNode.firstChild.nodeValue ? ". " : "") + v : "";
-    });
-  }
-  function showQol(row) {
-    qolRow = row === undefined ? qolRow : row; var w = qolRow;
-    if (!w) { q("#qol .qol-view").innerHTML = '<p class="small muted">Not answered.</p>'; }
-    else {
-      var five = Q.QUESTIONS.filter(function (x) { return w[x[0]] != null; });
-      var met = five.filter(function (x) { return w[x[0]] === -1 || w[x[0]] >= 3; }).length;
-      var cost = Q.ITEMS.reduce(function (t, it) { return t + (w[it[0]] || 0); }, 0);
-      q("#qol .qol-view").innerHTML = "<p>" + (five.length === 5 ? (met === 5 ? "All five needs met." : met + " of 5 needs met.") : five.length + " of 5 questions answered.") +
-        (cost ? " Your costs add up to " + Q.money(cost) + " a month" + (w.people > 1 ? " for " + w.people + " people" : "") + "." : "") + "</p>" +
-        '<p class="small muted">Updated ' + new Date(w.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) + ". Update it whenever things change.</p>";
-    }
-    Q.QUESTIONS.forEach(function (x) {
-      document.querySelectorAll('#qol input[name="' + x[0] + '"]').forEach(function (r) { r.checked = !!w && w[x[0]] != null && +r.value === w[x[0]]; });
-    });
-    Q.ITEMS.forEach(function (it) { $("qol-" + it[0]).value = w && w[it[0]] != null ? w[it[0]] : ""; });
-    $("qol-people").value = String(Math.min((w && w.people) || 1, 6));
-    $("qol-days").value = w && w.days_off != null ? w.days_off : "";
-    $("qol-clear").hidden = !w;
-  }
-  redraw.qol = function () { showQol(); };
-  function num(id, max) { var v = $(id).value.trim(); if (v === "") return null; var n = Math.round(+v); return isFinite(n) && n >= 0 && n <= max ? n : NaN; }
-  q("#qol .qol-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var row = { member_id: user.id, people: +$("qol-people").value, updated_at: new Date().toISOString() }, bad = false;
-    Q.QUESTIONS.forEach(function (x) { var c = document.querySelector('#qol input[name="' + x[0] + '"]:checked'); row[x[0]] = c ? +c.value : null; });
-    Q.ITEMS.forEach(function (it) { row[it[0]] = num("qol-" + it[0], it[0] === "c_housing" ? 50000 : it[0] === "c_phone" ? 5000 : 20000); if (row[it[0]] !== row[it[0]]) bad = true; });
-    row.days_off = num("qol-days", 365); if (row.days_off !== row.days_off) bad = true;
-    if (bad) { toast("Check the numbers. Whole dollars, and not too big."); return; }
-    if (QCOLS.every(function (k) { return k === "people" || row[k] == null; })) { toast("Answer at least one question first"); return; }
-    db.from("qol_checks").upsert(row).then(function (r) {
-      if (r.error) { toast("Couldn't save. Try again."); return; }
-      qolRow = row; editing("qol", false); toast("Saved. Only you can see these.");
-    });
-  });
-  $("qol-clear").addEventListener("click", function () {
-    db.from("qol_checks").delete().eq("member_id", user.id).then(function (r) {
-      if (r.error) { toast("Couldn't remove them. Try again."); return; }
-      qolRow = null; editing("qol", false); toast("Removed");
-    });
-  });
 
   // ---- Your business ----
   var biz = null;
@@ -480,7 +421,7 @@
       db.from("accept_pledges").select("points").eq("member_id", user.id).eq("listing_id", "").maybeSingle(),
       db.from("listing_claims").select("county_fips,family,listing_id,listing_name,verified_at").eq("member_id", user.id).eq("status", "verified").order("verified_at", { ascending: true }),
       db.from("accept_pledges").select("county_fips,listing_id,points").eq("member_id", user.id).neq("listing_id", ""),
-      db.from("qol_checks").select(QCOLS.join(",") + ",updated_at").eq("member_id", user.id).maybeSingle()
+      db.from("qol_checks").select(window.QOL.COLS.join(",")).eq("member_id", user.id).maybeSingle()
     ]).then(function (out) {
       var m = out[0].data || {}, c = m.county_fips && out[4][m.county_fips];
       $("where").textContent = c ? c[0] + ", " + c[1] : m.zip ? "ZIP " + m.zip : "Member";
@@ -490,10 +431,6 @@
       loadPhoto().then(showMe); showSkills(); loadPerms();
       showWork(out[2].data);
       showQol(out[9].error ? null : out[9].data);
-      fetch("/data/rai/" + (m.county_fips || "06097") + ".json").then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
-        qolRai = (d && d.yearly && d.yearly.livingWage && d.yearly.livingWage.monthly) || {};
-        raiHints();
-      });
       showBiz(out[5].data); loadBusy(); showPledge(out[6]);
       showClaimed(out[7].data, out[8].data);
       $("reflink").textContent = location.host + "/?ref=" + (m.referral_code || "");
@@ -514,7 +451,6 @@
       $("loading").hidden = true; $("app").hidden = false; $("signout").hidden = false;
       $("pnav-claimed").hidden = $("claimed").hidden;
       if (location.hash === "#pledge" && !$("pledge").hidden) $("pledge").scrollIntoView();
-      if (location.hash === "#s-qol") { $("s-qol").scrollIntoView(); editing("qol", true); }
       if (location.hash === "#password" && $("pwform")) { $("pwform").scrollIntoView(); if ($("newpw")) $("newpw").focus(); }
     });
   });
