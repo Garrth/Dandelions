@@ -103,7 +103,7 @@ window.QOL = (function () {
         '<p class="qf-note">Rai found is for one adult, from the MIT Living Wage Calculator' + (R.lw.updated ? " (" + esc(R.lw.updated) + ")" : "") +
           (m.zipRent ? ", with living space from the Census (median " + esc(m.zipRent) + " rent with utilities in your ZIP)" : "") + "." +
           (R.lw.oneAdult ? " For " + esc(raiPlace) + ", that's a living wage of $" + R.lw.oneAdult.toFixed(2) + " an hour working full time." : "") +
-          " Members say is the middle answer per person from members here, once 10 fill in a line. It's what people typed, so take it with a grain of salt.</p>" +
+          " Members say is the middle answer per person from members here, once 10 fill in a line.</p>" +
         "<h2>The self-check, private</h2>" +
         '<div class="qf-tbl"><table class="qf-q"><thead><tr><th>Question</th><th>Your answer</th></tr></thead><tbody>' + qRows + "</tbody></table></div>" +
         '<p class="qf-note">' + results() + "</p>" +
