@@ -23,7 +23,7 @@ body:has(.sendbar):not(:has(.tabs)) { padding-bottom: 0; }
 .tk { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 24px; align-items: start; }
 .tk.side-off { grid-template-columns: minmax(0, 1fr); }
 .tk.side-off .tk-side { display: none; }
-.tk-side { position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; border-right: 1px solid var(--line); padding-right: 16px; }
+.tk-side { position: sticky; top: calc(var(--top-h) + 12px); max-height: calc(100vh - var(--top-h) - 24px); overflow: auto; border-right: 1px solid var(--line); padding-right: 16px; }
 .tk-place { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; margin-bottom: 14px; }
 .tk-place select { height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 0 8px; font-weight: 400; font-size: 15px; }
 .tk-sidehead { margin-bottom: 6px; }

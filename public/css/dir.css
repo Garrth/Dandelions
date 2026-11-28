@@ -18,10 +18,10 @@ body.dir { padding-bottom: 32px; }
 .dir .locpanel .go { background: #15210f; color: #fdfdf8; border: 0; }
 .dir .locpanel .alt { background: #fff; color: #15210f; border: 1px solid #c4cab6; }
 .dir .locpanel .err { color: #b5541c; font-size: 14px; }
-.dir .letters { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 2px; padding: 6px 0; position: sticky; top: 0; background: var(--soft); z-index: 2; border-bottom: 1px solid var(--line); }
+.dir .letters { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 2px; padding: 6px 0; position: sticky; top: var(--top-h); background: var(--soft); z-index: 2; border-bottom: 1px solid var(--line); }
 .dir .letters a, .dir .letters span { height: 34px; display: flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; color: var(--ink); }
 .dir .letters span { color: var(--muted); font-weight: 400; opacity: .6; }
-.dir .letterhead { font-family: var(--display); font-weight: 800; font-size: 24px; background: var(--sun); color: #15210f; border-radius: 8px; padding: 2px 10px; margin: 16px 0 4px; scroll-margin-top: 50px; }
+.dir .letterhead { font-family: var(--display); font-weight: 800; font-size: 24px; background: var(--sun); color: #15210f; border-radius: 8px; padding: 2px 10px; margin: 16px 0 4px; scroll-margin-top: 42px; }
 .dir .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 0; min-height: 44px; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
 .dir .row:hover b, .dir .row:hover .name { text-decoration: underline; }
 .dir .row .n { font-size: 13px; color: var(--muted); white-space: nowrap; }

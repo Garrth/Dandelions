@@ -55,7 +55,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .navlinks { display: flex; align-items: center; gap: 14px; }
 .navlinks a:not(.btn) { color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none; }
 .navlinks a:not(.btn):hover { text-decoration: underline; }
-.top { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; }
+/* The top bar stays put while the page scrolls under it. --top-h is its height, so other sticky bars sit just below it. */
+:root { --top-h: 62px; }
+html { scroll-padding-top: calc(var(--top-h) + 8px); }
+.top { display: flex; align-items: center; justify-content: space-between; padding-block: 14px; position: sticky; top: 0; z-index: 30; background: var(--bg); margin-inline: -16px; padding-inline: 16px; }
 .brand { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-weight: 800; font-size: 20px; color: var(--ink); text-decoration: none; }
 .who { font-size: 14px; color: var(--ink); font-weight: 700; text-decoration: none; }
 
@@ -248,17 +251,17 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padd
 .botcheck { margin: 8px 0; }
 
 /* Profile section menu: fixed column on wide screens, a sticky "Sections" button on phones. */
-.pnav { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 8px 0; margin: 0 -16px; padding-inline: 16px; }
+.pnav { position: sticky; top: var(--top-h); z-index: 20; background: var(--bg); padding: 8px 0; margin: 0 -16px; padding-inline: 16px; }
 .pnav-btn { font: inherit; font-weight: 700; font-size: 15px; background: var(--card); color: var(--ink); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
 .pnav-list { display: none; position: absolute; left: 16px; top: 100%; min-width: 220px; background: var(--card); border: 2px solid var(--ink); border-radius: 14px; padding: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
 .pnav.open .pnav-list { display: grid; }
 .pnav-list a { display: block; padding: 10px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; font-weight: 600; }
 .pnav-list a:hover, .pnav-list a:focus-visible { background: var(--bg); }
-#app [id] { scroll-margin-top: 64px; }
+#app [id] { scroll-margin-top: 56px; }
 @media (min-width: 1140px) {
   .pnav { position: fixed; top: 110px; left: calc(50% - 360px - 200px); width: 180px; margin: 0; padding: 0; background: none; }
   .pnav-btn { display: none; }
   .pnav-list { display: grid; position: static; min-width: 0; border: 0; box-shadow: none; background: none; padding: 0; gap: 2px; }
   .pnav-list a { padding: 7px 12px; font-size: 15px; }
-  #app [id] { scroll-margin-top: 16px; }
+  #app [id] { scroll-margin-top: 8px; }
 }
