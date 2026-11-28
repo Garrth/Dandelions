@@ -50,26 +50,10 @@
     });
   }
   function $(id) { return document.getElementById(id); }
-  // Quality of life: what each living-wage item costs here (Rai's numbers) next to what members say they pay,
-  // plus the county results of the private self-check. Uses the member's county, or Sonoma County.
-  var county = "06097", qol = null;
-  function getJSON(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(u); return r.json(); }); }
-  function showQol() {
-    var el = $("qolbox"), Q = window.QOL;
-    function draw() {
-      if (!$("qolbox")) return;
-      $("qolbox").innerHTML = Q.table(qol.rai && qol.rai.yearly && qol.rai.yearly.livingWage, qol.totals, qol.rai && qol.rai.place) +
-        '<div class="card qol-box"><h3>The self-check</h3>' + Q.results(qol.totals) +
-        '<div class="row" style="margin-top:10px"><a class="btn small" href="' + (user ? "/app/profile.html#s-qol" : "/app/login.html") + '">' +
-        (user ? "Do your check" : "Log in to do your check") + '</a></div><p class="small muted" style="margin-top:8px">It takes about a minute. Only you see your answers.</p></div>';
-    }
-    if (qol) return draw();
-    el.innerHTML = '<p class="small muted">Loading the numbers...</p>';
-    Promise.all([
-      getJSON("/data/rai/" + county + ".json").catch(function () { return county === "06097" ? null : getJSON("/data/rai/06097.json").catch(function () { return null; }); }),
-      db.rpc("qol_county", { p_county: county }).then(function (r) { return r.error ? null : r.data; }, function () { return null; })
-    ]).then(function (out) { qol = { rai: out[0], totals: out[1] }; draw(); });
-  }
+  // Quality of life: the cost of living table and the private self-check (see qol.js).
+  // Uses the member's county and ZIP, or Sonoma County when signed out.
+  var where = { county: "06097", zip: "" };
+  function showQol() { window.QOL.mount($("qolbox"), { db: db, user: user, county: where.county, zip: where.zip }); }
   function proposeForm(b) {
     var f = $("pbox");
     if (!user) {
@@ -111,10 +95,10 @@
   db.auth.getSession().then(function (r) {
     user = r.data && r.data.session ? r.data.session.user : null;
     if (user) try { localStorage.removeItem("dandelions_return"); } catch (e) {}
-    if (user) db.from("members").select("county_fips").eq("id", user.id).maybeSingle().then(function (m) {
-      if (m.data && m.data.county_fips && m.data.county_fips !== county) { county = m.data.county_fips; qol = null; if ($("qolbox")) showQol(); }
-    });
-    return user ? db.from("talk_agreements").select("version").eq("member_id", user.id).maybeSingle().then(function (a) { agreed = !!a.data; }) : null;
+    var mem = user ? db.from("members").select("county_fips,zip").eq("id", user.id).maybeSingle().then(function (m) {
+      if (m.data) { where.county = m.data.county_fips || where.county; where.zip = m.data.zip || ""; }
+    }, function () {}) : null;
+    return Promise.all([mem, user ? db.from("talk_agreements").select("version").eq("member_id", user.id).maybeSingle().then(function (a) { agreed = !!a.data; }) : null]);
   }).then(function () { return K.load(db); }).then(function (b) { board = b; show(); }).catch(function () {
     box.innerHTML = '<p class="note">Couldn\'t load the baselines. Try refreshing.</p>';
   });

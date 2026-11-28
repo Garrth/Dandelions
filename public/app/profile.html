@@ -112,20 +112,11 @@
         </form>
       </div>
 
-      <div class="spread" id="s-qol"><h2 class="section-title">Quality of life check, private</h2><button class="btn ghost small edit" type="button" data-edit="qol">Edit</button></div>
+      <h2 class="section-title" id="s-qol">Quality of life check, private</h2>
       <div class="card" id="qol">
-        <p class="small muted" style="margin-bottom:10px">Optional, about a minute. Only you see your answers. Rai only shows county totals on the <a href="/app/baselines.html?b=quality">Quality of life baseline</a>, and only once at least 10 people in the county have answered.</p>
-        <div class="qol-view"></div>
-        <form class="qol-form" hidden>
-          <div id="qol-qs"></div>
-          <h3 style="font-size:16px;margin:4px 0 2px">What you really pay a month</h3>
-          <p class="small muted" style="margin:0 0 8px">Leave any line blank. Rai's number for one adult here is shown for comparison.</p>
-          <label class="field">How many people do these costs cover?
-            <select id="qol-people"><option value="1">Just me</option><option value="2">2 people</option><option value="3">3 people</option><option value="4">4 people</option><option value="5">5 people</option><option value="6">6 or more</option></select></label>
-          <div class="qol-costs" id="qol-costs"></div>
-          <label class="field">Paid days off a year <span class="muted">(holidays, vacation and sick days)</span><input id="qol-days" type="number" min="0" max="365" inputmode="numeric"></label>
-          <div class="row"><button class="btn small" type="submit">Save</button><button class="btn ghost small cancel" type="button">Cancel</button><button class="btn ghost small" type="button" id="qol-clear" hidden>Remove my answers</button></div>
-        </form>
+        <p id="qol-sum">Loading...</p>
+        <p class="small muted" style="margin-top:6px">Five questions and what you really pay a month. Only you see your answers. Rai only shows county totals, once at least 10 people in the county answer.</p>
+        <a class="btn small" id="qol-go" href="/app/baselines.html?b=quality#qolbox" style="margin-top:10px">Do your check</a>
       </div>
 
       <div id="claimed" hidden>
