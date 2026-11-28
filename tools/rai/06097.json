@@ -8,7 +8,7 @@
  "regionName": "West",
  "warnCounty": "Sonoma",
  "yearly": {
-  "pulled": "Oct 30, 2026",
+  "pulled": "Nov 28, 2026",
   "people": {
    "total": 486444,
    "households": 190998,
@@ -18,8 +18,9 @@
   },
   "businesses": {
    "withStaff": 14572,
-   "onePerson": 44462,
-   "year": 2023
+   "year": 2023,
+   "asOf": "2026-11-28",
+   "onePerson": 44462
   },
   "livingWage": {
    "oneAdult": 31.3,
@@ -37,8 +38,9 @@
     "health": 318,
     "taxes": 1003,
     "total": 5425,
-    "note": "MIT Living Wage Calculator, one adult with no children, Sonoma County, Feb 2026. Housing includes utilities. Other is clothing, personal care, household items and civic life."
-   }
+    "note": "MIT Living Wage Calculator, one adult with no children. Housing includes utilities. Other is clothing, personal care, household items and civic life."
+   },
+   "asOf": "2026-11-28"
   },
   "categories": [
    {
@@ -285,16 +287,16 @@
     "https://www.census.gov/quickfacts/fact/table/sonomacountycalifornia/INC110219"
    ],
    [
-    "Census County Business Patterns, 2019 and 2023",
-    "https://www.census.gov/programs-surveys/cbp.html"
-   ],
-   [
     "CSLB Public Data Portal, licenses by county",
     "https://www.cslb.ca.gov/onlineservices/dataportal/"
    ],
    [
-    "MIT Living Wage Calculator, Sonoma County",
+    "MIT Living Wage Calculator",
     "https://livingwage.mit.edu/counties/06097"
+   ],
+   [
+    "Census County Business Patterns and Nonemployer Statistics",
+    "https://www.census.gov/programs-surveys/cbp.html"
    ]
   ]
  }

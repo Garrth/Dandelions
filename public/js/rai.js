@@ -77,8 +77,9 @@
     var Y = d.yearly || {}, W = d.working || {}, LW = Y.livingWage || {}, P = Y.people || {}, B = Y.businesses || {};
     var h = "";
     h += '<div class="page-head"><div class="eyebrow">Rai\'s numbers</div><h1>' + esc(d.place) + " by the numbers.</h1>" +
-      "<p>Public numbers Rai, our AI, uses to spot what's getting better and what's getting worse. They update on their own every week.</p></div>";
-    if (missing) h += '<p class="note" style="margin-bottom:14px">Your county doesn\'t have its numbers yet. Here are ' + esc(d.place) + "'s, the first county. More counties come as people join.</p>";
+      "<p>Public numbers Rai, our AI, uses to spot what's getting better and what's getting worse. They update on their own every week.</p>" +
+      '<label class="rai-pick">Showing <select id="pick" aria-label="Pick a county"><option value="' + esc(d.fips) + '">' + esc(d.place) + "</option></select></label></div>";
+    if (missing) h += '<p class="note" style="margin-bottom:14px">Your county doesn\'t have its numbers yet. Here are ' + esc(d.place) + "'s. More counties come as people join.</p>";
 
     // Dandelions here: live, from the database.
     h += '<h2 class="section-title">Dandelions here</h2><div class="rai-tiles" id="live">' +
@@ -148,7 +149,7 @@
       h += '<h2 class="section-title">Who lives and works here</h2><div class="rai-tiles">' +
         (P.total ? tile("People", fmt(P.total), "Households " + fmt(P.households) + ", " + Math.round(P.renters * 100) + "% rent. " + esc(P.year) + ".") : "") +
         (P.medianRent ? tile("Median rent", money(P.medianRent, 0) + "<small> a month</small>", "Census, " + esc(P.year) + ".") : "") +
-        (B.withStaff ? tile("Businesses", fmt(B.withStaff) + "<small> with staff</small>", fmt(B.onePerson) + " more are one person working alone. " + esc(B.year) + ".", true) : "") +
+        (B.withStaff ? tile("Businesses", fmt(B.withStaff) + "<small> with staff</small>", (B.onePerson ? fmt(B.onePerson) + " more are one person working alone. " : "") + esc(B.year) + ".", true) : "") +
         "</div>";
     }
     if (Y.categories && Y.categories.length) {
@@ -163,6 +164,12 @@
         '<p class="muted">Yearly numbers last updated ' + esc(Y.pulled) + ". Want another number here? Say so in Talk.</p></div>";
     }
     box.innerHTML = h;
+    // County picker: every county with numbers. Picking one opens its page.
+    getJSON("/data/rai/counties-list.json").then(function (list) {
+      var sel = $("pick"); if (!sel || !list.length) return;
+      sel.innerHTML = list.map(function (c) { return '<option value="' + esc(c.fips) + '"' + (c.fips === d.fips ? " selected" : "") + ">" + esc(c.name) + "</option>"; }).join("");
+      sel.addEventListener("change", function () { location.href = "/app/rai.html?c=" + encodeURIComponent(sel.value); });
+    }).catch(function () {});
 
     if (Y.categories && Y.categories.length) {
       var q = "";

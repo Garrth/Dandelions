@@ -243,6 +243,11 @@ def main():
         c = json.load(open(p))
         counties[c['fips']] = c
     os.makedirs(OUT, exist_ok=True)
+    # The list of counties with numbers, for the county picker on Rai's numbers.
+    listing = [{'fips': f, 'name': c['name']} for f, c in sorted(counties.items(), key=lambda x: x[1]['name'])]
+    lpath = os.path.join(OUT, 'counties-list.json')
+    if not os.path.exists(lpath) or json.load(open(lpath)) != listing:
+        json.dump(listing, open(lpath, 'w'), separators=(',', ':'))
     try:
         warn = pull_warn({f: c for f, c in counties.items() if c.get('state') == 'CA'})
     except Exception as e:

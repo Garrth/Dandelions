@@ -25,6 +25,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install openpyxl==3.1.5
+      - name: Yearly numbers (MIT living wage, Census), only when due
+        env:
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+        run: python3 tools/rai_yearly.py
       - name: Pull the numbers
         env:
           BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
@@ -41,7 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git add public/data/rai
+          git add public/data/rai tools/rai
           if git diff --cached --quiet; then
             echo "Nothing changed."
             exit 0
