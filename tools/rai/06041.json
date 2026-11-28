@@ -1,0 +1,50 @@
+{
+ "fips": "06041",
+ "name": "Marin County, CA",
+ "state": "CA",
+ "laus": "LAUCN0604100000000",
+ "ces": "SMU0642034",
+ "cesName": "San Rafael area (Marin)",
+ "cpiRegion": "0400",
+ "regionName": "West",
+ "warnCounty": "Marin",
+ "yearly": {
+  "pulled": "Nov 28, 2026",
+  "priceRise2019to2023": 19,
+  "sources": [
+   [
+    "MIT Living Wage Calculator",
+    "https://livingwage.mit.edu/counties/06041"
+   ],
+   [
+    "Census County Business Patterns and Nonemployer Statistics",
+    "https://www.census.gov/programs-surveys/cbp.html"
+   ]
+  ],
+  "livingWage": {
+   "oneAdult": 36.36,
+   "oneAdultOneChild": 71.62,
+   "twoWorkingTwoKids": 50.48,
+   "minimum": 16.9,
+   "yearly": 75600,
+   "updated": "Feb 2026",
+   "monthly": {
+    "housing": 2450,
+    "food": 513,
+    "other": 739,
+    "phone": 138,
+    "transport": 824,
+    "health": 318,
+    "taxes": 1320,
+    "total": 6302,
+    "note": "MIT Living Wage Calculator, one adult with no children. Housing includes utilities. Other is clothing, personal care, household items and civic life."
+   },
+   "asOf": "2026-11-28"
+  },
+  "businesses": {
+   "withStaff": 10049,
+   "year": 2023,
+   "asOf": "2026-11-28"
+  }
+ }
+}

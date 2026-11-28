@@ -1,0 +1,50 @@
+{
+ "fips": "06001",
+ "name": "Alameda County, CA",
+ "state": "CA",
+ "laus": "LAUCN0600100000000",
+ "ces": "SMU0636084",
+ "cesName": "Oakland, Fremont and Berkeley area",
+ "cpiRegion": "0400",
+ "regionName": "West",
+ "warnCounty": "Alameda",
+ "yearly": {
+  "pulled": "Nov 28, 2026",
+  "priceRise2019to2023": 19,
+  "sources": [
+   [
+    "MIT Living Wage Calculator",
+    "https://livingwage.mit.edu/counties/06001"
+   ],
+   [
+    "Census County Business Patterns and Nonemployer Statistics",
+    "https://www.census.gov/programs-surveys/cbp.html"
+   ]
+  ],
+  "livingWage": {
+   "oneAdult": 32.31,
+   "oneAdultOneChild": 62.53,
+   "twoWorkingTwoKids": 44.65,
+   "minimum": 16.9,
+   "yearly": 67200,
+   "updated": "Feb 2026",
+   "monthly": {
+    "housing": 2152,
+    "food": 424,
+    "other": 739,
+    "phone": 160,
+    "transport": 754,
+    "health": 313,
+    "taxes": 1060,
+    "total": 5602,
+    "note": "MIT Living Wage Calculator, one adult with no children. Housing includes utilities. Other is clothing, personal care, household items and civic life."
+   },
+   "asOf": "2026-11-28"
+  },
+  "businesses": {
+   "withStaff": 42318,
+   "year": 2023,
+   "asOf": "2026-11-28"
+  }
+ }
+}

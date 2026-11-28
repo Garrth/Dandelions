@@ -118,7 +118,7 @@ Joining means saying three things: this work matters; the way we do things now w
   - Before posting, members agree to the Talk rules: be kind, be constructive, no haters, no spam or scams, keep private information private.
   - A post flagged by 3 different ID-checked members is hidden until a moderator looks at it. Anyone can flag (up to 10 a day), and moderators see every flag. Moderators can hide posts, put them back, and pause someone for breaking the rules. Everything a moderator does is logged.
   - Talk is the place to ask people questions, suggest changes to the site, or ask for a new number on Rai's numbers.
-- Rai's numbers, /app/rai.html : public numbers for the county, updated automatically every week.
+- Rai's numbers, /app/rai.html : public numbers for the county, updated automatically every week. It covers the 9 Bay Area counties (Alameda, Contra Costa, Marin, Napa, San Francisco, San Mateo, Santa Clara, Solano, Sonoma). It opens on your own county; the Showing dropdown at the top switches to any of the others. Other counties see Sonoma's numbers with a note until theirs are added. Yearly numbers (MIT living wage, Census people and businesses) refresh on their own about once a year.
   - Jobs and pay, plus prices for basics like eggs, milk, bread, ground beef, gas and electricity. The prices are regional averages for the West, eggs are the US average.
   - Price changes over a year, layoffs reported through California WARN notices, who lives and works here, and local business categories against the living wage.
   - Live Dandelions totals: pledges, verified businesses, and work-question totals once 10 people answer.

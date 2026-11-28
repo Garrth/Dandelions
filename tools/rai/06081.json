@@ -1,0 +1,50 @@
+{
+ "fips": "06081",
+ "name": "San Mateo County, CA",
+ "state": "CA",
+ "laus": "LAUCN0608100000000",
+ "ces": "SMU0641884",
+ "cesName": "San Francisco and San Mateo area",
+ "cpiRegion": "0400",
+ "regionName": "West",
+ "warnCounty": "San Mateo",
+ "yearly": {
+  "pulled": "Nov 28, 2026",
+  "priceRise2019to2023": 19,
+  "sources": [
+   [
+    "MIT Living Wage Calculator",
+    "https://livingwage.mit.edu/counties/06081"
+   ],
+   [
+    "Census County Business Patterns and Nonemployer Statistics",
+    "https://www.census.gov/programs-surveys/cbp.html"
+   ]
+  ],
+  "livingWage": {
+   "oneAdult": 38.44,
+   "oneAdultOneChild": 75.07,
+   "twoWorkingTwoKids": 51.73,
+   "minimum": 16.9,
+   "yearly": 79900,
+   "updated": "Feb 2026",
+   "monthly": {
+    "housing": 2742,
+    "food": 452,
+    "other": 739,
+    "phone": 166,
+    "transport": 785,
+    "health": 325,
+    "taxes": 1452,
+    "total": 6661,
+    "note": "MIT Living Wage Calculator, one adult with no children. Housing includes utilities. Other is clothing, personal care, household items and civic life."
+   },
+   "asOf": "2026-11-28"
+  },
+  "businesses": {
+   "withStaff": 21569,
+   "year": 2023,
+   "asOf": "2026-11-28"
+  }
+ }
+}

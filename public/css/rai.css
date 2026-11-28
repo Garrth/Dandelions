@@ -27,3 +27,5 @@
 .spark { grid-column: 1 / -1; display: block; color: var(--ink); margin: 4px 0 0; }
 .spark svg { display: block; width: 100%; height: 44px; }
 .spark-ends { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.rai-pick { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-weight: 700; font-size: 14px; }
+.rai-pick select { flex: 1; max-width: 320px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
