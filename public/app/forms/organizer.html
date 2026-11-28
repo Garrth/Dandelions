@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://cdn.plaid.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://utduohtyjbbcnzxfmutp.supabase.co; font-src 'self'; media-src 'self'; connect-src 'self' https://utduohtyjbbcnzxfmutp.supabase.co wss://utduohtyjbbcnzxfmutp.supabase.co https://*.plaid.com; frame-src https://challenges.cloudflare.com https://cdn.plaid.com https://*.plaid.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community organizer form | Dandelions</title>
+  <meta name="description" content="Start a Community organizer project: meetups, events and business outreach.">
+  <meta name="theme-color" content="#ffd21a">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/forms.css">
+<style>
+/* Layout: one paper-style form of square boxes, plus a strip of saved forms on top. */
+:root {
+  --bg: #fdfdf8; --paper: #ffffff; --ink: #15210f; --muted: #5a6652; --line: #b9c0a6;
+  --sun: #ffd21a; --sun-soft: #fff4b8; --leaf: #2d7a34; --warn: #b5541c; --lock: #eef0e6; --field: #fbfcf6; --auto: #e9f3e4;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10170d; --paper: #172113; --ink: #eef2e4; --muted: #a9b59f; --line: #3d4a35;
+  --sun-soft: #3d3816; --leaf: #7fcf72; --warn: #f0995e; --lock: #1f2b1a; --field: #131c10; --auto: #1d2e19; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10170d; --paper: #172113; --ink: #eef2e4; --muted: #a9b59f; --line: #3d4a35;
+  --sun-soft: #3d3816; --leaf: #7fcf72; --warn: #f0995e; --lock: #1f2b1a; --field: #131c10; --auto: #1d2e19; color-scheme: dark }
+* { box-sizing: border-box; border-radius: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.45 var(--body); }
+.wrap { max-width: 900px; margin: 0 auto; padding-block: 20px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 6vw, 38px); font-weight: 800; }
+h2 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--bg); padding: 6px 10px; grid-column: 1 / -1; }
+.tag { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); }
+.lede { color: var(--muted); margin: 6px 0 14px; max-width: 64ch; }
+button { font: inherit; color: inherit; cursor: pointer; }
+.btn { background: var(--sun); color: #15210f; border: 2px solid var(--ink); padding: 8px 14px; font-weight: 800; }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--sun); outline-offset: 1px; }
+
+.saved { border: 2px solid var(--ink); background: var(--paper); padding: 10px; margin-bottom: 16px; display: grid; gap: 8px; }
+.saved .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chipbtn { border: 1.5px solid var(--ink); background: var(--field); padding: 4px 10px; font-size: 13px; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chipbtn.on { background: var(--ink); color: var(--bg); }
+#status { font-size: 13px; color: var(--muted); }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 700; }
+.toggle input { width: auto; }
+
+.form { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 2px solid var(--ink); background: var(--paper); }
+.box { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 7px 9px 9px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.box > label, .box > .l { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.box small { color: var(--muted); font-size: 12px; }
+.s2 { grid-column: span 2; } .s3 { grid-column: span 3; } .s4 { grid-column: span 4; } .s6 { grid-column: span 6; }
+input, select, textarea { width: 100%; border: 1px solid var(--line); background: var(--field); color: var(--ink); padding: 7px 8px; font: inherit; font-weight: 600; }
+textarea { resize: vertical; min-height: 64px; }
+textarea.tall { min-height: 130px; }
+.auto { background: var(--auto); }
+.auto .v { font-weight: 700; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1.5px solid var(--leaf); color: var(--leaf); padding: 1px 8px; font-size: 12px; font-weight: 700; }
+.chip.bad { border-color: var(--warn); color: var(--warn); }
+.calc { font-family: var(--display); font-size: 20px; font-weight: 800; }
+
+.tbl { overflow-x: auto; grid-column: 1 / -1; border-bottom: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; min-width: 600px; }
+th, td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 4px; text-align: left; vertical-align: middle; }
+th { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 6px; }
+td input, td select { border: 0; background: transparent; padding: 5px; }
+td .oth { border-top: 1px dashed var(--line); }
+td.r, th.r { text-align: right; white-space: nowrap; }
+td.r input { text-align: right; }
+td.x { width: 32px; text-align: center; border-right: 0; }
+td.x button { border: 0; background: none; color: var(--warn); font-weight: 800; }
+tfoot td { font-weight: 800; padding: 6px; }
+.addrow { padding: 6px 9px; grid-column: 1 / -1; border-bottom: 1px solid var(--line); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.warn { color: var(--warn); font-weight: 700; }
+.tier.over { color: var(--warn); }
+.foot { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 640px) {
+  .form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .s2, .s3, .s4, .s6 { grid-column: span 2; }
+}
+</style><style>
+[hidden] { display: none !important; }
+td.ro { padding: 6px; font-weight: 600; }
+.go { padding: 10px; grid-column: 1 / -1; border-bottom: 1px solid var(--line); font-weight: 700; }
+.go a { color: var(--leaf); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="tag back" href="/app/work.html#dandelions/organizer">&larr; Community organizer</a>
+  <h1>Community organizer</h1>
+  <p class="viewonly">View only for now. Saving and sending open when points open.</p>
+  <p class="lede">Fill out one form for each meetup, event or round of business outreach. Each form is its own project you get paid for. Green boxes fill in from your profile.</p>
+
+  <form id="f" autocomplete="off">
+    <div class="foot" style="margin:0 0 12px"><button class="btn" type="submit">Save</button><button class="btn ghost cancel" type="button">Clear</button><span class="st" style="font-size:13px;color:var(--muted)"></span></div>
+    <div class="form">
+      <h2>Who and what</h2>
+      <div class="box s3"><label for="business">Project owner (your business)</label><select id="business"></select><small>Fills in from your profile.</small></div>
+      <div class="box s3 auto"><span class="l">From your profile</span><div class="chips" id="ownerChips"></div></div>
+      <div class="box s3"><label for="kind">Kind of work</label><select id="kind"></select></div>
+      <div class="box s3 main"><label for="name">Project name</label><input id="name" maxlength="90"></div>
+      <div class="box s6 main auto"><span class="l">What this kind of work is</span><span id="kdesc"></span></div>
+      <div class="go sw" hidden>Spread the word has its own form: <a href="/app/forms/spread.html">open the Spread the word form</a>. New sign-ups from your events and outreach are paid there.</div>
+
+      <h2 class="main" id="locHead">Event location</h2>
+      <div class="box s2 main ev"><label for="venue">Name of the place</label><input id="venue" placeholder="Like: Acme Cafe, Saturday farmers market"></div>
+      <div class="box s2 main ev"><label for="address">Address</label><input id="address" placeholder="Street, town"></div>
+      <div class="box s2 main ob"><label for="meet">How you'll meet</label><select id="meet"><option>In person (encouraged)</option><option>Video call (businesses already signed up)</option></select></div>
+      <div class="box s2 main auto"><label for="county">County</label><input id="county"><small>From your profile. Change it if it's wrong.</small></div>
+
+      <h2 class="main">Price</h2>
+      <div class="tbl main"><table>
+        <thead><tr><th>Item</th><th class="r">Price</th><th>Per</th><th>Paid</th></tr></thead>
+        <tbody id="price"></tbody>
+      </table></div>
+      <div class="addrow main"><small>Prices are set for now. Members can vote to change them.</small></div>
+
+      <h2 class="main">Milestones and goals</h2>
+      <div class="box s2 main"><label for="often">How often</label><select id="often"><option>One time</option><option>Every week</option><option>Every 2 weeks</option><option>Every month</option></select></div>
+      <div class="box s2 main"><label for="start">Start</label><input id="start" type="date"></div>
+      <div class="box s2 main" id="finWrap"><label for="finish">Finish</label><input id="finish" type="date"></div>
+      <div class="box s3 main"><label for="goal" id="goalLabel">Goal</label><select id="goal"></select><input id="goalOther" class="oth" type="number" min="1" placeholder="Number" hidden></div>
+      <div class="box s3 main auto"><span class="l">Points at goal, each time</span><span class="calc" id="each">0</span></div>
+      <div class="tbl main"><table>
+        <thead><tr><th>#</th><th>Date</th><th class="r">Goal</th><th class="r">Points at goal</th><th>Verified</th><th class="r">Points paid</th></tr></thead>
+        <tbody id="ms"></tbody>
+        <tfoot><tr><td colspan="3">Total at goal</td><td class="r" id="total">0</td><td></td><td class="r">0</td></tr></tfoot>
+      </table></div>
+      <div class="addrow main"><small id="msNote"></small></div>
+
+      <h2 class="main ob">Your businesses</h2>
+      <div class="box s6 main ob"><label for="bizList">Businesses you'll work with</label><textarea id="bizList" placeholder="One per line"></textarea><small>While a business is on your list, other organizers can't work with it. It can switch organizers anytime, and comes off your list after 60 days without a check-in. Be helpful, not pushy.</small></div>
+
+      <h2>Suggestion box</h2>
+      <div class="box s6"><label for="notes">Suggestions for Rai: what felt wrong, missing or confusing on this form?</label><textarea id="notes" placeholder="A box you needed, a box you didn't, a dropdown choice that's missing."></textarea></div>
+    </div>
+    <div class="foot"><button class="btn" type="submit">Save</button><button class="btn ghost cancel" type="button">Clear</button><span class="st" style="font-size:13px;color:var(--muted)"></span></div>
+  </form>
+</div>
+
+<script src="/js/vendor/supabase-js-2.118.0.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/forms/organizer.js"></script>
+<script src="/js/rai-chat.js"></script>
+</body>
+</html>

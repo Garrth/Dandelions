@@ -1,0 +1,7 @@
+/* Project start forms (/app/forms/). Page styles are inline in each form. */
+@font-face { font-family: "Bricolage Grotesque"; src: url("/fonts/bricolage-grotesque.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url("/fonts/figtree.woff2") format("woff2"); font-weight: 300 900; font-display: swap; }
+body { margin: 0; }
+a.tag.back { text-decoration: none; display: inline-block; margin-bottom: 6px; }
+a.tag.back:hover { text-decoration: underline; }
+.viewonly { background: var(--sun-soft); border: 2px solid var(--ink); padding: 8px 12px; font-weight: 700; margin: 10px 0 0; }
