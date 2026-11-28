@@ -10,11 +10,12 @@
  "yearly": {
   "pulled": "Nov 28, 2026",
   "people": {
-   "total": 486444,
+   "total": 485040,
    "households": 190998,
    "renters": 0.374,
    "medianRent": 2158,
-   "year": "July 2025"
+   "year": "2020-2024 survey",
+   "asOf": "2026-11-28"
   },
   "businesses": {
    "withStaff": 14572,
@@ -297,6 +298,10 @@
    [
     "Census County Business Patterns and Nonemployer Statistics",
     "https://www.census.gov/programs-surveys/cbp.html"
+   ],
+   [
+    "Census American Community Survey, 2020-2024",
+    "https://data.census.gov/"
    ]
   ]
  }

@@ -19,6 +19,10 @@
    [
     "Census County Business Patterns and Nonemployer Statistics",
     "https://www.census.gov/programs-surveys/cbp.html"
+   ],
+   [
+    "Census American Community Survey, 2020-2024",
+    "https://data.census.gov/"
    ]
   ],
   "livingWage": {
@@ -44,6 +48,14 @@
   "businesses": {
    "withStaff": 7755,
    "year": 2023,
+   "asOf": "2026-11-28"
+  },
+  "people": {
+   "total": 451918,
+   "households": 157512,
+   "renters": 0.37,
+   "medianRent": 2163,
+   "year": "2020-2024 survey",
    "asOf": "2026-11-28"
   }
  }
