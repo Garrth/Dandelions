@@ -29,6 +29,7 @@
       '<article class="card bl-base"><h2>' + esc(b.title) + "</h2>" +
       '<p class="small muted">Version ' + b.version + " · updated " + day(b.updated_at) + "</p>" + md(b.body) +
       (b.key === "quality" && window.QOL ? '<div id="qolbox"></div>' : "") +
+      (b.key === "ei" && window.EI ? '<div id="eibox"></div>' : "") +
       (b.topic_id ? '<div class="bl-talk"><p><b>Want to change it?</b> Propose new wording. It goes to Talk for discussion and a vote by members.</p>' +
         (open.length ? '<p class="small">' + (open.length === 1 ? "1 change is" : open.length + " changes are") + " in progress: " +
           open.map(function (p) { return '<a href="/app/talk.html?p=' + p.talk_post_id + '">' + esc(p.summary) + "</a>"; }).join(", ") + "</p>" : "") +
@@ -41,6 +42,7 @@
       }).join("") + "</details>" : "") +
       "</article>" + '<div style="margin-top:20px">' + K.howItWorks(board.settings) + "</div>";
     if (document.getElementById("qolbox")) showQol();
+    if (document.getElementById("eibox")) window.EI.mount($("eibox"), { db: db, user: user, county: where.county });
     if (document.getElementById("propose")) document.getElementById("propose").addEventListener("click", function () { proposeForm(b); });
     Array.prototype.forEach.call(box.querySelectorAll(".bl-tabs a"), function (a) {
       a.addEventListener("click", function (e) {
